@@ -1,0 +1,214 @@
+﻿@model CDQ.Models.Helper.HelpEsercente
+
+@{
+    ViewData["Title"] = "Profilo Esercente";
+}
+
+<br />
+<br />
+
+<div class="columns">
+    <div class="column is-offset-1 is-1">
+        <a asp-action="Index" class="button back">
+            <span class="icon">
+                <i class="fas fa-backward"></i>
+            </span>
+        </a>
+    </div>
+    <div class="column is-8" align="center">
+        <h1 class="title is-4">Aggiorna Profilo Esercente</h1>
+    </div>
+    <div class="column is-1" align="right">
+
+    </div>
+</div>
+
+<form method="post" id="formEsercente">
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="columns">
+
+        <div class="column is-10 is-offset-1">
+
+            <div class="panel">
+
+                <div class="panel-heading">Profilo Esercente</div>
+
+                <div class="panel-block">
+
+                    <div class="container">
+                        <div class="column">
+
+                            @Html.HiddenFor(model => Model.Esercente.ID)
+                            @Html.HiddenFor(model => Model.Upd)
+
+                            @for (var i = 0; i < Model.ListaCategorie.Count(); i++)
+                            {
+                                @Html.HiddenFor(model => Model.ListaCategorie[i].Text)
+                                @Html.HiddenFor(model => Model.ListaCategorie[i].Value)
+                            }
+
+                            @for (var i = 0; i < Model.ListaOrari.Count(); i++)
+                            {
+                                @Html.HiddenFor(model => Model.ListaOrari[i].Text)
+                                @Html.HiddenFor(model => Model.ListaOrari[i].Value)
+                            }
+
+                            @for (var i = 0; i < Model.ListaSlot.Count(); i++)
+                            {
+                                @Html.HiddenFor(model => Model.ListaSlot[i].Text)
+                                @Html.HiddenFor(model => Model.ListaSlot[i].Value)
+                            }
+
+
+                            <div class="columns">
+                                <div class="column is-10">
+                                    <div class="control is-expanded">
+                                        <label class="label">Ragione Sociale</label>
+                                        <div class="field">
+                                            <input asp-for="Esercente.RagioneSociale" class="input" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column is-2">
+                                    <label class="label"><br /></label>
+                                    <button type="submit" class="button is-dark">Aggiorna</button>
+                                </div>
+                            </div>
+
+                            <div class="columns">
+                                <div class="column is-3">
+                                    <div class="control is-expanded">
+                                        <label class="label">Telefono</label>
+                                        <div class="field">
+                                            <input asp-for="Esercente.Telefono" class="input" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column is-9">
+                                    <div class="control is-expanded">
+                                        <label class="label">Indirizzo</label>
+                                        <div class="field">
+                                            <input asp-for="Esercente.Indirizzo" class="input" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="columns">
+                                <div class="column is-3">
+                                    <div class="control is-expanded">
+                                        <label class="label">CAP</label>
+                                        <div class="field">
+                                            <input asp-for="Esercente.CAP" class="input" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column is-6">
+                                    <div class="control is-expanded">
+                                        <label class="label">Città</label>
+                                        <div class="field">
+                                            <input asp-for="Esercente.Comune" class="input" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column is-3">
+                                    <div class="control is-expanded">
+                                        <label class="label">Provincia</label>
+                                        <div class="field">
+                                            <input asp-for="Esercente.Provincia" class="input" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="columns">
+                                <div class="column is-7">
+                                    <div class="control is-expanded">
+                                        <label class="label">Sito web</label>
+                                        <div class="field">
+                                            <input asp-for="Esercente.Sitoweb" class="input" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column is-5">
+                                    <div class="field">
+                                        <label asp-for="Esercente.Categoria" class="label"></label>
+                                        <div class="select">
+                                            <select asp-for="IDCategoria" asp-items="Model.ListaCategorie">
+                                                <option hidden disabled selected>Selezionare la Categoria aziendale</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="columns">
+                                <div class="column is-4">
+                                    <div class="control is-expanded">
+                                        <label class="label">Mail</label>
+                                        <div class="field">
+                                            <input asp-for="Esercente.Mail" class="input" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column is-4">
+                                    <div class="control is-expanded">
+                                        <label class="label">PEC</label>
+                                        <div class="field">
+                                            <input asp-for="Esercente.PEC" class="input" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column is-4">
+                                    <div class="control is-expanded">
+                                        <label class="label">SDI</label>
+                                        <div class="field">
+                                            <input asp-for="Esercente.SDI" class="input" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="columns">
+                                <div class="column is-4">
+                                    <div class="field">
+                                        <label asp-for="Esercente.OraInizio" class="label">Orario Inizio Attività</label>
+                                        <div class="select">
+                                            <select asp-for="IDOraInizio" asp-items="Model.ListaOrari">
+                                                <option hidden disabled selected>Selezionare l'orario</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column is-4">
+                                    <div class="field">
+                                        <label asp-for="Esercente.OraFine" class="label">Orario Fine Attività</label>
+                                        <div class="select">
+                                            <select asp-for="IDOraFine" asp-items="Model.ListaOrari">
+                                                <option hidden disabled selected>Selezionare l'orario</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column is-4">
+                                    <div class="field">
+                                        <label asp-for="Esercente.MinutiSlot" class="label">Durata minima delle attività</label>
+                                        <div class="select">
+                                            <select asp-for="IDSlot" asp-items="Model.ListaSlot">
+                                                <option hidden disabled selected>Durata minima attività</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>

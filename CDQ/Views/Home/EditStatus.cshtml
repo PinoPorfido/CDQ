@@ -1,0 +1,56 @@
+﻿@model CDQ.Models.Helper.HelpStatus
+
+@{
+    ViewData["Title"] = "Status Pratica";
+}
+
+<br />
+<br />
+
+<div class="columns">
+    <div class="column is-offset-3 is-1">
+        <a asp-action="Status" asp-route-Ins="true" class="button back">
+            <span class="icon">
+                <i class="fas fa-backward"></i>
+            </span>
+        </a>
+    </div>
+    <div class="column is-4" align="center">
+        <h1 class="title is-4">@(Model.Del ? "Elimina" : Model.Ins ? "Inserisci" : "Aggiorna") Status Pratica</h1>
+    </div>
+</div>
+
+<div class="column is-6 is-offset-3">
+    <div class="panel">
+        <div class="panel-heading">Status Pratica</div>
+        <div class="panel-block">
+            <div class="container">
+                <form method="post">
+
+                    <div class="column is-full">
+
+                        @Html.HiddenFor(model => Model.Status.ID)
+                        @Html.HiddenFor(model => Model.Status.IsSistema)
+                        @Html.HiddenFor(model => Model.Status.User)
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="control is-expanded">
+                            <div class="field">
+                                <input asp-for="Status.Descrizione" readonly="@Model.Del" ? true : false" class="input" />
+                                @Html.ValidationMessageFor(m => m.Status.Descrizione, "", new { @class = "help help-message" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="column is-full">
+
+                        <button type="submit" class="button is-dark">@(Model.Del ? "Elimina" : Model.Ins ? "Inserisci" : "Aggiorna")</button>
+
+                    </div>
+
+                </form>               
+            </div>
+        </div>
+    </div>
+</div>

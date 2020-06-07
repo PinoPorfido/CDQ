@@ -1,0 +1,651 @@
+﻿@model CDQ.Models.Helper.HelpAttivitaRisorse
+
+@{
+    ViewData["Title"] = "Attività & Risorse";
+}
+
+<script>
+    function visualizzaTab(tab) {
+
+        document.getElementById('Tab').value = tab;
+
+        if (tab == 1 || tab == 2) {
+            if (tab == "1") document.getElementById("tab1").classList.add("is-active");
+            else document.getElementById("tab1").classList.remove("is-active");
+
+            if (tab == "2") document.getElementById("tab2").classList.add("is-active");
+            else document.getElementById("tab2").classList.remove("is-active");
+
+            document.getElementById("div1").style.display = tab == "1" ? "block" : "none";
+            document.getElementById("div2").style.display = tab == "2" ? "block" : "none";
+
+            //verifico se c'è un tab secondario acceso altrimenti accendo il primo
+            if (document.getElementById("div4").style.display == "none") {
+                document.getElementById("tab4").classList.remove("is-active");
+
+                document.getElementById("div4").style.display = "block";
+            }
+        }
+
+        else if (tab == 4) {
+            if (tab == "4") document.getElementById("tab4").classList.add("is-active");
+            else document.getElementById("tab4").classList.remove("is-active");
+
+            document.getElementById("div4").style.display = tab == "4" ? "block" : "none";
+
+
+            if (document.getElementById("div1").style.display == "none" && document.getElementById("div2").style.display == "none") {
+                document.getElementById("tab1").classList.remove("is-active");
+                document.getElementById("tab2").classList.remove("is-active");
+
+                document.getElementById("tab1").classList.add("is-active");
+                document.getElementById("div1").style.display = "block";
+            }
+        }
+
+    }</script>
+
+<script>
+    function valida(campo, valore, lista) {
+        var optionFound = false;
+        var datalist = document.getElementById(lista);
+        var val = document.getElementById(campo).value;
+        for (var j = 0; j < datalist.options.length; j++) {
+            if (val == datalist.options[j].value) {
+                optionFound = true;
+                document.getElementById(valore).value = datalist.options[j].id;
+                document.getElementById("buttonSearch").disabled = false;
+                break;
+            }
+        }
+        if (!optionFound) {
+            document.getElementById(campo).value = "";
+            document.getElementById(valore).value = "";
+            document.getElementById("buttonSearch").disabled = true;
+
+        }
+
+    }</script>
+
+<br />
+<br />
+
+<div class="columns">
+    <div class="column is-3 is-offset-1" align="left">
+        <a asp-action="Index" class="button back">
+            <span class="icon">
+                <i class="fas fa-backward"></i>
+            </span>
+        </a>
+    </div>
+    <div class="column is-4" align="center">
+        <h1 class="title is-4">Configurazione delle Attività e delle Risorse</h1>
+    </div>
+    <div class="column is-3" align="right">
+
+
+    </div>
+</div>
+
+<form method="post">
+
+    @Html.HiddenFor(model => Model.Esercente.ID)
+    @Html.HiddenFor(model => Model.Ins)
+    @Html.HiddenFor(model => Model.Tab)
+
+    @for (var i = 0; i < Model.ListaAttivit.Count(); i++)
+    {
+        @Html.HiddenFor(model => Model.ListaAttivit[i].Text)
+        @Html.HiddenFor(model => Model.ListaAttivit[i].Value)
+    }
+
+    @for (var i = 0; i < Model.ListaRisors.Count(); i++)
+    {
+        @Html.HiddenFor(model => Model.ListaRisors[i].Text)
+        @Html.HiddenFor(model => Model.ListaRisors[i].Value)
+    }
+
+    <div asp-validation-summary="ModelOnly" class="help help-message"></div>
+    <div class="columns">
+        <div class="column is-10 is-offset-1">
+            <div class="panel">
+                <div class="panel-heading">
+                    <div class="columns">
+                        <div class="column is-8" align="left">
+                            <p>Configurazione Esercizio: Attività e Risorse</p>
+                        </div>
+                        <div class="column is-6" align="right">
+                        </div>
+                    </div>
+                </div>
+
+                <p class="panel-tabs">
+                    <a id="tab1" onclick="visualizzaTab('1')" class='@(Model.Tab==1 ? "is-active":"")'>Attività</a>
+                    <a id="tab2" onclick="visualizzaTab('2')" class='@(Model.Tab==2 ? "is-active":"")'>Risorse</a>
+                </p>
+
+                <div id="div1" style='display:@(Model.Tab==1 ? "block":"none")'>
+
+                    <div class="panel-block">
+                        <div class="container">
+                            <div class="panel-heading">
+                                <h6 class="title" style="font-size:small">Attività</h6>
+                            </div>
+                            <div class="column">
+
+                                <table class="table is-fullwidth">
+                                    <thead>
+                                        <tr>
+                                            <th width="100%">Descrizione</th>
+                                            <th align="center">Aggiorna</th>
+                                            <th align="center">Elimina</th>
+                                        </tr>
+                                    <tbody>
+                                        @if (Model.ListaAttivita != null)
+                                        {
+                                            @foreach (var item in Model.ListaAttivita)
+                                            {
+                                            <tr>
+                                                <td style="font-family:'Arial Narrow'">
+                                                    @Html.DisplayFor(modelItem => item.Descrizione)
+                                                </td>
+
+                                                <td style="font-family:'Arial Narrow'" align="center">
+                                                    <a title="aggiorna dati" onclick="setModalAttivita('@item.ID','@item.Descrizione');">
+                                                        <span>
+                                                            <span class="icon">
+                                                                <i class="fas fa-edit"></i>
+                                                            </span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+
+                                                <td align="center">
+                                                    <a id="@item.ID" asp-action="EliminaAttivita" asp-route-ID="@Model.Esercente.ID" onclick="return confirmElimina(this.id)" asp-route-IDAttivita="@item.ID" title="elimina Attività">
+                                                        <span>
+                                                            <span class="icon">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                            </span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td>
+                                                <a onclick="setModalAttivita()" data-tooltip="Nuova Attività">
+                                                    <span class="icon"><i class="fas fa-file-medical"></i></span>
+                                                </a>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="div2" style='display:@(Model.Tab==2 ? "block":"none")'>
+
+                    <div class="panel-block">
+                        <div class="container">
+                            <div class="panel-heading">
+                                <h6 class="title" style="font-size:small">Risorse</h6>
+                            </div>
+                            <div class="column">
+
+                                <table class="table is-fullwidth">
+                                    <thead>
+                                        <tr>
+                                            <th width="90%">Descrizione</th>
+                                            <th align="center" width="10%">Capienza</th>
+                                            <th align="center">Aggiorna</th>
+                                            <th align="center">Elimina</th>
+                                        </tr>
+                                    <tbody>
+                                        @if (Model.ListaRisorse != null)
+                                        {
+                                            @foreach (var item in Model.ListaRisorse)
+                                            {
+                                        <tr>
+                                            <td style="font-family:'Arial Narrow'">
+                                                @Html.DisplayFor(modelItem => item.Descrizione)
+                                            </td>
+
+                                            <td style="font-family:'Arial Narrow'" align="center">
+                                                @Html.DisplayFor(modelItem => item.Capienza)
+                                            </td>
+
+
+                                            <td align="center">
+                                                <a title="aggiorna dati" onclick="setModalRisorsa('@item.ID','@item.Descrizione','@item.Capienza');">
+                                                    <span>
+                                                        <span class="icon">
+                                                            <i class="fas fa-edit"></i>
+                                                        </span>
+                                                    </span>
+                                                </a>
+                                            </td>
+                                            <td align="center">
+                                                <a id="@item.ID" asp-action="EliminaRisorsa" asp-route-ID="@Model.Esercente.ID" onclick="return confirmElimina(this.id)" asp-route-IDRisorsa="@item.ID" title="elimina Risorsa">
+                                                    <span>
+                                                        <span class="icon">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </span>
+                                                    </span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td>
+                                                <a onclick="setModalRisorsa()" data-tooltip="Nuova Risorsa">
+                                                    <span class="icon"><i class="fas fa-file-medical"></i></span>
+                                                </a>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
+<div class="columns">
+
+    <div class="column is-10 is-offset-1">
+
+        <nav class="panel">
+            <p class="panel-heading">
+                Assegnazione delle Risorse alle Attività
+            </p>
+            <p class="panel-tabs">
+                <a id="tab4" onclick="visualizzaTab('4')" class='@(Model.Tab==4 ? "is-active":"")'>Assegnazione delle Risorse alle Attività</a>
+            </p>
+
+
+            <div id="div4" style='display:@(Model.Tab==4 || Model.Tab==1 ? "block":"none")'>
+                <div class="panel-block">
+                    <div class="container">
+                        <div class="column">
+                            <table class="table is-fullwidth">
+                                <thead>
+                                    <tr>
+                                        <th width="45%">Attività</th>
+                                        <th width="45%">Risorsa</th>
+                                        <th width="10%">Capienza</th>
+                                        <th align="center">Aggiorna</th>
+                                        <th align="center">Elimina</th>
+                                    </tr>
+                                <tbody>
+                                    @foreach (var item in Model.ListaRisorseAttivita)
+                                    {
+                                        <tr>
+                                            <td style="font-family:'Arial Narrow'">
+                                                @Html.DisplayFor(modelItem => item.Attivita.Descrizione)
+                                            </td>
+
+                                            <td style="font-family:'Arial Narrow'">
+                                                @Html.DisplayFor(modelItem => item.Risorsa.Descrizione)
+                                            </td>
+
+                                            <td style="font-family:'Arial Narrow'" align="center">
+                                                @Html.DisplayFor(modelItem => item.Capienza)
+                                            </td>
+
+                                            <td align="center">
+                                                <a title="aggiorna dati" onclick="setModalRisorsaAttivita('@item.ID','@item.Attivita.ID','@item.Risorsa.ID','@item.Capienza');">
+                                                    <span>
+                                                        <span class="icon">
+                                                            <i class="fas fa-edit"></i>
+                                                        </span>
+                                                    </span>
+                                                </a>
+                                            </td>
+                                            <td align="center">
+                                                <a id="@item.ID" asp-action="EliminaRisorsaAttivita" asp-route-ID="@Model.Esercente.ID" onclick="return confirmElimina(this.id)" asp-route-IDRisorsaAttivita="@item.ID" title="elimina Associazione Attività-Risorsa">
+                                                    <span>
+                                                        <span class="icon">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </span>
+                                                    </span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td>
+                                            <a onclick="setModalRisorsaAttivita()" data-tooltip="Nuova Associazione Attività-Risorsa">
+                                                <span class="icon"><i class="fas fa-file-medical"></i></span>
+                                            </a>
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </nav>
+    </div>
+</div>
+
+
+<div id="modal-RisorsaAttivita" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <form id="formInsRisorsaAttivita" asp-action="InserisciRisorsaAttivita">
+
+            <header class="modal-card-head">
+                <p id="pTitoloRisorsaAttivita" class="modal-card-title">Inserisci Associazione Attività-Risorsa</p>
+                <button class="delete" type="reset" onclick="cancelModalRisorsaAttivita()"></button>
+            </header>
+            <section class="modal-card-body">
+                <input asp-for="Esercente.ID" type="hidden">
+                <input asp-for="Tab" value="4" type="hidden">
+                <input asp-for="ModeRisorsaAttivita" value="Ins" type="hidden">
+                <input asp-for="IDRisorsaAttivita" type="hidden">
+
+                <div class="columns">
+                    <div class="column is-6">
+                        <label class="label">Attività</label>
+                        <div class="select">
+                            <select id="select_attivita" asp-for="IDAttivita" asp-items="Model.ListaAttivit">
+                                <option value=0>Seleziona un'Attività</option>
+                            </select>
+                            <label id="labelMessage" class="help-message help"></label>
+                        </div>
+                    </div>
+                    <div class="column is-6">
+                        <label class="label">Risorsa</label>
+                        <div class="select">
+                            <select id="select_risorsa" asp-for="IDRisorsa" asp-items="Model.ListaRisors">
+                                <option value=0>Seleziona una Risorsa</option>
+                            </select>
+                            <label id="labelMessage" class="help-message help"></label>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="columns">
+                    <div class="column is-4">
+                        <div class="field">
+                            <label class="label">Capienza</label>
+                            <input id="CapienzaRisorsaAttivita" asp-for="RisorsaAttivita.Capienza" class="input">
+                        </div>
+                    </div>
+                </div>
+
+
+            </section>
+            <footer class="modal-card-foot">
+                <button id="buttonRisorsaAttivitaOk" type="button" onclick="form.submit()" class="button is-dark">Aggiungi</button>
+                <button type="button" class="button is-dark" onclick="cancelModalRisorsaAttivita()">Annulla</button>
+            </footer>
+        </form>
+    </div>
+</div>
+
+
+<div id="modal-Attivita" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <form id="formInsAttivita" asp-action="InserisciAttivita">
+
+            <header class="modal-card-head">
+                <p id="pTitoloAttivita" class="modal-card-title">Inserisci Attivita</p>
+                <button class="delete" type="reset" onclick="cancelModalAttivita()"></button>
+            </header>
+            <section class="modal-card-body">
+                <input asp-for="Esercente.ID" type="hidden">
+                <input asp-for="Tab" value="1" type="hidden">
+                <input asp-for="ModeAttivita" value="Ins" type="hidden">
+                <input asp-for="IDAttivita" type="hidden">
+
+                <div class="columns">
+                    <div class="column is-fullwidth">
+                        <div class="field">
+                            <label class="label">Descrizione Attività</label>
+                            <input id="DescrizioneAttivita" asp-for="Attivita.Descrizione" class="input">
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+            <footer class="modal-card-foot">
+                <button id="buttonAttivitaOk" type="button" onclick="form.submit()" class="button is-dark">Aggiungi</button>
+                <button type="button" class="button is-dark" onclick="cancelModalAttivita()">Annulla</button>
+            </footer>
+        </form>
+    </div>
+</div>
+
+<div id="modal-Risorsa" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <form id="formInsRisorsa" asp-action="InserisciRisorsa">
+
+            <header class="modal-card-head">
+                <p id="pTitoloRisorsa" class="modal-card-title">Inserisci Risorsa</p>
+                <button class="delete" type="reset" onclick="cancelModalRisorsa()"></button>
+            </header>
+            <section class="modal-card-body">
+                <input asp-for="Esercente.ID" type="hidden">
+                <input asp-for="Tab" value="1" type="hidden">
+                <input asp-for="ModeRisorsa" value="Ins" type="hidden">
+                <input asp-for="IDRisorsa" type="hidden">
+
+                <div class="columns">
+                    <div class="column is-fullwidth">
+                        <div class="field">
+                            <label class="label">Descrizione Risorsa</label>
+                            <input id="DescrizioneRisorsa" asp-for="Risorsa.Descrizione" class="input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="columns">
+                    <div class="column is-4">
+                        <div class="field">
+                            <label class="label">Capienza</label>
+                            <input id="CapienzaRisorsa" asp-for="Risorsa.Capienza" class="input">
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+            <footer class="modal-card-foot">
+                <button id="buttonRisorsaOk" type="button" onclick="form.submit()" class="button is-dark">Aggiungi</button>
+                <button type="button" class="button is-dark" onclick="cancelModalRisorsa()">Annulla</button>
+            </footer>
+        </form>
+    </div>
+</div>
+
+
+
+
+<div id="modal-elimina" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Attenzione</p>
+            <button class="delete" type="reset" onclick="document.getElementById('Elimina').value = 'N';cancelModalElimina()"></button>
+        </header>
+        <section class="modal-card-body">
+            <p>Eliminare l'informazione selezionata?</p>
+            <input id="IDCaller" type="hidden" />
+            <input id="Elimina" type="hidden" value="N" />
+        </section>
+        <footer class="modal-card-foot">
+            <button type="button" onclick="document.getElementById('Elimina').value = 'S';cancelModalElimina();document.getElementById(document.getElementById('IDCaller').value).click()" class="button is-dark">Elimina</button>
+            <button type="button" class="button is-dark" onclick="document.getElementById('Elimina').value = 'N';cancelModalElimina()">Annulla</button>
+        </footer>
+    </div>
+</div>
+
+
+<script>
+
+    function confirmElimina(id) {
+        setModalElimina(id);
+        return document.getElementById('Elimina').value == "S";
+    }
+
+
+    function setModalElimina(id) {
+
+
+        document.getElementById("IDCaller").value = id;
+
+        document.getElementById("modal-elimina").classList.add("is-active");
+
+    }
+
+    function cancelModalElimina() {
+
+        document.getElementById("modal-elimina").classList.remove("is-active");
+
+    }
+
+    function setModalRisorsaAttivita(id, AttivitaID, RisorsaID, Capienza) {
+        if (typeof id == "undefined") {
+            document.getElementById('ModeRisorsaAttivita').value = 'Ins';
+            document.getElementById("buttonRisorsaAttivitaOk").innerHTML = "Inserisci";
+            document.getElementById("pTitoloRisorsaAttivita").innerHTML = "Inserisci Associazione Attività-Risorsa";
+
+            document.getElementById("IDRisorsaAttivita").value = "";
+            document.getElementById("select_attivita").value = "0";
+            document.getElementById("select_risorsa").value = "0";
+            document.getElementById("CapienzaRisorsaAttivita").value = "0";
+
+        }
+        else {
+            document.getElementById('ModeRisorsaAttivita').value = 'Upd';
+            document.getElementById("buttonRisorsaAttivitaOk").innerHTML = "Aggiorna";
+            document.getElementById("pTitoloRisorsaAttivita").innerHTML = "Aggiorna Associazione Attività-Risorsa";
+
+            document.getElementById("IDRisorsaAttivita").value = id;
+            document.getElementById("select_attivita").value = AttivitaID;
+            document.getElementById("select_risorsa").value = RisorsaID;
+            document.getElementById("CapienzaRisorsaAttivita").value = Capienza;
+
+        }
+
+        document.getElementById("modal-RisorsaAttivita").classList.add("is-active");
+
+    }
+
+    function cancelModalRisorsaAttivita() {
+
+        document.getElementById("modal-RisorsaAttivita").classList.remove("is-active");
+
+    }
+
+    function setModalAttivita(id, Descrizione) {
+        if (typeof id == "undefined") {
+            document.getElementById('ModeAttivita').value = 'Ins';
+            document.getElementById("buttonAttivitaOk").innerHTML = "Inserisci";
+            document.getElementById("pTitoloAttivita").innerHTML = "Inserisci Attività";
+
+            document.getElementById("IDAttivita").value = "";
+            document.getElementById("DescrizioneAttivita").value = "";
+        }
+        else {
+            document.getElementById('ModeAttivita').value = 'Upd';
+            document.getElementById("buttonAttivitaOk").innerHTML = "Aggiorna";
+            document.getElementById("pTitoloAttivita").innerHTML = "Aggiorna Attività";
+
+            document.getElementById("IDAttivita").value = id;
+            document.getElementById("DescrizioneAttivita").value = Descrizione;
+        }
+
+        document.getElementById("modal-Attivita").classList.add("is-active");
+
+    }
+
+    function cancelModalAttivita() {
+
+        document.getElementById("modal-Attivita").classList.remove("is-active");
+
+    }
+
+    function setModalRisorsa(id, Descrizione, Capienza) {
+        if (typeof id == "undefined") {
+            document.getElementById('ModeRisorsa').value = 'Ins';
+            document.getElementById("buttonRisorsaOk").innerHTML = "Inserisci";
+            document.getElementById("pTitoloRisorsa").innerHTML = "Inserisci Risorsa";
+
+            document.getElementById("IDRisorsa").value = "";
+            document.getElementById("DescrizioneRisorsa").value = "";
+            document.getElementById("CapienzaRisorsa").value = "0";
+        }
+        else {
+            document.getElementById('ModeRisorsa').value = 'Upd';
+            document.getElementById("buttonRisorsaOk").innerHTML = "Aggiorna";
+            document.getElementById("pTitoloRisorsa").innerHTML = "Aggiorna Risorsa";
+
+            document.getElementById("IDRisorsa").value = id;
+            document.getElementById("DescrizioneRisorsa").value = Descrizione;
+            document.getElementById("CapienzaRisorsa").value = Capienza;
+        }
+
+        document.getElementById("modal-Risorsa").classList.add("is-active");
+
+    }
+
+    function cancelModalRisorsa() {
+
+        document.getElementById("modal-Risorsa").classList.remove("is-active");
+
+    }
+
+
+
+</script>

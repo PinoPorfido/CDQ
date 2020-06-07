@@ -1,0 +1,191 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - CDQ</title>
+
+    <link rel="stylesheet" href="~/css/site.css?20200406" />
+
+    <script defer src="~/lib/fontawesome/js/all.js"></script>
+
+    <link rel="stylesheet" href="/lib/bulma/css/bulma.css">
+
+    <link rel="stylesheet" href="/lib/bulma/css/bulma-tooltip.min.css">
+
+    <link rel="stylesheet" href="/lib/bulma/css/bulma-extensions.min.css">
+
+    <script src="~/lib/bulma/js/bulma-tagsinput.min.js"></script>
+
+</head>
+<body class="body-content">
+    <header>
+        <nav style="height:80px" class="navbar has-shadow is-spaced">
+            <div class="navbar-brand">
+                <a class="navbar-icon" asp-action="Index">
+                    <img src="~/images/CDQ.jpg" width="70">
+                </a>
+
+                <div class="navbar-menu" asp-action="Index">
+                    <a class="navbar-item" asp-action="Index">
+
+                        @if (HttpContextAccessor.HttpContext.Session.GetString("username") != null)
+                        {
+                            <p style="width:200px;text-align:center;vertical-align:central"><span style="font-size:xx-large;color:steelblue;font-weight:bold">C.D.Q.</span></p>
+                        }
+                        else
+                        {
+                            <p><span style="font-size:x-large;color:steelblue;font-weight:bold">Cosa Dove Quando - Sistema di Prenotazione Integrata</span></p>
+                        }
+                    </a>
+                </div>
+                <div id="navbarBurger" class="navbar-burger burger" onclick="document.querySelector('#navbarMenu').classList.toggle('is-active');" data-target="navbarMenu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+
+            @if (HttpContextAccessor.HttpContext.Session.GetString("username") != null)
+            {
+
+
+                <div id="navbarMenu" class="navbar-menu">
+                    <div class="navbar-start">
+
+                        <div class="navbar-item has-dropdown is-hoverable">
+                            <a class="navbar-link">
+                                <span class="icon has-text-dark">
+                                    <i class="fas fa-cogs"></i>
+                                </span>
+                                <span>Configurazione</span>
+                            </a>
+
+                            <div class="navbar-dropdown">
+                                <a asp-action="Password" class="navbar-item">
+                                    <span style="color:red">
+                                        <i class="fas fa-key"></i>
+                                    </span>
+                                    <span>&emsp;Cambio Password</span>
+                                </a>
+
+                                @if (HttpContextAccessor.HttpContext.Session.GetString("IDesercente") != "-")
+                                {
+                                    <a asp-action="EditEsercente" class="navbar-item">
+                                        <span style="color:blue">
+                                            <i class="fas fa-id-card"></i>
+                                        </span>
+                                        <span>&emsp;Profilo</span>
+                                    </a>
+
+                                    <hr class="navbar-divider">
+
+                                    <a asp-action="AttivitaRisorse" class="navbar-item">
+                                        <span style="color:forestgreen">
+                                            <i class="fas fa-list"></i>
+                                        </span>
+                                        <span>&emsp;Attività e Risorse</span>
+                                    </a>
+                                }
+
+
+                            </div>
+                        </div>
+
+                        <div class="navbar-item has-dropdown is-hoverable">
+                            <a class="navbar-link">
+                                <span style="color:darkorange" class="icon">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                </span>
+                                <span>Gestione</span>
+                            </a>
+
+                            <div class="navbar-dropdown">
+                                <a asp-action="Pianificazione" class="navbar-item">
+                                    <span style="color:red" class="icon">
+                                        <i class="far fa-calendar-alt"></i>
+                                    </span>
+                                    <span>&emsp;Pianificazione</span>
+                                </a>
+                                <a asp-action="Calendario" class="navbar-item">
+                                    <span style="color:green" class="icon">
+                                        <i class="far fa-calendar-check"></i>
+                                    </span>
+                                    <span>&emsp;Calendario</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="navbar-item has-dropdown is-hoverable">
+                            <a class="navbar-link">
+                                <span style="color:forestgreen" class="icon">
+                                    <i class="fas fa-coins"></i>
+                                </span>
+                                <span>Conto</span>
+                            </a>
+
+                            <div class="navbar-dropdown">
+
+                                <a asp-action="Conto" class="navbar-item">
+                                    <span class="icon" style="color:royalblue">
+                                        <i class="fas fa-euro-sign"></i>
+                                    </span>
+                                    <span>&emsp;Situazione Conto</span>
+                                </a>
+
+                                <a asp-action="Fatture" class="navbar-item">
+                                    <span style="color:darkorange" class="icon">
+                                        <i class="fas fa-file-invoice"></i>
+                                    </span>
+                                    <span>&emsp;Fatture emesse</span>
+                                </a>
+
+                            </div>
+                        </div>
+
+                        <a class="navbar-item" asp-action="Dashboard">
+                            <span class="icon has-text-danger">
+                                <i class="fas fas fa-chart-bar"></i>
+                            </span>
+                            <span>Report Attività</span>
+                        </a>
+
+
+                    </div>
+                    <div class="navbar-end">
+                        <span class="icon has-text-info has-tooltip-bottom" data-tooltip='@(HttpContextAccessor.HttpContext.Session.GetString("nominativo")+" ("+HttpContextAccessor.HttpContext.Session.GetString("ruolo")+")")'>
+                            <i class="fas fas fa-user"></i>
+                        </span>
+                        <a class="navbar-item" asp-action="Logout">
+                            <span class="icon has-text-dark">
+                                <i class="fas fas fa-sign-out-alt"></i>
+                            </span>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+            }
+        </nav>
+    </header>
+    <div class="container">
+        <partial name="_CookieConsentPartial" />
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/js/site.js?20200406" asp-append-version="true"></script>
+
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>
+
+<link rel="stylesheet" href="~/css/cdq.css" />
+
+<link rel="stylesheet" href="~/css/calendar.css" />
+
+

@@ -1,0 +1,15 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/CDQ/bin/Debug/netcoreapp2.2
+/CDQ/obj
+/CDQ/FodyWeavers.xsd
+/CDQ/FederWebApp.csproj.user
+/CDQ/bin/Release/netcoreapp2.2
+/CDQ/Properties/PublishProfiles
+/DB/sgcc.realm
+/DB/sgcc.realm.lock
+/Deliverables
+/CDQ/bin/Debug/netcoreapp3.1

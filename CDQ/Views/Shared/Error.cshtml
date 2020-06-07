@@ -1,0 +1,31 @@
+﻿@model CDQ.Models.ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+
+<div class="columns">
+    <div class="column is-6 is-offset-3">
+
+        <article class="message is-danger">
+            <div class="message-header">
+                <p>Errore Applicazione</p>
+            </div>
+            <div class="message-body">
+                <p>Si è verificato un errore applicativo.</p>
+                <p>E' possibile riprovare l'operazione che si stava eseguendo.</p>
+                <p>Se il problema persiste, contattare il fornitore del Software indicando la sequenza di operazioni svolte.</p>
+            </div>
+        </article>
+    </div>
+</div>
+
+<input type="hidden" value="@Html.Raw(Model.Message)" />

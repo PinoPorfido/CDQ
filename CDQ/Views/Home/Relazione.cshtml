@@ -1,0 +1,1642 @@
+﻿@model CDQ.Models.Helper.HelpRelazione
+
+@{
+    ViewData["Title"] = "Relazione";
+}
+
+<script>
+    function visualizzaTab(tab) {
+
+        document.getElementById('Tab').value = tab;
+
+        if (tab == 1 || tab == 2 || tab == 3) {
+            if (tab == "1") document.getElementById("tab1").classList.add("is-active");
+            else document.getElementById("tab1").classList.remove("is-active");
+
+            if (tab == "2") document.getElementById("tab2").classList.add("is-active");
+            else document.getElementById("tab2").classList.remove("is-active");
+
+            if (tab == "3") document.getElementById("tab3").classList.add("is-active");
+            else document.getElementById("tab3").classList.remove("is-active");
+
+            document.getElementById("div1").style.display = tab == "1" ? "block" : "none";
+            document.getElementById("div2").style.display = tab == "2" ? "block" : "none";
+            document.getElementById("div3").style.display = tab == "3" ? "block" : "none";
+
+            //verifico se c'è un tab secondario acceso altrimenti accendo il primo
+            if (document.getElementById("div4").style.display == "none" && document.getElementById("div5").style.display == "none" &&
+                document.getElementById("div6").style.display == "none" && document.getElementById("div7").style.display == "none" &&
+                document.getElementById("div8").style.display == "none" && document.getElementById("div9").style.display == "none" &&
+                document.getElementById("div10").style.display == "none") {
+                document.getElementById("tab4").classList.remove("is-active");
+                document.getElementById("tab5").classList.remove("is-active");
+                document.getElementById("tab6").classList.remove("is-active");
+                document.getElementById("tab7").classList.remove("is-active");
+                document.getElementById("tab8").classList.remove("is-active");
+                document.getElementById("tab9").classList.remove("is-active");
+                document.getElementById("tab10").classList.remove("is-active");
+
+                document.getElementById("tab4").classList.add("is-active");
+                document.getElementById("div4").style.display = "block";
+            }
+        }
+
+        else if (tab == 4 || tab == 5 || tab == 6 || tab == 7 || tab == 8 || tab == 9 || tab == 10) {
+            if (tab == "4") document.getElementById("tab4").classList.add("is-active");
+            else document.getElementById("tab4").classList.remove("is-active");
+
+            if (tab == "5") document.getElementById("tab5").classList.add("is-active");
+            else document.getElementById("tab5").classList.remove("is-active");
+
+            if (tab == "6") document.getElementById("tab6").classList.add("is-active");
+            else document.getElementById("tab6").classList.remove("is-active");
+
+            if (tab == "7") document.getElementById("tab7").classList.add("is-active");
+            else document.getElementById("tab7").classList.remove("is-active");
+
+            if (tab == "8") document.getElementById("tab8").classList.add("is-active");
+            else document.getElementById("tab8").classList.remove("is-active");
+
+            if (tab == "9") document.getElementById("tab9").classList.add("is-active");
+            else document.getElementById("tab9").classList.remove("is-active");
+
+            if (tab == "10") document.getElementById("tab10").classList.add("is-active");
+            else document.getElementById("tab10").classList.remove("is-active");
+
+            document.getElementById("div4").style.display = tab == "4" ? "block" : "none";
+            document.getElementById("div5").style.display = tab == "5" ? "block" : "none";
+            document.getElementById("div6").style.display = tab == "6" ? "block" : "none";
+            document.getElementById("div7").style.display = tab == "7" ? "block" : "none";
+            document.getElementById("div8").style.display = tab == "8" ? "block" : "none";
+            document.getElementById("div9").style.display = tab == "9" ? "block" : "none";
+            document.getElementById("div10").style.display = tab == "10" ? "block" : "none";
+
+
+            if (document.getElementById("div1").style.display == "none" && document.getElementById("div2").style.display == "none" &&
+                document.getElementById("div3").style.display == "none") {
+                document.getElementById("tab1").classList.remove("is-active");
+                document.getElementById("tab2").classList.remove("is-active");
+                document.getElementById("tab3").classList.remove("is-active");
+
+                document.getElementById("tab1").classList.add("is-active");
+                document.getElementById("div1").style.display = "block";
+            }
+        }
+
+    }</script>
+
+<script>
+    function valida(campo, valore, lista) {
+        var optionFound = false;
+        var datalist = document.getElementById(lista);
+        var val = document.getElementById(campo).value;
+        for (var j = 0; j < datalist.options.length; j++) {
+            if (val == datalist.options[j].value) {
+                optionFound = true;
+                document.getElementById(valore).value = datalist.options[j].id;
+                document.getElementById("buttonSearch").disabled = false;
+                break;
+            }
+        }
+        if (!optionFound) {
+            document.getElementById(campo).value = "";
+            document.getElementById(valore).value = "";
+            document.getElementById("buttonSearch").disabled = true;
+
+        }
+
+    }</script>
+
+<br />
+<br />
+
+<div class="columns">
+    <div class="column is-3 is-offset-1" align="left">
+        <a asp-action="Relazioni" asp-route-Ins="true" class="button back">
+            <span class="icon">
+                <i class="fas fa-backward"></i>
+            </span>
+        </a>
+    </div>
+    <div class="column is-4" align="center">
+        <h1 class="title is-4">Relazione</h1>
+    </div>
+    <div class="column is-3" align="right">
+
+
+    </div>
+</div>
+
+<form asp-action="AggiornaRelazione" method="post">
+
+    @Html.HiddenFor(model => Model.Relazioni.ID)
+    @Html.HiddenFor(model => Model.Ins)
+    @Html.HiddenFor(model => Model.Tab)
+
+    @for (var i = 0; i < Model.ListaCauseDebito.Count(); i++)
+    {
+        @Html.HiddenFor(model => Model.ListaCauseDebito[i].Text)
+        @Html.HiddenFor(model => Model.ListaCauseDebito[i].Value)
+    }
+
+    @for (var i = 0; i < Model.ListaGradi.Count(); i++)
+    {
+        @Html.HiddenFor(model => Model.ListaGradi[i].Text)
+        @Html.HiddenFor(model => Model.ListaGradi[i].Value)
+    }
+
+    @for (var i = 0; i < Model.ListaStatus.Count(); i++)
+    {
+        @Html.HiddenFor(model => Model.ListaStatus[i].Text)
+        @Html.HiddenFor(model => Model.ListaStatus[i].Value)
+    }
+
+    @for (var i = 0; i < Model.ListaTipiPratica.Count(); i++)
+    {
+        @Html.HiddenFor(model => Model.ListaTipiPratica[i].Text)
+        @Html.HiddenFor(model => Model.ListaTipiPratica[i].Value)
+    }
+    <div asp-validation-summary="ModelOnly" class="help help-message"></div>
+    <div class="columns">
+        <div class="column is-10 is-offset-1">
+            <div class="panel">
+                <div class="panel-heading">
+                    <div class="columns">
+                        <div class="column is-4" align="left">
+                            <p>Dati principali della Proposta</p>
+                        </div>
+                        <div class="column is-6" align="right">
+                        </div>
+                        <div class="column is-2" align="right">
+                            <button type="submit" class="button is-dark">Aggiorna</button>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="panel-tabs">
+                    <a id="tab1" onclick="visualizzaTab('1')" class='@(Model.Tab==1 ? "is-active":"")'>Intestazione Relazione</a>
+                    <a id="tab2" onclick="visualizzaTab('2')" class='@(Model.Tab==2 ? "is-active":"")'>Informazioni aggiuntive</a>
+                    <a id="tab3" onclick="visualizzaTab('3')" class='@(Model.Tab==3 ? "is-active":"")'>Dati di sintesi</a>
+                </p>
+
+                <div id="div1" style='display:@(Model.Tab==1 ? "block":"none")'>
+
+                    <div class="panel-block">
+                        <div class="container">
+                            <div class="column">
+
+                                <div class="columns">
+                                    <div class="column is-5">
+                                        <div class="field">
+                                            <label asp-for="Relazioni.TipoPratica" class="label">Oggetto</label>
+                                            <div class="select is-fullwidth" style="font-size:small">
+                                                <select asp-for="IDTipiPratica" asp-items="Model.ListaTipiPratica"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="column is-4">
+                                        <label asp-for="Relazioni.Oggetto" class="label">Altre info oggetto</label>
+                                        <input asp-for="Relazioni.Oggetto" class="input" style="font-size:small" />
+                                    </div>
+                                    <div class="column is-3">
+                                        <div class="field">
+                                            <label asp-for="Relazioni.Status" class="label"></label>
+                                            <div class="select is-fullwidth" style="font-size:small">
+                                                <select asp-for="IDStatus" asp-items="Model.ListaStatus"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="columns">
+                                    <div class="column is-4">
+                                        <label asp-for="Relazioni.Tribunale" class="label"></label>
+                                        <input asp-for="Relazioni.Tribunale" class="input" style="font-size:small" />
+                                    </div>
+                                    <div class="column is-4">
+                                        <label asp-for="Relazioni.SezioneTribunale" class="label">Sezione del Tribunale</label>
+                                        <input asp-for="Relazioni.SezioneTribunale" class="input" style="font-size:small" />
+                                    </div>
+                                    <div class="column is-4">
+                                        <label asp-for="Relazioni.LuogoData" class="label">Luogo, Data</label>
+                                        <input asp-for="Relazioni.LuogoData" class="input" style="font-size:small" />
+                                    </div>
+                                </div>
+
+                                <div class="panel-block">
+                                    <div class="container">
+                                        <div class="panel-heading">
+                                            <h6 class="title" style="font-size:small">Ricorrenti</h6>
+                                        </div>
+                                        <div class="column">
+                                            <table class="table is-fullwidth">
+                                                <thead>
+                                                    <tr>
+                                                        <th width="20%">Cognome</th>
+                                                        <th width="20%">Nome</th>
+                                                        <th width="15%">Codice Fiscale</th>
+                                                        <th width="25%">Domicilio</th>
+                                                        <th width="10%" align="center">% Rif.</th>
+                                                        <th align="center">Aggiorna</th>
+                                                        <th align="center">Elimina</th>
+                                                    </tr>
+                                                <tbody>
+                                                    @if (Model.ListaRicorrenti != null)
+                                                    {
+                                                        @foreach (var item in Model.ListaRicorrenti)
+                                                        {
+                                                            <tr>
+                                                                <td style="font-size:small">
+                                                                    @Html.DisplayFor(modelItem => item.Cognome)
+                                                                </td>
+
+                                                                <td style="font-size:small">
+                                                                    @Html.DisplayFor(modelItem => item.Nome)
+                                                                </td>
+
+                                                                <td style="font-size:small">
+                                                                    @Html.DisplayFor(modelItem => item.CodiceFiscale)
+                                                                </td>
+
+                                                                <td style="font-size:small">
+                                                                    @Html.DisplayFor(modelItem => item.Domicilio)
+                                                                </td>
+
+                                                                <td style="font-size:small">
+                                                                    @Html.DisplayFor(modelItem => item.Percentuale)
+                                                                </td>
+
+                                                                <td align="center">
+                                                                    <a title="aggiorna dati" onclick="setModalRicorrenti('@item.ID','@item.Cognome','@item.Nome','@item.CodiceFiscale','@item.Domicilio','@item.Percentuale');">
+                                                                        <span>
+                                                                            <span class="icon">
+                                                                                <i class="fas fa-edit"></i>
+                                                                            </span>
+                                                                        </span>
+                                                                    </a>
+                                                                </td>
+                                                                <td align="center">
+                                                                    <a id="@item.ID" asp-action="EliminaRicorrenti" asp-route-ID="@Model.Relazioni.ID" onclick="return confirmElimina(this.id)" asp-route-IDRicorrenti="@item.ID" asp-route-bProp="false" title="elimina Ricorrente">
+                                                                        <span>
+                                                                            <span class="icon">
+                                                                                <i class="fas fa-trash-alt"></i>
+                                                                            </span>
+                                                                        </span>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td>
+                                                            <a onclick="setModalRicorrenti()" data-tooltip="Nuovo Ricorrente">
+                                                                <span class="icon"><i class="fas fa-file-medical"></i></span>
+                                                            </a>
+                                                        </td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="div2" style='display:@(Model.Tab==2 ? "block":"none")'>
+
+                    <div class="panel-block">
+                        <div class="container">
+                            <div class="column">
+                                <div class="columns">
+                                    <div class="column is-10">
+                                        <div class="control">
+                                            <label class="label" style="vertical-align:text-bottom">Indicazione delle cause dell’indebitamento e Diligenza</label>
+                                            <textarea id="icod" class="textarea has-fixed-size" rows="5" style="font-size:small; font-family:'Arial Narrow'" asp-for="Relazioni.CauseIndebitamentoeDiligenza"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="column is-2" style="vertical-align:middle">
+                                        <label class="label"><br /><br /></label>
+                                        <input type="hidden" id="TP1" asp-for="TP_CauseIndebitamentoeDiligenza" class="input" />
+                                        <a class="button" style="font-family:Arial; font-size:smaller; background-color:royalblue; height:auto; color:white" onclick="document.getElementById('icod').value =  document.getElementById('TP1').value">Inserisci<br />Testo<br />Standard</a>
+                                    </div>
+                                </div>
+
+
+                                <div class="columns">
+                                    <div class="column is-10">
+                                        <div class="control">
+                                            <label class="label" style="vertical-align:bottom">Resoconto pagamenti negli ultimi 5 anni</label>
+                                            <input type="hidden" id="TP2" asp-for="TP_ResocontoPagamenti5Anni" class="input" />
+                                            <textarea id="rpu5a" class="textarea has-fixed-size" rows="3" style="font-size:small; font-family:'Arial Narrow'" asp-for="Relazioni.ResocontoPagamenti5Anni"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="column is-2" style="vertical-align:middle">
+                                        <label class="label"><br /></label>
+                                        <a class="button" style="font-family:Arial; font-size:smaller; background-color:royalblue; height:auto; color:white" onclick="document.getElementById('rpu5a').value = document.getElementById('TP2').value">Inserisci<br />Testo<br />Standard</a>
+                                    </div>
+                                </div>
+
+                                <label class="label">Nomina del Professionista</label>
+                                <div class="columns">
+                                    <div class="column is-2">
+                                        <label asp-for="Relazioni.AttoNominaProfessionista" class="label">Atto</label>
+                                        <input asp-for="Relazioni.AttoNominaProfessionista" class="input" />
+                                    </div>
+                                    <div class="column is-4">
+                                        <label asp-for="Relazioni.TitoloNominativoProfessionista" class="label">Titolo e nominativo</label>
+                                        <input asp-for="Relazioni.TitoloNominativoProfessionista" class="input" />
+                                    </div>
+                                    <div class="column is-4">
+                                        <label asp-for="Relazioni.IndirizzoProfessionista" class="label">Indirizzo</label>
+                                        <input asp-for="Relazioni.IndirizzoProfessionista" class="input" />
+                                    </div>
+                                    <div class="column is-2">
+                                        <label asp-for="Relazioni.RecapitiProfessionista" class="label">Recapiti</label>
+                                        <input asp-for="Relazioni.RecapitiProfessionista" class="input" />
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="div3" style='display:@(Model.Tab==3 ? "block":"none")'>
+                    <div class="panel-block">
+                        <div class="container">
+                            <div class="column">
+
+                                <div class="columns">
+                                    <div class="column is-4">
+                                        <label asp-for="Relazioni.ComponentiNucleo" class="label">Componenti nucleo familiare</label>
+                                        <input asp-for="Relazioni.ComponentiNucleo" class="input" />
+                                    </div>
+                                    <div class="column is-4">
+                                        <label asp-for="Relazioni.RateProposte" class="label">Rate proposte</label>
+                                        <input asp-for="Relazioni.RateProposte" class="input" />
+                                    </div>
+                                    <div class="column is-4">
+                                        <label asp-for="Relazioni.RataMax" class="label">Rata massima</label>
+                                        <input asp-for="Relazioni.RataMax" class="input" />
+                                    </div>
+                                </div>
+
+                                <div class="columns">
+                                    <div class="column is-4">
+                                        <label asp-for="Relazioni.RedditoMensile" class="label">Reddito mensile</label>
+                                        <input asp-for="Relazioni.RedditoMensile" class="input" />
+                                    </div>
+                                    <div class="column is-4">
+                                        <label asp-for="Relazioni.PatrimonioMobProQ" class="label">Patrimonio mobiliare pro-quota</label>
+                                        <input asp-for="Relazioni.PatrimonioMobProQ" class="input" />
+                                    </div>
+                                    <div class="column is-4">
+                                        <label asp-for="Relazioni.PatrimonioImmobProQ" class="label">Patrimonio immobiliare pro-quota</label>
+                                        <input asp-for="Relazioni.PatrimonioImmobProQ" class="input" />
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
+@if (!Model.Ins)
+{
+    <div class="columns">
+
+        <div class="column is-10 is-offset-1">
+
+            <nav class="panel">
+                <p class="panel-heading">
+                    Dati ulteriori per la redazione della Proposta
+                </p>
+                <p class="panel-tabs">
+                    <a id="tab4" onclick="visualizzaTab('4')" class='@(Model.Tab==4 ? "is-active":"")'>Massa Debitoria</a>
+                    <a id="tab5" onclick="visualizzaTab('5')" class='@(Model.Tab==5 ? "is-active":"")'>Atti di Disposizione</a>
+                    <a id="tab6" onclick="visualizzaTab('6')" class='@(Model.Tab==6 ? "is-active":"")'>Annotazioni</a>
+                    <a id="tab7" onclick="visualizzaTab('7')" class='@(Model.Tab==7 ? "is-active":"")'>Spese Mese</a>
+                    <a id="tab8" onclick="visualizzaTab('8')" class='@(Model.Tab==8 ? "is-active":"")'>Patrimonio Immobiliare</a>
+                    <a id="tab9" onclick="visualizzaTab('9')" class='@(Model.Tab==9 ? "is-active":"")'>Beni Mobili Registrati</a>
+                    <a id="tab10" onclick="visualizzaTab('10')" class='@(Model.Tab==10 ? "is-active":"")'>Beni Mobili</a>
+                </p>
+
+
+                <div id="div4" style='display:@(Model.Tab==4 || Model.Tab==1 ? "block":"none")'>
+                    <div class="panel-block">
+                        <div class="container">
+                            <div class="column">
+                                <table class="table is-fullwidth">
+                                    <thead>
+                                        <tr>
+                                            <th width="20%">Creditore</th>
+                                            <th width="15%">Causa Indebitamento</th>
+                                            <th width="10%">Nota</th>
+                                            <th width="15%">Grado</th>
+                                            <th align="right" width="15%">Importo</th>
+                                            <th width="10%">% Sodd.</th>
+                                            <th align="right" width="15%">Soddisfo</th>
+                                            <th align="center">Aggiorna</th>
+                                            <th align="center">Elimina</th>
+                                        </tr>
+                                    <tbody>
+                                        @foreach (var item in Model.ListaMasseDebitorie)
+                                        {
+                                            <tr>
+                                                <td style="font-family:'Arial Narrow'; font-size:small">
+                                                    @Html.DisplayFor(modelItem => item.Creditore)
+                                                </td>
+
+                                                <td style="font-family:'Arial Narrow'; font-size:small">
+                                                    @Html.DisplayFor(modelItem => item.CausaDebito.Descrizione)
+                                                </td>
+
+                                                <td style="font-family:'Arial Narrow'; font-size:small">
+                                                    @Html.DisplayFor(modelItem => item.Nota)
+                                                </td>
+
+                                                <td style="font-family:'Arial Narrow'; font-size:small">
+                                                    @Html.DisplayFor(modelItem => item.Grado.Descrizione)
+                                                </td>
+
+                                                <td style="font-family:'Arial Narrow'; font-size:small" align="right">
+                                                    @Html.DisplayFor(modelItem => item.Importo)
+                                                </td>
+
+                                                <td style="font-family:'Arial Narrow'; font-size:small" align="center">
+                                                    @Html.DisplayFor(modelItem => item.PercentualeSoddisfo)
+                                                </td>
+
+                                                <td style="font-family:'Arial Narrow'; font-size:small; color:red" align="right">
+                                                    @Html.DisplayFor(modelItem => item.Soddisfo)
+                                                </td>
+
+                                                <td align="center">
+                                                    <a title="aggiorna dati" onclick="setModalMasseDebitorie('@item.ID','@item.Creditore','@item.CausaDebito.ID','@item.Nota','@item.Grado.ID','@item.Importo','@item.PercentualeSoddisfo');">
+                                                        <span>
+                                                            <span class="icon">
+                                                                <i class="fas fa-edit"></i>
+                                                            </span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                                <td align="center">
+                                                    <a id="@item.ID" asp-action="EliminaMasseDebitorie" asp-route-ID="@Model.Relazioni.ID" onclick="return confirmElimina(this.id)" asp-route-IDMasseDebitorie="@item.ID" asp-route-bProp="false" title="elimina Elemento Debitorio">
+                                                        <span>
+                                                            <span class="icon">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                            </span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td>
+                                                <a onclick="setModalMasseDebitorie()" data-tooltip="Nuovo Elemento Debitorio">
+                                                    <span class="icon"><i class="fas fa-file-medical"></i></span>
+                                                </a>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="div5" style='display:@(Model.Tab==5 ? "block":"none")'>
+                    <div class="panel-block">
+                        <div class="container">
+                            <div class="column">
+                                <table class="table is-fullwidth">
+                                    <thead>
+                                        <tr>
+                                            <th width="100%">Descrizione</th>
+                                            <th align="center">Aggiorna</th>
+                                            <th align="center">Elimina</th>
+                                        </tr>
+                                    <tbody>
+                                        @foreach (var item in Model.ListaAttiDisposizione)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.Descrizione)
+                                                </td>
+
+                                                <td align="center">
+                                                    <a title="aggiorna dati" onclick="setModalAttiDisposizione('@item.ID','@item.Descrizione');">
+                                                        <span>
+                                                            <span class="icon">
+                                                                <i class="fas fa-edit"></i>
+                                                            </span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                                <td align="center">
+                                                    <a id="@item.ID" asp-action="EliminaAttiDisposizione" asp-route-ID="@Model.Relazioni.ID" onclick="return confirmElimina(this.id)" asp-route-IDAttiDisposizione="@item.ID" asp-route-bProp="false" title="Elimina Atto di Disposizione">
+                                                        <span>
+                                                            <span class="icon">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                            </span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td>
+                                                <a onclick="setModalAttiDisposizione()" data-tooltip="Nuovo Atto di Disposizione">
+                                                    <span class="icon"><i class="fas fa-file-medical"></i></span>
+                                                </a>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+
+                                            <td></td>
+
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="div6" style='display:@(Model.Tab==6 ? "block":"none")'>
+                    <div class="panel-block">
+                        <div class="container">
+                            <div class="column">
+                                <table class="table is-fullwidth">
+                                    <thead>
+                                        <tr>
+                                            <th width="100%">Descrizione</th>
+                                            <th align="center">Aggiorna</th>
+                                            <th align="center">Elimina</th>
+                                        </tr>
+                                    <tbody>
+                                        @foreach (var item in Model.ListaAnnotazioniAggiuntive)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.Descrizione)
+                                                </td>
+
+                                                <td align="center">
+                                                    <a title="aggiorna dati" onclick="setModalAnnotazioniAggiuntive('@item.ID','@item.Descrizione');">
+                                                        <span>
+                                                            <span class="icon">
+                                                                <i class="fas fa-edit"></i>
+                                                            </span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                                <td align="center">
+                                                    <a id="@item.ID" asp-action="EliminaAnnotazioniAggiuntive" asp-route-ID="@Model.Relazioni.ID" onclick="return confirmElimina(this.id)" asp-route-IDAnnotazioniAggiuntive="@item.ID" asp-route-bProp="false" title="elimina Annotazione Aggiuntiva">
+                                                        <span>
+                                                            <span class="icon">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                            </span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td>
+                                                <a onclick="setModalAnnotazioniAggiuntive()" data-tooltip="Nuova Annotazione Aggiuntiva">
+                                                    <span class="icon"><i class="fas fa-file-medical"></i></span>
+                                                </a>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+
+                                            <td></td>
+
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div id="div7" style='display:@(Model.Tab==7 ? "block":"none")'>
+                    <div class="panel-block">
+                        <div class="container">
+                            <div class="column">
+                                <table class="table is-fullwidth">
+                                    <thead>
+                                        <tr>
+                                            <th width="70%">Spesa Mensile</th>
+                                            <th align="right" width="30%">Importo</th>
+                                            <th align="center">Aggiorna</th>
+                                            <th align="center">Elimina</th>
+                                        </tr>
+                                    <tbody>
+                                        @foreach (var item in Model.ListaSpeseMese)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.Descrizione)
+                                                </td>
+
+                                                <td align="right">
+                                                    @Html.DisplayFor(modelItem => item.Importo)
+                                                </td>
+                                                <td align="center">
+                                                    <a title="aggiorna dati" onclick="setModalSpeseMese('@item.ID','@item.Descrizione','@item.Importo');">
+                                                        <span>
+                                                            <span class="icon">
+                                                                <i class="fas fa-edit"></i>
+                                                            </span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                                <td align="center">
+                                                    <a id="@item.ID" asp-action="EliminaSpeseMese" asp-route-ID="@Model.Relazioni.ID" onclick="return confirmElimina(this.id)" asp-route-IDSpeseMese="@item.ID" asp-route-bProp="false" title="elimina Spesa Mensile">
+                                                        <span>
+                                                            <span class="icon">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                            </span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td>
+                                                <a onclick="setModalSpeseMese()" data-tooltip="Nuova Spesa mensile">
+                                                    <span class="icon"><i class="fas fa-file-medical"></i></span>
+                                                </a>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="div8" style='display:@(Model.Tab==8 ? "block":"none")'>
+                    <div class="panel-block">
+                        <div class="container">
+                            <div class="column">
+                                <table class="table is-fullwidth">
+                                    <thead>
+                                        <tr>
+                                            <th width="40%">Descrizione</th>
+                                            <th width="20%" align="right">Superficie</th>
+                                            <th width="20%" align="right">Valore OMI/VAM</th>
+                                            <th width="20%" align="right">Stima per intero</th>
+                                            <th align="center">Aggiorna</th>
+                                            <th align="center">Elimina</th>
+                                        </tr>
+                                    <tbody>
+                                        @foreach (var item in Model.ListaPatrimonioImmobiliare)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.Descrizione)
+                                                </td>
+
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.Superficie)
+                                                </td>
+
+                                                <td align="right">
+                                                    @Html.DisplayFor(modelItem => item.ValoreOmiVan)
+                                                </td>
+
+                                                <td align="right">
+                                                    @Html.DisplayFor(modelItem => item.StimaPerIntero)
+                                                </td>
+
+                                                <td align="center">
+                                                    <a title="aggiorna dati" onclick="setModalPatrimonioImmobiliare('@item.ID','@item.Descrizione','@item.Superficie','@item.ValoreOmiVan');">
+                                                        <span>
+                                                            <span class="icon">
+                                                                <i class="fas fa-edit"></i>
+                                                            </span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                                <td align="center">
+                                                    <a id="@item.ID" asp-action="EliminaPatrimonioImmobiliare" asp-route-ID="@Model.Relazioni.ID" onclick="return confirmElimina(this.id)" asp-route-IDPatrimonioImmobiliare="@item.ID" asp-route-bProp="false" title="elimina Elemento Patrimoniale">
+                                                        <span>
+                                                            <span class="icon">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                            </span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td>
+                                                <a onclick="setModalPatrimonioImmobiliare()" data-tooltip="Nuovo Elemento Patrimoniale">
+                                                    <span class="icon"><i class="fas fa-file-medical"></i></span>
+                                                </a>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="div9" style='display:@(Model.Tab==9 ? "block":"none")'>
+                    <div class="panel-block">
+                        <div class="container">
+                            <div class="column">
+                                <table class="table is-fullwidth">
+                                    <thead>
+                                        <tr>
+                                            <th width="50%">Descrizione</th>
+                                            <th width="20%">Targa</th>
+                                            <th width="30%" align="right">Stima riviste di settore</th>
+                                            <th align="center">Aggiorna</th>
+                                            <th align="center">Elimina</th>
+                                        </tr>
+                                    <tbody>
+                                        @foreach (var item in Model.ListaBeniMobiliRegistrati)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.Descrizione)
+                                                </td>
+
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.Targa)
+                                                </td>
+
+                                                <td align="right">
+                                                    @Html.DisplayFor(modelItem => item.Stima)
+                                                </td>
+
+                                                <td align="center">
+                                                    <a title="aggiorna dati" onclick="setModalBeniMobiliRegistrati('@item.ID','@item.Descrizione','@item.Targa','@item.Stima');">
+                                                        <span>
+                                                            <span class="icon">
+                                                                <i class="fas fa-edit"></i>
+                                                            </span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                                <td align="center">
+                                                    <a id="@item.ID" asp-action="EliminaBeniMobiliRegistrati" asp-route-ID="@Model.Relazioni.ID" onclick="return confirmElimina(this.id)" asp-route-IDBeniMobiliRegistrati="@item.ID" asp-route-bProp="false" title="elimina Bene Mobile Registrato">
+                                                        <span>
+                                                            <span class="icon">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                            </span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td>
+                                                <a onclick="setModalBeniMobiliRegistrati()" data-tooltip="Nuovo Bene Mobile Registrato">
+                                                    <span class="icon"><i class="fas fa-file-medical"></i></span>
+                                                </a>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="div10" style='display:@(Model.Tab==10 ? "block":"none")'>
+                    <div class="panel-block">
+                        <div class="container">
+                            <div class="column">
+                                <table class="table is-fullwidth">
+                                    <thead>
+                                        <tr>
+                                            <th width="70%">Descrizione</th>
+                                            <th width="30%" align="right">Costo Storico</th>
+                                            <th align="center">Aggiorna</th>
+                                            <th align="center">Elimina</th>
+                                        </tr>
+                                    <tbody>
+                                        @foreach (var item in Model.ListaBeniMobili)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.Descrizione)
+                                                </td>
+
+                                                <td align="right">
+                                                    @Html.DisplayFor(modelItem => item.CostoStorico)
+                                                </td>
+
+                                                <td align="center">
+                                                    <a title="aggiorna dati" onclick="setModalBeniMobili('@item.ID','@item.Descrizione','@item.CostoStorico');">
+                                                        <span>
+                                                            <span class="icon">
+                                                                <i class="fas fa-edit"></i>
+                                                            </span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                                <td align="center">
+                                                    <a id="@item.ID" asp-action="EliminaBeniMobili" asp-route-ID="@Model.Relazioni.ID" onclick="return confirmElimina(this.id)" asp-route-IDBeniMobili="@item.ID" asp-route-bProp="false" title="elimina Bene Mobile">
+                                                        <span>
+                                                            <span class="icon">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                            </span>
+                                                        </span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td>
+                                                <a onclick="setModalBeniMobili()" data-tooltip="Nuovo Bene Mobile">
+                                                    <span class="icon"><i class="fas fa-file-medical"></i></span>
+                                                </a>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </nav>
+        </div>
+    </div>
+
+
+}
+
+<div id="modal-MasseDebitorie" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <form id="formInsMasseDebitorie" asp-action="InserisciMasseDebitorieR">
+
+            <header class="modal-card-head">
+                <p id="pTitoloMasseDebitorie" class="modal-card-title">Inserisci Elemento Debitorio</p>
+                <button class="delete" type="reset" onclick="cancelModalMasseDebitorie()"></button>
+            </header>
+            <section class="modal-card-body">
+                <input asp-for="Relazioni.ID" type="hidden">
+                <input asp-for="Tab" value="4" type="hidden">
+                <input asp-for="ModeMasseDebitorie" value="Ins" type="hidden">
+                <input asp-for="IDMasseDebitorie" type="hidden">
+
+                <div class="columns">
+                    <div class="column is-6">
+                        <div class="field">
+                            <label class="label">Creditore</label>
+                            <input id="creditore" asp-for="MasseDebitorie.Creditore" class="input">
+                        </div>
+                    </div>
+                    <div class="column is-6">
+                        <label class="label">Grado</label>
+                        <div class="select">
+                            <select id="select_grado" asp-for="IDGradi" asp-items="Model.ListaGradi">
+                                <option value=0>Seleziona una grado</option>
+                            </select>
+                            <label id="labelMessage" class="help-message help"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="columns">
+                    <div class="column is-6">
+                        <label class="label">Causa Indebitamento</label>
+                        <div class="select">
+                            <select id="select_causa_debito" asp-for="IDCauseDebito" asp-items="Model.ListaCauseDebito">
+                                <option value=0>Seleziona una causa</option>
+                            </select>
+                            <label id="labelMessage" class="help-message help"></label>
+                        </div>
+                    </div>
+                    <div class="column is-6">
+                        <div class="field">
+                            <label class="label">Nota</label>
+                            <input id="nota_MasseDebitorie" asp-for="MasseDebitorie.Nota" class="input">
+                        </div>
+                    </div>
+                </div>
+                <div class="columns">
+                    <div class="column is-4">
+                        <div class="field">
+                            <label class="label">Importo</label>
+                            <input id="importo_MasseDebitorie" onblur="this.value = formatMoney(this.value)" onkeydown="return handleReplaceDotWithComma(this,event)" asp-for="MasseDebitorie.Importo" class="input">
+                        </div>
+                    </div>
+                    <div class="column is-4">
+                        <div class="field">
+                            <label class="label">Percentuale Soddisfo</label>
+                            <input id="perc_soddisfo" onblur="this.value = formatMoney(this.value)" onkeydown="return handleReplaceDotWithComma(this,event)" asp-for="MasseDebitorie.PercentualeSoddisfo" class="input">
+                        </div>
+                    </div>
+                    <div class="column is-4">
+                        <div class="field">
+                            <input type="hidden" ID="soddisfo" class="input">
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+            <footer class="modal-card-foot">
+                <button id="buttonMasseDebitorieOk" type="button" onclick="form.submit()" class="button is-dark">Aggiungi</button>
+                <button type="button" class="button is-dark" onclick="cancelModalMasseDebitorie()">Annulla</button>
+            </footer>
+        </form>
+    </div>
+</div>
+
+<div id="modal-Ricorrenti" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <form id="formInsRicorrenti" asp-action="InserisciRicorrentiR">
+
+            <header class="modal-card-head">
+                <p id="pTitoloRicorrenti" class="modal-card-title">Inserisci Ricorrente</p>
+                <button class="delete" type="reset" onclick="cancelModalRicorrenti()"></button>
+            </header>
+            <section class="modal-card-body">
+                <input asp-for="Relazioni.ID" type="hidden">
+                <input asp-for="Tab" value="4" type="hidden">
+                <input asp-for="ModeRicorrenti" value="Ins" type="hidden">
+                <input asp-for="IDRicorrenti" type="hidden">
+
+                <div class="columns">
+                    <div class="column is-6">
+                        <div class="field">
+                            <label class="label">Cognome</label>
+                            <input id="CognomeRicorrente" asp-for="Ricorrenti.Cognome" class="input">
+                        </div>
+                    </div>
+                    <div class="column is-6">
+                        <div class="field">
+                            <label class="label">Nome</label>
+                            <input id="NomeRicorrente" asp-for="Ricorrenti.Nome" class="input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="columns">
+                    <div class="column is-6">
+                        <div class="field">
+                            <label class="label">CodiceFiscale</label>
+                            <input id="CodiceFiscaleRicorrente" asp-for="Ricorrenti.CodiceFiscale" class="input">
+                        </div>
+                    </div>
+                    <div class="column is-4">
+                        <div class="field">
+                            <label class="label">Percentuale di Riferimento</label>
+                            <input id="PercentualeRicorrente" onblur="this.value = formatMoney(this.value)" onkeydown="return handleReplaceDotWithComma(this,event)" asp-for="Ricorrenti.Percentuale" class="input">
+                        </div>
+                    </div>
+                </div>
+                <div class="columns">
+                    <div class="column is-12">
+                        <div class="field">
+                            <label class="label">Domicilio</label>
+                            <input id="DomicilioRicorrente" asp-for="Ricorrenti.Domicilio" class="input">
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+            <footer class="modal-card-foot">
+                <button id="buttonRicorrentiOk" type="button" onclick="form.submit()" class="button is-dark">Aggiungi</button>
+                <button type="button" class="button is-dark" onclick="cancelModalRicorrenti()">Annulla</button>
+            </footer>
+        </form>
+    </div>
+</div>
+
+
+<div id="modal-AttiDisposizione" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <form id="formInsAttiDisposizione" asp-action="InserisciAttiDisposizioneR">
+
+            <header class="modal-card-head">
+                <p id="pTitoloAttiDisposizione" class="modal-card-title">Inserisci Atto di Disposizione</p>
+                <button class="delete" type="reset" onclick="cancelModalAttiDisposizione()"></button>
+            </header>
+            <section class="modal-card-body">
+                <input asp-for="Relazioni.ID" type="hidden">
+                <input asp-for="Tab" value="5" type="hidden">
+                <input asp-for="ModeAttiDisposizione" value="Ins" type="hidden">
+                <input asp-for="IDAttiDisposizione" type="hidden">
+
+                <div class="columns">
+                    <div class="column is-12">
+                        <div class="field">
+                            <label class="label">Atto di Disposizione</label>
+                            <input id="descrizioneAttiDisposizione" asp-for="AttiDisposizione.Descrizione" class="input">
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+            <footer class="modal-card-foot">
+                <button id="buttonAttiDisposizioneOk" type="button" onclick="form.submit()" class="button is-dark">Aggiungi</button>
+                <button type="button" class="button is-dark" onclick="cancelModalAttiDisposizione()">Annulla</button>
+            </footer>
+        </form>
+    </div>
+</div>
+
+<div id="modal-AnnotazioniAggiuntive" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <form id="formInsAnnotazioniAggiuntive" asp-action="InserisciAnnotazioniAggiuntiveR">
+
+            <header class="modal-card-head">
+                <p id="pTitoloAnnotazioniAggiuntive" class="modal-card-title">Inserisci Annotazione aggiuntiva</p>
+                <button class="delete" type="reset" onclick="cancelModalAnnotazioniAggiuntive()"></button>
+            </header>
+            <section class="modal-card-body">
+                <input asp-for="Relazioni.ID" type="hidden">
+                <input asp-for="Tab" value="6" type="hidden">
+                <input asp-for="ModeAnnotazioniAggiuntive" value="Ins" type="hidden">
+                <input asp-for="IDAnnotazioniAggiuntive" type="hidden">
+
+                <div class="columns">
+                    <div class="column is-12">
+                        <div class="field">
+                            <label class="label">Annotazione aggiuntiva</label>
+                            <input id="descrizioneAnnotazioniAggiuntive" asp-for="AnnotazioniAggiuntive.Descrizione" class="input">
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+            <footer class="modal-card-foot">
+                <button id="buttonAnnotazioniAggiuntiveOk" type="button" onclick="form.submit()" class="button is-dark">Aggiungi</button>
+                <button type="button" class="button is-dark" onclick="cancelModalAnnotazioniAggiuntive()">Annulla</button>
+            </footer>
+        </form>
+    </div>
+</div>
+
+<div id="modal-SpeseMese" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <form id="formInsSpeseMese" asp-action="InserisciSpeseMeseR">
+
+            <header class="modal-card-head">
+                <p id="pTitoloSpeseMese" class="modal-card-title">Inserisci Spesa mensile</p>
+                <button class="delete" type="reset" onclick="cancelModalSpeseMese()"></button>
+            </header>
+            <section class="modal-card-body">
+                <input asp-for="Relazioni.ID" type="hidden">
+                <input asp-for="Tab" value="7" type="hidden">
+                <input asp-for="ModeSpeseMese" value="Ins" type="hidden">
+                <input asp-for="IDSpeseMese" type="hidden">
+
+                <div class="columns">
+                    <div class="column is-12">
+                        <div class="field">
+                            <label class="label">Descrizione spesa mensili</label>
+                            <input id="descrizioneSpeseMese" asp-for="SpeseMese.Descrizione" class="input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="columns">
+                    <div class="column is-12">
+                        <div class="field">
+                            <label class="label">Importo spesa mensile</label>
+                            <input id="importoSpeseMese" onblur="this.value = formatMoney(this.value)" onkeydown="return handleReplaceDotWithComma(this,event)" asp-for="SpeseMese.Importo" class="input">
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+            <footer class="modal-card-foot">
+                <button id="buttonSpeseMeseOk" type="button" onclick="form.submit()" class="button is-dark">Aggiungi</button>
+                <button type="button" class="button is-dark" onclick="cancelModalSpeseMese()">Annulla</button>
+            </footer>
+        </form>
+    </div>
+</div>
+
+
+<div id="modal-PatrimonioImmobiliare" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <form id="formInsPatrimonioImmobiliare" asp-action="InserisciPatrimonioImmobiliareR">
+
+            <header class="modal-card-head">
+                <p id="pTitoloPatrimonioImmobiliare" class="modal-card-title">Inserisci elemento del Patrimonio immobiliare</p>
+                <button class="delete" type="reset" onclick="cancelModalPatrimonioImmobiliare()"></button>
+            </header>
+            <section class="modal-card-body">
+                <input asp-for="Relazioni.ID" type="hidden">
+                <input asp-for="Tab" value="8" type="hidden">
+                <input asp-for="ModePatrimonioImmobiliare" value="Ins" type="hidden">
+                <input asp-for="IDPatrimonioImmobiliare" type="hidden">
+
+                <div class="columns">
+                    <div class="column is-12">
+                        <div class="field">
+                            <label class="label">Descrizione dell'immobile</label>
+                            <input id="descrizionePatrimonioImmobiliare" asp-for="PatrimonioImmobiliare.Descrizione" class="input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="columns">
+                    <div class="column is-6">
+                        <div class="field">
+                            <label class="label">Superficie dell'immobile in mq</label>
+                            <input id="superficiePatrimonioImmobiliare" onkeydown="return handleReplaceDotWithComma(this,event)" asp-for="PatrimonioImmobiliare.Superficie" class="input">
+                        </div>
+                    </div>
+                    <div class="column is-6">
+                        <div class="field">
+                            <label class="label">Valutazione al mq (OMI/VAM)</label>
+                            <input id="valoreOMIVAMPatrimonioImmobiliare" onblur="this.value = formatMoney(this.value)" onkeydown="return handleReplaceDotWithComma(this,event)" asp-for="PatrimonioImmobiliare.ValoreOmiVan" class="input">
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+            <footer class="modal-card-foot">
+                <button id="buttonPatrimonioImmobiliareOk" type="button" onclick="form.submit()" class="button is-dark">Aggiungi</button>
+                <button type="button" class="button is-dark" onclick="cancelModalPatrimonioImmobiliare()">Annulla</button>
+            </footer>
+        </form>
+    </div>
+</div>
+
+<div id="modal-BeniMobiliRegistrati" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <form id="formInsBeniMobiliRegistrati" asp-action="InserisciBeniMobiliRegistratiR">
+
+            <header class="modal-card-head">
+                <p id="pTitoloBeniMobiliRegistrati" class="modal-card-title">Inserisci Bene Mobile Registrato</p>
+                <button class="delete" type="reset" onclick="cancelModalBeniMobiliRegistrati()"></button>
+            </header>
+            <section class="modal-card-body">
+                <input asp-for="Relazioni.ID" type="hidden">
+                <input asp-for="Tab" value="9" type="hidden">
+                <input asp-for="ModeBeniMobiliRegistrati" value="Ins" type="hidden">
+                <input asp-for="IDBeniMobiliRegistrati" type="hidden">
+
+                <div class="columns">
+                    <div class="column is-12">
+                        <div class="field">
+                            <label class="label">Descrizione del Bene Mobile Registrato</label>
+                            <input id="descrizioneBeniMobiliRegistrati" asp-for="BeniMobiliRegistrati.Descrizione" class="input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="columns">
+                    <div class="column is-6">
+                        <div class="field">
+                            <label class="label">Targa del Bene Mobile Registrato</label>
+                            <input id="targaBeniMobiliRegistrati" asp-for="BeniMobiliRegistrati.Targa" class="input">
+                        </div>
+                    </div>
+                    <div class="column is-6">
+                        <div class="field">
+                            <label class="label">Stima del Bene da riviste di settore</label>
+                            <input id="stimaBeniMobiliRegistrati" onblur="this.value = formatMoney(this.value)" onkeydown="return handleReplaceDotWithComma(this,event)" asp-for="BeniMobiliRegistrati.Stima" class="input">
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+            <footer class="modal-card-foot">
+                <button id="buttonBeniMobiliRegistratiOk" type="button" onclick="form.submit()" class="button is-dark">Aggiungi</button>
+                <button type="button" class="button is-dark" onclick="cancelModalBeniMobiliRegistrati()">Annulla</button>
+            </footer>
+        </form>
+    </div>
+</div>
+
+<div id="modal-BeniMobili" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <form id="formInsBeniMobili" asp-action="InserisciBeniMobiliR">
+
+            <header class="modal-card-head">
+                <p id="pTitoloBeniMobili" class="modal-card-title">Inserisci Bene Mobile</p>
+                <button class="delete" type="reset" onclick="cancelModalBeniMobili()"></button>
+            </header>
+            <section class="modal-card-body">
+                <input asp-for="Relazioni.ID" type="hidden">
+                <input asp-for="Tab" value="9" type="hidden">
+                <input asp-for="ModeBeniMobili" value="Ins" type="hidden">
+                <input asp-for="IDBeniMobili" type="hidden">
+
+                <div class="columns">
+                    <div class="column is-12">
+                        <div class="field">
+                            <label class="label">Descrizione del Bene Mobile</label>
+                            <input id="descrizioneBeniMobili" asp-for="BeniMobili.Descrizione" class="input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="columns">
+                    <div class="column is-12">
+                        <div class="field">
+                            <label class="label">Costo storico del Bene Mobile</label>
+                            <input id="costostoricoBeniMobili" onblur="this.value = formatMoney(this.value)" onkeydown="return handleReplaceDotWithComma(this,event)" asp-for="BeniMobili.CostoStorico" class="input">
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+            <footer class="modal-card-foot">
+                <button id="buttonBeniMobiliOk" type="button" onclick="form.submit()" class="button is-dark">Aggiungi</button>
+                <button type="button" class="button is-dark" onclick="cancelModalBeniMobili()">Annulla</button>
+            </footer>
+        </form>
+    </div>
+</div>
+
+
+<div id="modal-elimina" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Attenzione</p>
+            <button class="delete" type="reset" onclick="document.getElementById('Elimina').value = 'N';cancelModalElimina()"></button>
+        </header>
+        <section class="modal-card-body">
+            <p>Eliminare l'informazione selezionata?</p>
+            <input id="IDCaller" type="hidden" />
+            <input id="Elimina" type="hidden" value="N" />
+        </section>
+        <footer class="modal-card-foot">
+            <button type="button" onclick="document.getElementById('Elimina').value = 'S';cancelModalElimina();document.getElementById(document.getElementById('IDCaller').value).click()" class="button is-dark">Elimina</button>
+            <button type="button" class="button is-dark" onclick="document.getElementById('Elimina').value = 'N';cancelModalElimina()">Annulla</button>
+        </footer>
+    </div>
+</div>
+
+
+<script>
+
+    function confirmElimina(id) {
+        setModalElimina(id);
+        return document.getElementById('Elimina').value == "S";
+    }
+
+
+    function setModalElimina(id) {
+
+
+        document.getElementById("IDCaller").value = id;
+
+        document.getElementById("modal-elimina").classList.add("is-active");
+
+    }
+
+    function cancelModalElimina() {
+
+        document.getElementById("modal-elimina").classList.remove("is-active");
+
+    }
+
+    function setModalMasseDebitorie(id, Creditore, CausaDebitoID, Nota, GradoID, importo, PercSoddisfo) {
+        if (typeof id == "undefined") {
+            document.getElementById('ModeMasseDebitorie').value = 'Ins';
+            document.getElementById("buttonMasseDebitorieOk").innerHTML = "Inserisci";
+            document.getElementById("pTitoloMasseDebitorie").innerHTML = "Inserisci Elemento Debitorio";
+
+            document.getElementById("IDMasseDebitorie").value = "";
+            document.getElementById("creditore").value = "";
+            document.getElementById("select_causa_debito").value = "0";
+            document.getElementById("nota_MasseDebitorie").value = "";
+            document.getElementById("select_grado").value = "0";
+            document.getElementById("importo_MasseDebitorie").value = "0";
+            document.getElementById("perc_soddisfo").value = "100";
+
+        }
+        else {
+            document.getElementById('ModeMasseDebitorie').value = 'Upd';
+            document.getElementById("buttonMasseDebitorieOk").innerHTML = "Aggiorna";
+            document.getElementById("pTitoloMasseDebitorie").innerHTML = "Aggiorna Elemento Debitorio";
+
+            document.getElementById("IDMasseDebitorie").value = id;
+            document.getElementById("creditore").value = Creditore;
+            document.getElementById("select_causa_debito").value = CausaDebitoID;
+            document.getElementById("nota_MasseDebitorie").value = Nota;
+            document.getElementById("select_grado").value = GradoID;
+            document.getElementById("importo_MasseDebitorie").value = importo;
+            document.getElementById("perc_soddisfo").value = PercSoddisfo;
+
+        }
+
+        document.getElementById("modal-MasseDebitorie").classList.add("is-active");
+
+    }
+
+    function cancelModalMasseDebitorie() {
+
+        document.getElementById("modal-MasseDebitorie").classList.remove("is-active");
+
+    }
+
+
+    function setModalRicorrenti(id, Cognome, Nome, CodiceFiscale, Domicilio, Percentuale) {
+        if (typeof id == "undefined") {
+            document.getElementById('ModeRicorrenti').value = 'Ins';
+            document.getElementById("buttonRicorrentiOk").innerHTML = "Inserisci";
+            document.getElementById("pTitoloRicorrenti").innerHTML = "Inserisci Ricorrente";
+
+            document.getElementById("IDRicorrenti").value = "";
+            document.getElementById("CognomeRicorrente").value = "";
+            document.getElementById("NomeRicorrente").value = "";
+            document.getElementById("CodiceFiscaleRicorrente").value = "";
+            document.getElementById("DomicilioRicorrente").value = "";
+            document.getElementById("PercentualeRicorrente").value = "100";
+        }
+        else {
+            document.getElementById('ModeRicorrenti').value = 'Upd';
+            document.getElementById("buttonRicorrentiOk").innerHTML = "Aggiorna";
+            document.getElementById("pTitoloRicorrenti").innerHTML = "Aggiorna Elemento Debitorio";
+
+            document.getElementById("IDRicorrenti").value = id;
+            document.getElementById("CognomeRicorrente").value = Cognome;
+            document.getElementById("NomeRicorrente").value = Nome;
+            document.getElementById("CodiceFiscaleRicorrente").value = CodiceFiscale;
+            document.getElementById("DomicilioRicorrente").value = Domicilio;
+            document.getElementById("PercentualeRicorrente").value = Percentuale;
+
+        }
+
+        document.getElementById("modal-Ricorrenti").classList.add("is-active");
+
+    }
+
+    function cancelModalRicorrenti() {
+
+        document.getElementById("modal-Ricorrenti").classList.remove("is-active");
+
+    }
+
+
+    function setModalAttiDisposizione(id, Descrizione) {
+        if (typeof id == "undefined") {
+            document.getElementById('ModeAttiDisposizione').value = 'Ins';
+            document.getElementById("buttonAttiDisposizioneOk").innerHTML = "Inserisci";
+            document.getElementById("pTitoloAttiDisposizione").innerHTML = "Inserisci Atto di Disposizione";
+
+            document.getElementById("IDAttiDisposizione").value = "";
+            document.getElementById("descrizioneAttiDisposizione").value = "";
+
+        }
+        else {
+            document.getElementById('ModeAttiDisposizione').value = 'Upd';
+            document.getElementById("buttonAttiDisposizioneOk").innerHTML = "Aggiorna";
+            document.getElementById("pTitoloAttiDisposizione").innerHTML = "Aggiorna Atto di Disposizione";
+
+            document.getElementById("IDAttiDisposizione").value = id;
+            document.getElementById("descrizioneAttiDisposizione").value = Descrizione;
+
+        }
+
+        document.getElementById("modal-AttiDisposizione").classList.add("is-active");
+
+    }
+
+    function cancelModalAttiDisposizione() {
+
+        document.getElementById("modal-AttiDisposizione").classList.remove("is-active");
+
+    }
+
+    function setModalAnnotazioniAggiuntive(id, Descrizione) {
+        if (typeof id == "undefined") {
+            document.getElementById('ModeAnnotazioniAggiuntive').value = 'Ins';
+            document.getElementById("buttonAnnotazioniAggiuntiveOk").innerHTML = "Inserisci";
+            document.getElementById("pTitoloAnnotazioniAggiuntive").innerHTML = "Inserisci Annotazione Aggiuntiva";
+
+            document.getElementById("IDAnnotazioniAggiuntive").value = "";
+            document.getElementById("descrizioneAnnotazioniAggiuntive").value = "";
+
+        }
+        else {
+            document.getElementById('ModeAnnotazioniAggiuntive').value = 'Upd';
+            document.getElementById("buttonAnnotazioniAggiuntiveOk").innerHTML = "Aggiorna";
+            document.getElementById("pTitoloAnnotazioniAggiuntive").innerHTML = "Aggiorna Annotazione Aggiuntiva";
+
+            document.getElementById("IDAnnotazioniAggiuntive").value = id;
+            document.getElementById("descrizioneAnnotazioniAggiuntive").value = Descrizione;
+
+        }
+
+        document.getElementById("modal-AnnotazioniAggiuntive").classList.add("is-active");
+
+    }
+
+    function cancelModalAnnotazioniAggiuntive() {
+
+        document.getElementById("modal-AnnotazioniAggiuntive").classList.remove("is-active");
+
+    }
+
+
+    function setModalSpeseMese(id, Descrizione, Importo) {
+        if (typeof id == "undefined") {
+            document.getElementById('ModeSpeseMese').value = 'Ins';
+            document.getElementById("buttonSpeseMeseOk").innerHTML = "Inserisci";
+            document.getElementById("pTitoloSpeseMese").innerHTML = "Inserisci Spesa mensile";
+
+            document.getElementById("IDSpeseMese").value = "";
+            document.getElementById("descrizioneSpeseMese").value = "";
+            document.getElementById("importoSpeseMese").value = "0";
+        }
+        else {
+            document.getElementById('ModeSpeseMese').value = 'Upd';
+            document.getElementById("buttonSpeseMeseOk").innerHTML = "Aggiorna";
+            document.getElementById("pTitoloSpeseMese").innerHTML = "Aggiorna Spesa mensile";
+
+            document.getElementById("IDSpeseMese").value = id;
+            document.getElementById("descrizioneSpeseMese").value = Descrizione;
+            document.getElementById("importoSpeseMese").value = Importo;
+        }
+
+        document.getElementById("modal-SpeseMese").classList.add("is-active");
+    }
+
+    function cancelModalSpeseMese() {
+        document.getElementById("modal-SpeseMese").classList.remove("is-active");
+    }
+
+
+    function setModalPatrimonioImmobiliare(id, Descrizione, Superficie, ValoriOMIVAM) {
+        if (typeof id == "undefined") {
+            document.getElementById('ModePatrimonioImmobiliare').value = 'Ins';
+            document.getElementById("buttonPatrimonioImmobiliareOk").innerHTML = "Inserisci";
+            document.getElementById("pTitoloPatrimonioImmobiliare").innerHTML = "Inserisci elemento del Patrimonio Immobilare";
+
+            document.getElementById("IDPatrimonioImmobiliare").value = "";
+            document.getElementById("descrizionePatrimonioImmobiliare").value = "";
+            document.getElementById("superficiePatrimonioImmobiliare").value = "0";
+            document.getElementById("valoreOMIVAMPatrimonioImmobiliare").value = "0";
+        }
+        else {
+            document.getElementById('ModePatrimonioImmobiliare').value = 'Upd';
+            document.getElementById("buttonPatrimonioImmobiliareOk").innerHTML = "Aggiorna";
+            document.getElementById("pTitoloPatrimonioImmobiliare").innerHTML = "Aggiorna elemento del Patrimonio Immobiliare";
+
+            document.getElementById("IDPatrimonioImmobiliare").value = id;
+            document.getElementById("descrizionePatrimonioImmobiliare").value = Descrizione;
+            document.getElementById("superficiePatrimonioImmobiliare").value = Superficie;
+            document.getElementById("valoreOMIVAMPatrimonioImmobiliare").value = ValoriOMIVAM;
+        }
+
+        document.getElementById("modal-PatrimonioImmobiliare").classList.add("is-active");
+    }
+
+    function cancelModalPatrimonioImmobiliare() {
+        document.getElementById("modal-PatrimonioImmobiliare").classList.remove("is-active");
+    }
+
+    function setModalBeniMobiliRegistrati(id, Descrizione, Targa, Stima) {
+        if (typeof id == "undefined") {
+            document.getElementById('ModeBeniMobiliRegistrati').value = 'Ins';
+            document.getElementById("buttonBeniMobiliRegistratiOk").innerHTML = "Inserisci";
+            document.getElementById("pTitoloBeniMobiliRegistrati").innerHTML = "Inserisci Bene Mobile Registrato";
+
+            document.getElementById("IDBeniMobiliRegistrati").value = "";
+            document.getElementById("descrizioneBeniMobiliRegistrati").value = "";
+            document.getElementById("targaBeniMobiliRegistrati").value = "";
+            document.getElementById("stimaBeniMobiliRegistrati").value = "0";
+        }
+        else {
+            document.getElementById('ModeBeniMobiliRegistrati').value = 'Upd';
+            document.getElementById("buttonBeniMobiliRegistratiOk").innerHTML = "Aggiorna";
+            document.getElementById("pTitoloBeniMobiliRegistrati").innerHTML = "Aggiorna Bene Mobile Registrato";
+
+            document.getElementById("IDBeniMobiliRegistrati").value = id;
+            document.getElementById("descrizioneBeniMobiliRegistrati").value = Descrizione;
+            document.getElementById("targaBeniMobiliRegistrati").value = Targa;
+            document.getElementById("stimaBeniMobiliRegistrati").value = Stima;
+        }
+
+        document.getElementById("modal-BeniMobiliRegistrati").classList.add("is-active");
+    }
+
+    function cancelModalBeniMobiliRegistrati() {
+        document.getElementById("modal-BeniMobiliRegistrati").classList.remove("is-active");
+    }
+
+    function setModalBeniMobili(id, Descrizione, CostoStorico) {
+        if (typeof id == "undefined") {
+            document.getElementById('ModeBeniMobili').value = 'Ins';
+            document.getElementById("buttonBeniMobiliOk").innerHTML = "Inserisci";
+            document.getElementById("pTitoloBeniMobili").innerHTML = "Inserisci Bene Mobile";
+
+            document.getElementById("IDBeniMobili").value = "";
+            document.getElementById("descrizioneBeniMobili").value = "";
+            document.getElementById("costostoricoBeniMobili").value = "";
+        }
+        else {
+            document.getElementById('ModeBeniMobili').value = 'Upd';
+            document.getElementById("buttonBeniMobiliOk").innerHTML = "Aggiorna";
+            document.getElementById("pTitoloBeniMobili").innerHTML = "Aggiorna Bene Mobile";
+
+            document.getElementById("IDBeniMobili").value = id;
+            document.getElementById("descrizioneBeniMobili").value = Descrizione;
+            document.getElementById("costostoricoBeniMobili").value = CostoStorico;
+        }
+
+        document.getElementById("modal-BeniMobili").classList.add("is-active");
+    }
+
+    function cancelModalBeniMobili() {
+        document.getElementById("modal-BeniMobili").classList.remove("is-active");
+    }
+
+
+</script>

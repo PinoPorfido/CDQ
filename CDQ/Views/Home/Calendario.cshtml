@@ -1,0 +1,677 @@
+﻿@model CDQ.Models.Helper.HelpCalendario
+
+@{
+    ViewData["Title"] = "Attività & Risorse";
+}
+
+<br />
+<br />
+
+<div class="columns">
+    <div class="column is-1 is-offset-1" align="left">
+        <a asp-action="Index" class="button back">
+            <span class="icon">
+                <i class="fas fa-backward"></i>
+            </span>
+        </a>
+    </div>
+    <div class="column is-8" align="center">
+        <h1 class="title is-4">Calendario Operativo</h1>
+    </div>
+    <div class="column is-2" align="right">
+    </div>
+</div>
+
+<form id="formRicerca" method="get">
+    <div class="columns">
+        <div class="column is-10 is-offset-1">
+            <div class="panel">
+                <div class="panel-heading">Filtra Pianificazioni esistenti</div>
+                <div class="panel-block">
+                    <div class="container">
+                        <div class="column" align="center">
+
+                            @Html.HiddenFor(model => Model.Mode)
+
+                            @for (var i = 0; i < Model.ListaOrari.Count(); i++)
+                            {
+                                @Html.HiddenFor(model => Model.ListaOrari[i].Text)
+                                @Html.HiddenFor(model => Model.ListaOrari[i].Value)
+                            }
+
+
+                            @*<div class="columns">
+            <div class="column is-4">
+                <div class="select is-fullwidth">
+                    <select asp-for="IDGiornoR" asp-items="Model.ListaGiorni" onchange="this.form.submit()"></select>
+                </div>
+                <div class="field">
+                    <input id="IsSortGiorno" asp-for="IsSortGiorno" class="is-checkradio is-small is-info" type="checkbox" onclick="SetCheck('giorno');this.form.submit()">
+                    <label for="IsSortGiorno"><strong>Ordina per Giorno e Ora Inizio</strong></label>
+                </div>
+            </div>
+            <div class="column is-4">
+                <div class="select is-fullwidth">
+                    <select asp-for="IDAttivita" asp-items="Model.ListaAttivita" onchange="this.form.submit()">
+                        <option value=-1>Seleziona un'Attività</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <input id="IsSortAttivita" asp-for="IsSortAttivita" class="is-checkradio is-small is-info" type="checkbox" onclick="SetCheck('attivita');this.form.submit()">
+                    <label for="IsSortAttivita"><strong>Ordina per Attività, Giorno e Ora Inizio</strong></label>
+                </div>
+            </div>
+            <div class="column is-4">
+                <div class="select is-fullwidth">
+                    <select asp-for="IDRisorsa" asp-items="Model.ListaRisorse" onchange="this.form.submit()">
+                        <option value=-1>Seleziona una Risorsa</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <input id="IsSortRisorsa" asp-for="IsSortRisorsa" class="is-checkradio is-small is-info" type="checkbox" onclick="SetCheck('risorsa');this.form.submit()">
+                    <label for="IsSortRisorsa"><strong>Ordina per Risorsa, Giorno e Ora Inizio</strong></label>
+                </div>
+            </div>
+        </div>*@
+                            @*<table class="table is-fullwidth">
+        <thead>
+            <tr>
+                <th width="2%">-</th>
+                <th width="14%">LUN</th>
+                <th width="14%">MAR</th>
+                <th width="14%">MER</th>
+                <th width="14%">GIO</th>
+                <th width="14%">VEN</th>
+                <th width="14%">SAB</th>
+                <th width="14%">DOM</th>
+            </tr>
+        <tbody>*@
+                            @*@{
+            foreach (var item in Model.ListaCalendari)
+            {
+                <tr>
+                    <td width="25%">
+                        @Html.DisplayFor(modelItem => item.RisorsaAttivita.Attivita.Descrizione)
+                    </td>
+                    <td width="15%">
+                        @Html.DisplayFor(modelItem => item.RisorsaAttivita.Risorsa.Descrizione)
+                    </td>
+                    <td width="5%" align="center">
+                        @Html.DisplayFor(modelItem => item.Capienza)
+                    </td>
+                    <td width="15%">
+                        @Html.DisplayFor(modelItem => item.Giorno.Nome)
+                    </td>
+                    <td align="center">
+                        @Html.DisplayFor(modelItem => item.OraInizio_OUT)
+                    </td>
+                    <td align="center">
+                        @Html.DisplayFor(modelItem => item.OraFine_OUT)
+                    </td>
+                    <td align="center">
+                        @Html.DisplayFor(modelItem => item.Durata_OUT)
+                    </td>
+                    <td align="center">
+                        <a title="aggiorna dati" onclick="setUpdPianificazione('@item.ID','@item.RisorsaAttivita.ID','@item.Giorno.ID','@item.OraInizio','@item.OraFine','@item.Capienza');">
+                            <span>
+                                <span class="icon">
+                                    <i class="fas fa-edit"></i>
+                                </span>
+                            </span>
+                        </a>
+                    </td>
+                    <td align="center">
+                        <a id="@item.ID" asp-action="EliminaPianificazione" asp-route-ID="@item.ID" onclick="return confirmElimina(this.id)" title="elimina Pianificazione">
+                            <span>
+                                <span class="icon">
+                                    <i class="fas fa-trash-alt"></i>
+                                </span>
+                            </span>
+                        </a>
+                    </td>
+                </tr>
+            }
+        }*@
+                            @*</tbody>
+        </table>*@
+
+                            <table class="calendar table table-bordered is-fullwidth">
+                                <thead>
+                                    <tr>
+                                        <th>&nbsp;</th>
+                                        <th width="14%" align="center">LUN</th>
+                                        <th width="14%" align="center">MAR</th>
+                                        <th width="14%" align="center">MER</th>
+                                        <th width="14%" align="center">GIO</th>
+                                        <th width="14%" align="center">VEN</th>
+                                        <th width="14%" align="center">SAB</th>
+                                        <th width="14%" align="center">DOM</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>08:00</td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+                                        <td class=" no-events" rowspan="1"></td>
+                                        <td class=" no-events" rowspan="1"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>08:30</td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+                                        <td class=" no-events" rowspan="1"></td>
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>09:00</td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>09:30</td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>10:00</td>
+
+                                        <td class=" has-events" rowspan="4">
+
+                                            <div class="row-fluid lecture" style="width: 99%; height: 100%;">
+
+
+                                                <span class="title">Combinatorics</span> <span class="lecturer">
+                                                    <a>
+                                                        Prof.
+                                                        Someone
+                                                    </a>
+                                                </span> <span class="location">23/111</span>
+                                            </div>
+                                        </td>
+
+                                        <td class=" has-events" rowspan="4">
+
+                                            <div class="row-fluid lecture" style="width: 99%; height: 100%;">
+
+
+                                                <span class="title">Algebra 2</span> <span class="lecturer">
+                                                    <a>
+                                                        Prof.
+                                                        Else <span class="location">44/654</span>
+
+                                            </div>
+                                        </td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" has-events" rowspan="4">
+
+                                            <div class="row-fluid lecture" style="width: 99%; height: 100%;">
+
+
+                                                <span class="title">Data Structures</span> <span class="lecturer">
+                                                    <a>
+                                                        Prof.
+                                                        If
+                                                    </a>
+                                                </span> <span class="location">54/222</span>
+                                            </div>
+                                        </td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>10:30</td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>11:00</td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>11:30</td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>12:00</td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" has-events conflicts " rowspan="3">
+
+                                            <div class="row-fluid practice" style="width: 49.5%; height: 100%;">
+
+
+                                                <span class="title">Algebra 2</span> <span class="lecturer">
+                                                    <a>
+                                                        Mr.
+                                                        Someone
+                                                    </a>
+                                                </span> <span class="location">12/444</span>
+                                            </div>
+
+                                            <div class="row-fluid lecture" style="width: 49.5%; height: 100%;">
+
+
+                                                <span class="title">Calculus 1</span> <span class="lecturer">
+                                                    <a>
+                                                        Prof.
+                                                        Foo
+                                                    </a>
+                                                </span> <span class="location">66/321</span>
+                                            </div>
+                                        </td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" has-events" rowspan="4">
+
+                                            <div class="row-fluid lecture" style="width: 99%; height: 100%;">
+
+
+                                                <span class="title">Algebra 2</span> <span class="lecturer">
+                                                    <a>
+                                                        Prof.
+                                                        Oak
+                                                    </a>
+                                                </span> <span class="location">54/224</span>
+                                            </div>
+                                        </td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>12:30</td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>13:00</td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>13:30</td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>14:00</td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" has-events" rowspan="4">
+
+                                            <div class="row-fluid lecture" style="width: 99%; height: 100%;">
+
+
+                                                <span class="title">Data Structures</span> <span class="lecturer">
+                                                    <a>
+                                                        Prof.
+                                                        Oak
+                                                    </a>
+                                                </span> <span class="location">33/111</span>
+                                            </div>
+                                        </td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" has-events" rowspan="6">
+
+                                            <div class="row-fluid lecture" style="width: 99%; height: 100%;">
+
+
+                                                <span class="title">Calculus 1</span> <span class="lecturer">
+                                                    <a>
+                                                        Dr.
+                                                        Ok
+                                                    </a>
+                                                </span> <span class="location">12/54</span>
+                                            </div>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>14:30</td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>15:00</td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>15:30</td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>16:00</td>
+
+                                        <td class=" has-events" rowspan="4">
+
+                                            <div class="row-fluid practice" style="width: 99%; height: 100%;">
+
+
+                                                <span class="title">Calculus 1</span> <span class="lecturer">
+                                                    <a>
+                                                        Mrs.
+                                                        Ak
+                                                    </a>
+                                                </span> <span class="location">54/125</span>
+                                            </div>
+                                        </td>
+
+                                        <td class=" has-events" rowspan="3">
+
+                                            <div class="row-fluid lecture" style="width: 99%; height: 100%;">
+
+
+                                                <span class="title">Combinatorics</span> <span class="lecturer">
+                                                    <a>
+                                                        Ms.
+                                                        Nice
+                                                    </a>
+                                                </span> <span class="location">99/411</span>
+                                            </div>
+                                        </td>
+
+                                        <td class=" has-events" rowspan="4">
+
+                                            <div class="row-fluid practice" style="width: 99%; height: 100%;">
+
+
+                                                <span class="title">Combinatorics</span> <span class="lecturer">
+                                                    <a>
+                                                        Ms.
+                                                        K
+                                                    </a>
+                                                </span> <span class="location">24/900</span>
+                                            </div>
+                                        </td>
+
+                                        <td class=" has-events" rowspan="4">
+
+                                            <div class="row-fluid practice" style="width: 99%; height: 100%;">
+
+
+                                                <span class="title">Data Structures</span> <span class="lecturer">
+                                                    <a>
+                                                        Mr.
+                                                        Ben
+                                                    </a>
+                                                </span> <span class="location">54/214</span>
+                                            </div>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>16:30</td>
+                                        <td class=" has-events" rowspan="4">
+
+                                            <div class="row-fluid practice" style="width: 99%; height: 100%;">
+
+
+                                                <span class="title">Calculus 1</span> <span class="lecturer">
+                                                    <a>
+                                                        Mrs.
+                                                        Ak
+                                                    </a>
+                                                </span> <span class="location">54/125</span>
+                                            </div>
+                                        </td>
+
+
+                                    </tr>
+                                    <tr>
+                                        <td>17:00</td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>17:30</td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>18:00</td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>18:30</td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>19:00</td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>19:30</td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                        <td class=" no-events" rowspan="1"></td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</form>
+
+
+<div id="modal-elimina" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Attenzione</p>
+            <button class="delete" type="reset" onclick="document.getElementById('Elimina').value = 'N';cancelModalElimina()"></button>
+        </header>
+        <section class="modal-card-body">
+            <p>Eliminare l'informazione selezionata?</p>
+            <input id="IDCaller" type="hidden" />
+            <input id="Elimina" type="hidden" value="N" />
+        </section>
+        <footer class="modal-card-foot">
+            <button type="button" onclick="document.getElementById('Elimina').value = 'S';cancelModalElimina();document.getElementById(document.getElementById('IDCaller').value).click()" class="button is-dark">Elimina</button>
+            <button type="button" class="button is-dark" onclick="document.getElementById('Elimina').value = 'N';cancelModalElimina()">Annulla</button>
+        </footer>
+    </div>
+</div>
+
+<script>
+
+    function confirmElimina(id) {
+        setModalElimina(id);
+        return document.getElementById('Elimina').value == "S";
+    }
+
+
+    function setModalElimina(id) {
+
+
+        document.getElementById("IDCaller").value = id;
+
+        document.getElementById("modal-elimina").classList.add("is-active");
+
+    }
+
+    function cancelModalElimina() {
+
+        document.getElementById("modal-elimina").classList.remove("is-active");
+
+    }
+
+    function setUpdPianificazione(id, RisorsaAttivitaID, GiornoID, OraInizio, OraFine, Capienza) {
+        if (typeof id == "undefined") {
+            document.getElementById('Mode').value = 'Ins';
+        }
+        else {
+            document.getElementById('Mode').value = 'Upd';
+            document.getElementById("IDPianificazione").value = id;
+            document.getElementById("select_RisorsaAttivita").value = RisorsaAttivitaID;
+            document.getElementById("select_Giorno").value = GiornoID;
+            document.getElementById("select_OraInizio").value = OraInizio;
+            document.getElementById("select_OraFine").value = OraFine;
+            document.getElementById("Capienza").value = Capienza;
+        }
+    }
+
+</script>
+
+<script>
+    function SetCheck(id) {
+
+        if (id == "giorno" && document.getElementById('IsSortGiorno').checked == true) {
+            document.getElementById('IsSortAttivita').checked = false;
+            document.getElementById('IsSortRisorsa').checked = false;
+        }
+        if (id == "attivita" && document.getElementById('IsSortAttivita').checked == true) {
+            document.getElementById('IsSortGiorno').checked = false;
+            document.getElementById('IsSortRisorsa').checked = false;
+        }
+        if (id == "risorsa" && document.getElementById('IsSortRisorsa').checked == true) {
+            document.getElementById('IsSortAttivita').checked = false;
+            document.getElementById('IsSortGiorno').checked = false;
+        }
+    }
+
+    function GetCapienza() {
+        var x = document.getElementById("select_RisorsaAttivita").selectedIndex;
+        var y = document.getElementById("select_RisorsaAttivita").options;
+        var z = document.getElementById("select_RisorsaAttivitaCapienza").options;
+        document.getElementById("Capienza").value = z[x - 1].text;
+    }
+
+
+</script>

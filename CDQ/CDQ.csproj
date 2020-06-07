@@ -1,0 +1,330 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Models\Agente.cs" />
+    <Compile Remove="Models\AgenteProgetto.cs" />
+    <Compile Remove="Models\Associato.cs" />
+    <Compile Remove="Models\AssociatoCorso.cs" />
+    <Compile Remove="Models\AssociatoProgetto.cs" />
+    <Compile Remove="Models\AssociatoServizio.cs" />
+    <Compile Remove="Models\Aula.cs" />
+    <Compile Remove="Models\CaricamentoINAIL.cs" />
+    <Compile Remove="Models\CaricamentoINPS.cs" />
+    <Compile Remove="Models\CaricamentoW430.cs" />
+    <Compile Remove="Models\Causale.cs" />
+    <Compile Remove="Models\ConsulenzaServizio.cs" />
+    <Compile Remove="Models\Corso.cs" />
+    <Compile Remove="Models\Edizione.cs" />
+    <Compile Remove="Models\EnteAttuatore.cs" />
+    <Compile Remove="Models\EnteDelegato.cs" />
+    <Compile Remove="Models\Fondo.cs" />
+    <Compile Remove="Models\Helper\HelpAgente.cs" />
+    <Compile Remove="Models\Helper\HelpAgenti.cs" />
+    <Compile Remove="Models\Helper\HelpAssociato.cs" />
+    <Compile Remove="Models\Helper\HelpAula.cs" />
+    <Compile Remove="Models\Helper\HelpCausale.cs" />
+    <Compile Remove="Models\Helper\HelpCorsi.cs" />
+    <Compile Remove="Models\Helper\HelpCorso.cs" />
+    <Compile Remove="Models\Helper\HelpEdizione.cs" />
+    <Compile Remove="Models\Helper\HelpElencoAssociati.cs" />
+    <Compile Remove="Models\Helper\HelpINAIL.cs" />
+    <Compile Remove="Models\Helper\HelpINAILUpload.cs" />
+    <Compile Remove="Models\Helper\HelpINPS.cs" />
+    <Compile Remove="Models\Helper\HelpINPSUpload.cs" />
+    <Compile Remove="Models\Helper\HelpMovimenti.cs" />
+    <Compile Remove="Models\Helper\HelpPagamento.cs" />
+    <Compile Remove="Models\Helper\HelpProgetti.cs" />
+    <Compile Remove="Models\Helper\HelpProgetto.cs" />
+    <Compile Remove="Models\Helper\HelpScadenzeCorsi.cs" />
+    <Compile Remove="Models\Helper\HelpSchedaAssociato.cs" />
+    <Compile Remove="Models\Helper\HelpServizi.cs" />
+    <Compile Remove="Models\Helper\HelpServizio.cs" />
+    <Compile Remove="Models\Helper\HelpSituazioneAgente.cs" />
+    <Compile Remove="Models\Helper\HelpTipoCorso.cs" />
+    <Compile Remove="Models\Helper\HelpW430.cs" />
+    <Compile Remove="Models\Helper\HelpW430Upload.cs" />
+    <Compile Remove="Models\Helper\InfoAgenti.cs" />
+    <Compile Remove="Models\Helper\LinkAngente.cs" />
+    <Compile Remove="Models\Helper\ListaServiziAgente.cs" />
+    <Compile Remove="Models\Helper\Movimento.cs" />
+    <Compile Remove="Models\Helper\PagamentoRipartito.cs" />
+    <Compile Remove="Models\Helper\SaldoAgente.cs" />
+    <Compile Remove="Models\Helper\TreeViewNode.cs" />
+    <Compile Remove="Models\INAIL.cs" />
+    <Compile Remove="Models\INPS.cs" />
+    <Compile Remove="Models\NaturaGiuridica.cs" />
+    <Compile Remove="Models\Pagamento.cs" />
+    <Compile Remove="Models\PagamentoAgente.cs" />
+    <Compile Remove="Models\Personale.cs" />
+    <Compile Remove="Models\PersonaleCorso.cs" />
+    <Compile Remove="Models\PersonaleEdizione.cs" />
+    <Compile Remove="Models\Progetto.cs" />
+    <Compile Remove="Models\Progressivo.cs" />
+    <Compile Remove="Models\Ripartizione.cs" />
+    <Compile Remove="Models\Ristorno.cs" />
+    <Compile Remove="Models\RuoloProgetto.cs" />
+    <Compile Remove="Models\RuoloRappresentante.cs" />
+    <Compile Remove="Models\RuoloServizio.cs" />
+    <Compile Remove="Models\Servizio.cs" />
+    <Compile Remove="Models\SpesaProgetto.cs" />
+    <Compile Remove="Models\SpesaServizio.cs" />
+    <Compile Remove="Models\TipoAteco.cs" />
+    <Compile Remove="Models\TipoAttivita.cs" />
+    <Compile Remove="Models\TipoCorso.cs" />
+    <Compile Remove="Models\TipoCorsoAteco.cs" />
+    <Compile Remove="Models\TipoProgetto.cs" />
+    <Compile Remove="Models\TipoSpesaProgetto.cs" />
+    <Compile Remove="Models\VersamentoAgente.cs" />
+    <Compile Remove="Models\W430.cs" />
+    <Compile Remove="Utils\Sanatorie.cs" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="DocumentFormat.OpenXml" Version="2.10.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.3" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.3" />
+    <PackageReference Include="Realm" Version="4.3.0" />
+    <PackageReference Include="iTextSharp" Version="5.5.13.1" />
+    <PackageReference Include="ExcelDataReader" Version="3.6.0" />
+    <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.7.0" />
+    <PackageReference Include="OfficeOpenXml.Core.ExcelPackage" Version="1.0.0" />
+    <PackageReference Include="Microsoft.AspNet.SignalR" Version="2.4.1" />
+    <PackageReference Include="Microsoft.AspNet.SignalR.JS" Version="2.4.1" />
+    <PackageReference Include="DotNetCore.NPOI" Version="1.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services\" />
+    <Folder Include="Utils\" />
+    <Folder Include="wwwroot\images\" />
+    <Folder Include="wwwroot\images\small\" />
+    <Folder Include="wwwroot\etc\" />
+    <Folder Include="wwwroot\etc\pdf\" />
+    <Folder Include="Hubs\" />
+    <Folder Include="wwwroot\etc\xlsx\" />
+    <Folder Include="wwwroot\etc\docx\" />
+    <Folder Include="wwwroot\lib\fontawesome\svgs\brands\" />
+    <Folder Include="wwwroot\lib\fontawesome\svgs\regular\" />
+    <Folder Include="wwwroot\lib\fontawesome\svgs\solid\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="Views\Home\Agenti.cshtml" />
+    <Content Remove="Views\Home\Associati.cshtml" />
+    <Content Remove="Views\Home\Aule.cshtml" />
+    <Content Remove="Views\Home\Causali.cshtml" />
+    <Content Remove="Views\Home\Corsi.cshtml" />
+    <Content Remove="Views\Home\Corso.cshtml" />
+    <Content Remove="Views\Home\EditAgente.cshtml" />
+    <Content Remove="Views\Home\EditAssociato.cshtml" />
+    <Content Remove="Views\Home\EditAula.cshtml" />
+    <Content Remove="Views\Home\EditCausale.cshtml" />
+    <Content Remove="Views\Home\EditTipoCorso.cshtml" />
+    <Content Remove="Views\Home\Edizione.cshtml" />
+    <Content Remove="Views\Home\INAIL.cshtml" />
+    <Content Remove="Views\Home\INAILUpload.cshtml" />
+    <Content Remove="Views\Home\INPS.cshtml" />
+    <Content Remove="Views\Home\INPSUpload.cshtml" />
+    <Content Remove="Views\Home\MenuAnagrafica.cshtml" />
+    <Content Remove="Views\Home\MenuConfigurazione.cshtml" />
+    <Content Remove="Views\Home\MenuPrimaNota.cshtml" />
+    <Content Remove="Views\Home\Movimenti.cshtml" />
+    <Content Remove="Views\Home\Pagamento.cshtml" />
+    <Content Remove="Views\Home\Progetti.cshtml" />
+    <Content Remove="Views\Home\Progetto.cshtml" />
+    <Content Remove="Views\Home\Ristorni.cshtml" />
+    <Content Remove="Views\Home\ScadenzeCorsi.cshtml" />
+    <Content Remove="Views\Home\SchedaAssociato.cshtml" />
+    <Content Remove="Views\Home\Servizi.cshtml" />
+    <Content Remove="Views\Home\Servizio.cshtml" />
+    <Content Remove="Views\Home\SituazioneAgente.cshtml" />
+    <Content Remove="Views\Home\Struttura.cshtml" />
+    <Content Remove="Views\Home\TipiCorso.cshtml" />
+    <Content Remove="Views\Home\UploadAddebiti.cshtml" />
+    <Content Remove="Views\Home\UploadAgenti.cshtml" />
+    <Content Remove="Views\Home\UploadAssociati.cshtml" />
+    <Content Remove="Views\Home\UploadMat.cshtml" />
+    <Content Remove="Views\Home\UploadRistorni.cshtml" />
+    <Content Remove="Views\Home\W430.cshtml" />
+    <Content Remove="Views\Home\W430Upload.cshtml" />
+    <Content Remove="wwwroot\etc\docx\verbale.docx" />
+    <Content Remove="wwwroot\etc\docx\~%24dello Proposta Integrato.docx" />
+    <Content Remove="wwwroot\etc\docx\~%24dello Relazione Integrato.docx" />
+    <Content Remove="wwwroot\images\grafico.png" />
+    <Content Remove="wwwroot\images\penna.png" />
+    <Content Remove="wwwroot\images\ruota.png" />
+    <Content Remove="wwwroot\images\schede.png" />
+    <Content Remove="wwwroot\images\trei.png" />
+    <Content Remove="wwwroot\images\struttura.png" />
+    <Content Remove="wwwroot\images\scheda.png" />
+    <Content Remove="wwwroot\images\Associati.png" />
+    <Content Remove="wwwroot\images\Consulenti.png" />
+    <Content Remove="wwwroot\images\Tutor_sub_agenti.png" />
+    <Content Remove="wwwroot\images\indietro.png" />
+    <Content Remove="wwwroot\images\Ristorni.png" />
+    <Content Remove="wwwroot\images\Struttura.png" />
+    <Content Remove="wwwroot\images\small\Appuntamenti.png" />
+    <Content Remove="wwwroot\images\small\Bollettino.png" />
+    <Content Remove="wwwroot\images\small\Disdetta.png" />
+    <Content Remove="wwwroot\images\small\Elimina.png" />
+    <Content Remove="wwwroot\images\small\Pagamento.png" />
+    <Content Remove="Models\Helper\HelpCausale.config" />
+    <Content Remove="Views\Home\Tree.cshtml" />
+    <Content Remove="wwwroot\images\small\appuntamenti.png" />
+    <Content Remove="wwwroot\images\small\Modulo adesioni.png" />
+    <Content Remove="wwwroot\images\small\adesioni.png" />
+    <Content Remove="wwwroot\etc\pdf\Bollettino.pdf" />
+    <Content Remove="wwwroot\etc\pdf\Disdetta.pdf" />
+    <Content Remove="Views\Home\TreeMoney.cshtml" />
+    <Content Remove="wwwroot\etc\pdf\Adesione_.pdf" />
+    <Content Remove="wwwroot\images\inail.png" />
+    <Content Remove="wwwroot\images\inps.png" />
+    <Content Remove="wwwroot\images\w430.png" />
+    <Content Remove="wwwroot\images\movimenti.png" />
+    <Content Remove="wwwroot\images\primanota.png" />
+    <Content Remove="wwwroot\images\configurazione.png" />
+    <Content Remove="wwwroot\lib\.DS_Store" />
+    <Content Remove="wwwroot\lib\signalr\.DS_Store" />
+    <Content Remove="wwwroot\lib\fontawesome-free-5.13.0-web\css\all.min.css" />
+    <Content Remove="wwwroot\lib\fontawesome-free-5.13.0-web\css\v4-shims.min.css" />
+    <Content Remove="wwwroot\lib\fontawesome-free-5.13.0-web\css\regular.min.css" />
+    <Content Remove="wwwroot\lib\fontawesome-free-5.13.0-web\css\solid.min.css" />
+    <Content Remove="wwwroot\lib\fontawesome-free-5.13.0-web\js\regular.min.js" />
+    <Content Remove="wwwroot\lib\fontawesome-free-5.13.0-web\js\fontawesome.min.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="wwwroot\images\causali.png" />
+    <None Remove="Properties\PublishProfiles\FolderProfile 3.pubxml" />
+    <None Remove="Properties\PublishProfiles\FolderProfile 5.pubxml" />
+    <None Remove="Properties\PublishProfiles\FolderProfile 33.pubxml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="wwwroot\images\associati.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\consulenti.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\indietro.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\ristorni.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\struttura.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\etc\pdf\Bollettino.pdf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\etc\pdf\Disdetta.pdf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\inail.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\inps.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\w430.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\movimenti.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\primanota.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\configurazione.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Interop.Microsoft.Office.Interop.Word">
+      <HintPath>Interop.Microsoft.Office.Interop.Word.dll</HintPath>
+      <Private>true</Private>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="wwwroot\images\anagrafica.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\associati.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\causali.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\consulenti.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\consultazione.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\ristorni.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\etc\pdf\Adesione.pdf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\etc\xlsx\libro_soci.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\servizi.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\etc\xlsx\libro_soci %28copia%29.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\etc\xlsx\elenco_privati.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\small\servizi.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\small\elimina.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\small\sposta.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\small\feder_splash.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\small\disdetta.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\small\adesione.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\small\bollettino.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\small\aggiorna.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\small\dettagli.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\small\pagamento.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\small\appuntamento.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\small\scheda.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\tutor.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ProjectExtensions><VisualStudio><UserProperties properties_4launchsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
+</Project>

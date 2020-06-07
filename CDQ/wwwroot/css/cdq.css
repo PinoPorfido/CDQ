@@ -1,0 +1,55 @@
+﻿.panel-heading {
+    font-size: medium;
+    font-weight: bold;
+}
+
+.modal-card-title {
+    font-size: medium;
+    font-weight: bold;
+}
+
+.back {
+    background-color: none;
+    color: steelblue;
+}
+
+.label {
+    font-size: small;
+}
+
+.help-message {
+    color: brown;
+}
+
+.title {
+    color: steelblue;
+}
+
+th {
+    font-size: small;
+}
+
+.button-heading {
+    font-weight: normal;
+}
+
+.icon {
+    cursor: pointer;
+    pointer-events: initial !important;
+}
+
+.field-validation-valid {
+    font-size: 0;
+}
+
+.datalisttable {
+    position: absolute;
+    border-radius: 5px;
+    color: white;
+    background-color: #333333;
+    font-size: small;
+    display: block;
+    max-height: 250px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}

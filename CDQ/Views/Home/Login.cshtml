@@ -1,0 +1,61 @@
+﻿@model CDQ.Models.Helper.HelpUtente
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<br />
+<br />
+<br />
+<br />
+
+
+<div class="column is-4 is-offset-4">
+    <div class="panel">
+        <p class="panel-heading">
+            Accesso Utente
+        </p>
+        <div class="panel-block">
+            <div class="container">
+
+                <div class="column is-10 is-offset-1">
+
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="field">
+                            <p class="control has-icons-left has-icons-right">
+                                <input asp-for="Utente.Mail" class="input" type="text" placeholder="Username">
+                                <span class="icon is-small is-left">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <span class="icon is-small is-right">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </p>
+                        </div>
+                        <div class="field">
+                            <p class="control has-icons-left">
+                                <input asp-for="Utente.Password" class="input" type="password" placeholder="Password">
+                                    <span class="icon is-small is-left">
+                                        <i class="fas fa-lock"></i>
+                                    </span>
+                            </p>
+                        </div>
+
+                        <div class="field">
+                            <div class="control">
+                                <font class="help help-message">@Model.Message</font>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <button type="submit" class="button is-dark">Login</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
