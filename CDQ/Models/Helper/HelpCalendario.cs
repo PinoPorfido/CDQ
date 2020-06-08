@@ -13,7 +13,13 @@ namespace CDQ.Models.Helper
 
         public List<SelectListItem> ListaOrari { get; set; }
 
-        public IEnumerable<Calendario> ListaCalendari { get; set; }
+        public IEnumerable<StrutturaCalendario> ListaStrutturaCalendari { get; set; }
+
+        public string Settimana { get; set; }
+
+        public int IDSettimana { get; set; }
+
+        public int Anno { get; set; }
 
         public string Mode { get; set; }
 		

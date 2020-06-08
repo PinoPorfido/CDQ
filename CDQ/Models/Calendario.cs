@@ -47,11 +47,11 @@ namespace CDQ.Models
             }
         }
 
-        public int CapienzaResidua
+        public int CapienzaResidua()
         {
-            get
             {
-                int res = Convert.ToInt32(Services.RealmDataStore.CapienzaResidua(ID));
+                //int res = Services.RealmDataStore.CapienzaResidua(ID);
+                int res = 0;
                 return res;
             }
         }

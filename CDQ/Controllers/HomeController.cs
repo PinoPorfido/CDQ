@@ -2151,16 +2151,37 @@ namespace CDQ.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> Calendario(string ID = "-1", int IDSettimana = -1)
+        public async Task<IActionResult> Calendario(string ID = "-1", int IDSettimana = -1, int Anno = -1, string Dir = "")
         {
 
             if (!CheckUser()) return RedirectToAction(nameof(Login));
             if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
 
+            DateTime dtPrimoGiornoSettimana = DateTime.Now;
+            DateTime dtUltimoGiornoSettimana = dtPrimoGiornoSettimana.AddDays(6);
 
-            if (IDSettimana == -1) IDSettimana = Utils.Utils.SettimanaAnno(DateTime.Now);
 
-            DateTime dtPrimoGiornoSettimana = Utils.Utils.PrimoGiornoSettimana(DateTime.Now.Year, IDSettimana);
+            if (IDSettimana == -1 || Dir == "oggi") IDSettimana = Utils.Utils.SettimanaAnno(DateTime.Now); 
+            if (Anno == -1) Anno = DateTime.Now.Year;
+
+            dtPrimoGiornoSettimana = Utils.Utils.PrimoGiornoSettimana(Anno, IDSettimana);
+            dtUltimoGiornoSettimana = dtPrimoGiornoSettimana.AddDays(6);
+
+            if (Dir == "less") //devo tornare indietro di una settimana
+            {
+                dtPrimoGiornoSettimana = dtPrimoGiornoSettimana.AddDays(-7);
+                dtUltimoGiornoSettimana = dtPrimoGiornoSettimana.AddDays(6);
+            }
+
+            if (Dir == "more") //devo tornare indietro di una settimana
+            {
+                dtPrimoGiornoSettimana = dtPrimoGiornoSettimana.AddDays(7);
+                dtUltimoGiornoSettimana = dtPrimoGiornoSettimana.AddDays(6);
+            }
+
+            IDSettimana = Utils.Utils.SettimanaAnno(dtPrimoGiornoSettimana);
+
+            string Settimana = dtPrimoGiornoSettimana.ToShortDateString() + "-" + dtUltimoGiornoSettimana.ToShortDateString(); 
 
             int intOI = 480;
             int intOF = 1200;
@@ -2182,9 +2203,241 @@ namespace CDQ.Controllers
                 ListaOrari.Add(si);
             }
 
-            var ListaCalendari = await RealmDataStore.ListaCalendari(esercente, dtPrimoGiornoSettimana);
+            IEnumerable<Calendario> ListaCalendari = await RealmDataStore.ListaCalendari(esercente, dtPrimoGiornoSettimana);
+            List<StrutturaCalendario> ListaStrutturaCalendari = new List<StrutturaCalendario>();
 
 
+
+            //costruisco la mia ListaStrutturaCalendari
+            for (int i = Convert.ToInt32(intOI * dFattore / 60); i <= Convert.ToInt32(intOF * dFattore / 60); i++)
+            {
+
+                //creo la struttura con 8 colonne e  n-righe con valori di default               
+                //Cella standard
+                StrutturaCella SC0 = new StrutturaCella
+                {
+                    Calendario = null,
+                    TipoCella = 0,
+                    Riga = 1,
+                    Colonna = 1
+                };
+                //Cella standard
+                StrutturaCella SC1 = new StrutturaCella
+                {
+                    Calendario = null,
+                    TipoCella = 0,
+                    Riga = 1,
+                    Colonna = 1
+                };
+                //Cella standard
+                StrutturaCella SC2 = new StrutturaCella
+                {
+                    Calendario = null,
+                    TipoCella = 0,
+                    Riga = 1,
+                    Colonna = 1
+                };
+                //Cella standard
+                StrutturaCella SC3 = new StrutturaCella
+                {
+                    Calendario = null,
+                    TipoCella = 0,
+                    Riga = 1,
+                    Colonna = 1
+                };
+                //Cella standard
+                StrutturaCella SC4 = new StrutturaCella
+                {
+                    Calendario = null,
+                    TipoCella = 0,
+                    Riga = 1,
+                    Colonna = 1
+                };
+                //Cella standard
+                StrutturaCella SC5 = new StrutturaCella
+                {
+                    Calendario = null,
+                    TipoCella = 0,
+                    Riga = 1,
+                    Colonna = 1
+                };
+                //Cella standard
+                StrutturaCella SC6 = new StrutturaCella
+                {
+                    Calendario = null,
+                    TipoCella = 0,
+                    Riga = 1,
+                    Colonna = 1
+                };
+
+                StrutturaCalendario strutturaCalendario = new StrutturaCalendario
+                {
+
+                    sOrarioCella = Utils.Utils.ConvertiOrario(i * intSlot),
+                    iOrarioCella = i * intSlot,
+                    SC1 = SC1,
+                    SC2 = SC2,
+                    SC3 = SC3,
+                    SC4 = SC4,
+                    SC5 = SC5,
+                    SC6 = SC6,
+                    SC0 = SC0
+                };
+
+                ListaStrutturaCalendari.Add(strutturaCalendario);
+            }
+
+            List<string> CelleSpente = new List<string>();
+
+            //adesso ciclo sulla ListaCalendari per vedere se esistono attività da descrivere
+            foreach (Calendario c in ListaCalendari)
+            {
+                foreach (StrutturaCalendario s in ListaStrutturaCalendari)
+                {
+                    if (c.OraInizio == s.iOrarioCella) //ho trovato un elemento che inizia nella riga
+                    {
+                        //cerco la colonna giusto
+                        switch ((int)c.Data.DayOfWeek)
+                        {
+                            case 0:  //DOM
+                                s.SC0.Calendario = c;
+                                s.SC0.TipoCella = 1;
+                                s.SC0.Riga = (c.OraFine-c.OraInizio)/intSlot;
+                                s.SC0.Colonna = 1;
+                                if (s.SC0.Riga > 1)
+                                {
+                                    for (int x = 2; x <= s.SC0.Riga; x++)
+                                    {
+                                        CelleSpente.Add(c.OraInizio+intSlot*(x-1) + "#0");
+                                    }
+                                }
+                                break;
+                            case 1:  //LUN
+                                s.SC1.Calendario = c;
+                                s.SC1.TipoCella = 1;
+                                s.SC1.Riga = (c.OraFine - c.OraInizio) / intSlot;
+                                s.SC1.Colonna = 1;
+                                if (s.SC1.Riga > 1)
+                                {
+                                    for (int x = 2; x <= s.SC1.Riga; x++)
+                                    {
+                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#1");
+                                    }
+                                }
+                                break;
+                            case 2:  //MAR
+                                s.SC2.Calendario = c;
+                                s.SC2.TipoCella = 1;
+                                s.SC2.Riga = (c.OraFine - c.OraInizio) / intSlot;
+                                s.SC2.Colonna = 1;
+                                if (s.SC2.Riga > 1)
+                                {
+                                    for (int x = 2; x <= s.SC2.Riga; x++)
+                                    {
+                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#2");
+                                    }
+                                }
+                                break;
+                            case 3:  //MER
+                                s.SC3.Calendario = c;
+                                s.SC3.TipoCella = 1;
+                                s.SC3.Riga = (c.OraFine - c.OraInizio) / intSlot;
+                                s.SC3.Colonna = 1;
+                                if (s.SC3.Riga > 1)
+                                {
+                                    for (int x = 2; x <= s.SC3.Riga; x++)
+                                    {
+                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#3");
+                                    }
+                                }
+                                break;
+                            case 4:  //GIO
+                                s.SC4.Calendario = c;
+                                s.SC4.TipoCella = 1;
+                                s.SC4.Riga = (c.OraFine - c.OraInizio) / intSlot;
+                                s.SC4.Colonna = 1;
+                                if (s.SC4.Riga > 1)
+                                {
+                                    for (int x = 2; x <= s.SC4.Riga; x++)
+                                    {
+                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#4");
+                                    }
+                                }
+                                break;
+                            case 5:  //VEN
+                                s.SC5.Calendario = c;
+                                s.SC5.TipoCella = 1;
+                                s.SC5.Riga = (c.OraFine - c.OraInizio) / intSlot;
+                                s.SC5.Colonna = 1;
+                                if (s.SC5.Riga > 1)
+                                {
+                                    for (int x = 2; x <= s.SC5.Riga; x++)
+                                    {
+                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#5");
+                                    }
+                                }
+                                break;
+                            case 6:  //SAB
+                                s.SC6.Calendario = c;
+                                s.SC6.TipoCella = 1;
+                                s.SC6.Riga = (c.OraFine - c.OraInizio) / intSlot;
+                                s.SC6.Colonna = 1;
+                                if (s.SC6.Riga > 1)
+                                {
+                                    for (int x = 2; x <= s.SC6.Riga; x++)
+                                    {
+                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#6");
+                                    }
+                                }
+                                break;
+                        }
+
+                        break;
+                    }
+
+                }
+
+            }
+
+            //spengo le celle coperte da eventi precedenti
+            foreach (string v in CelleSpente)
+            {
+                string[] cr = v.Split("#");
+
+                foreach (StrutturaCalendario s in ListaStrutturaCalendari)
+                {
+                    if (Convert.ToInt32(cr[0]) == s.iOrarioCella) //ho trovato un elemento che inizia nella riga
+                    {
+                        switch (cr[1])
+                        {
+                            case "0":
+                                s.SC0.TipoCella = -1;
+                                break;
+                            case "1":
+                                s.SC1.TipoCella = -1;
+                                break;
+                            case "2":
+                                s.SC2.TipoCella = -1;
+                                break;
+                            case "3":
+                                s.SC3.TipoCella = -1;
+                                break;
+                            case "4":
+                                s.SC4.TipoCella = -1;
+                                break;
+                            case "5":
+                                s.SC5.TipoCella = -1;
+                                break;
+                            case "6":
+                                s.SC6.TipoCella = -1;
+                                break;
+                        }
+                        break;
+                    }
+
+                }
+            }
+            
             Calendario calendario = new Calendario
             {
                 Data = dtPrimoGiornoSettimana
@@ -2201,7 +2454,10 @@ namespace CDQ.Controllers
             {
                 ListaOrari = ListaOrari,
                 Mode = "Ins",
-                ListaCalendari = ListaCalendari
+                ListaStrutturaCalendari = ListaStrutturaCalendari,
+                Settimana = Settimana,
+                IDSettimana = IDSettimana,
+                Anno = Anno
             };
 
             return View(helpCalendario);

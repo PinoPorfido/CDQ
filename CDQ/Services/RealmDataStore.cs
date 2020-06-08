@@ -246,7 +246,12 @@ namespace CDQ.Services
 
             var prenotazione = vRealmDb.All<Prenotazione>().Where(a => a.Calendario == calendario);
 
-            int ris = calendario.Capienza - prenotazione.Count();
+            int ris = 0;
+
+            if (prenotazione != null)
+            {
+                ris = calendario.Capienza - prenotazione.Count();
+            }
 
             return ris;
 
@@ -2075,7 +2080,7 @@ namespace CDQ.Services
         {
             var vRealmDb = await GetRealm();
 
-            DateTime dtUltimoGiorno = dtPrimoGiorno.AddDays(6);
+            DateTime dtUltimoGiorno = dtPrimoGiorno.AddDays(7);
 
             IEnumerable<Calendario> lista = vRealmDb.All<Calendario>().Where(ss => ss.Data <= dtUltimoGiorno && ss.Data >= dtPrimoGiorno && ss.Esercente == esercente);
 

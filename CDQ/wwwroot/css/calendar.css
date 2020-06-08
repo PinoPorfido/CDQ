@@ -12,19 +12,20 @@ table.calendar > tbody > tr > td {
 
 table.calendar > tbody > tr > td > div {
     //padding: 8px;
-    height: 40px;
+    height: 45px;
     overflow: hidden;
     display: inline-block;
     vertical-align: middle;
     float: left;
 }
 
-table.calendar > tbody > tr > td.has-events {
-    color: white;
-    cursor: pointer;
-    padding: 0;
-    border-radius: 4px;
-}
+    table.calendar > tbody > tr > td.has-events {
+        color: white;
+        cursor: pointer;
+        padding: 0;
+        border-radius: 4px;
+        vertical-align: middle;
+    }
 
 table.calendar > tbody > tr > td.has-events > div {
     background-color: #08C;
@@ -52,13 +53,14 @@ table.calendar > tbody > tr > td.has-events > div > span {
     text-align: center;
 }
 table.calendar > tbody > tr > td.has-events > div > span a {
-    color: yellow;
+    color: white;
+    font-size: small;
 }
 
 table.calendar > tbody > tr > td.has-events > div > span.title {
     color:azure;
     font-weight: bold;
-    font-size:medium;
+    font-size:small;
 }
 
 table.table-borderless > thead > tr > th, table.table-borderless > tbody > tr > td {
