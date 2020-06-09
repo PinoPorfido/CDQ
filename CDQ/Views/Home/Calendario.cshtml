@@ -8,6 +8,7 @@
 <br />
 
 <div class="columns">
+
     <div class="column is-1" align="left">
         <a asp-action="Index" class="button back">
             <span class="icon">
@@ -16,11 +17,141 @@
         </a>
     </div>
     <div class="column is-10" align="center">
-        <h1 class="title is-4">Calendario Operativo</h1>
+        <h1 class="title is-4">Calendario Operativo - @Model.Esercente</h1>
     </div>
     <div class="column is-1" align="right">
+        <a class="button back" id="ShowHide1" data-tooltip="Nascondi/Mostra il Pannello di Modifica" onclick="mostraPannello('PannelloEdit')">
+            <span class="icon" id="ShowHide2">
+                <i id="ShowHide" class="fas fa-eye-slash"></i>
+            </span>
+        </a>
     </div>
 </div>
+
+
+<form id="formCalendario" method="post">
+
+    <div asp-validation-summary="ModelOnly" class="help help-message"></div>
+    <div class="columns">
+        <div class="column is-fullwidth">
+            <div class="panel" id="PannelloEdit" hidden="@Model.IsHidden">
+                <div class="panel-heading">
+                    <div class="columns">
+                        <div class="column is-5" align="center">
+                            <p>Predisposizione del Calendario Operativo</p>
+                        </div>
+                        <div class="column is-2" align="center">
+                            <a id="CreaSettimana" class="button is-dark" asp-action="CreaCalendario" asp-route-IDSettimana="@Model.IDSettimanaC" asp-route-Anno="@Model.Anno" onclick="return confirmCreation(this.id)" data-tooltip="Crea il calendario relativo alla settimana corrente utilizzando la Pianificazione su Settimana Tipo">Crea Calendario</a>
+                        </div>
+                        <div class="column is-5" align="right">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-block">
+                    <div class="container">
+
+                        <div class="column">
+
+                            <input id="IDPianificazione" asp-for="Calendario.ID" type="hidden">
+                            <input id="Nascondi" asp-for="IsHidden" class="is-checkradio is-small is-info" type="checkbox">
+
+
+
+                            @Html.HiddenFor(model => Model.ModeCalendario)
+
+                            @Html.HiddenFor(model => Model.IDSettimana)
+
+                            @Html.HiddenFor(model => Model.IDSettimanaC)
+
+                            @Html.HiddenFor(model => Model.Anno)
+
+                            @for (var i = 0; i < Model.ListaOrari.Count(); i++)
+                            {
+                                @Html.HiddenFor(model => Model.ListaOrari[i].Text)
+                                @Html.HiddenFor(model => Model.ListaOrari[i].Value)
+                            }
+
+                            @for (var i = 0; i < Model.ListaGiorni.Count(); i++)
+                            {
+                                @Html.HiddenFor(model => Model.ListaGiorni[i].Text)
+                                @Html.HiddenFor(model => Model.ListaGiorni[i].Value)
+                            }
+
+                            @for (var i = 0; i < Model.ListaRisorseAttivita.Count(); i++)
+                            {
+                                @Html.HiddenFor(model => Model.ListaRisorseAttivita[i].Text)
+                                @Html.HiddenFor(model => Model.ListaRisorseAttivita[i].Value)
+                            }
+
+                            @for (var i = 0; i < Model.ListaRisorseAttivitaCapienza.Count(); i++)
+                            {
+                                @Html.HiddenFor(model => Model.ListaRisorseAttivitaCapienza[i].Text)
+                                @Html.HiddenFor(model => Model.ListaRisorseAttivitaCapienza[i].Value)
+                            }
+
+                            <select hidden id="select_RisorsaAttivitaCapienza" asp-items="Model.ListaRisorseAttivitaCapienza"></select>
+
+                            <div class="columns">
+                                <div class="column is-3">
+                                    <div class="field">
+                                        <label asp-for="Calendario.RisorsaAttivita" class="label">Risorsa-Attività</label>
+                                        <div class="select is-fullwidth">
+                                            <select id="select_RisorsaAttivita" asp-for="IDRisorsaAttivita" asp-items="Model.ListaRisorseAttivita" onchange="GetCapienza()">
+                                                <option hidden disabled selected>Selezionare la Risorsa-Attività</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column is-1">
+                                    <label asp-for="Calendario.Capienza" class="label">Capienza</label>
+                                    <input id="Capienza" asp-for="Calendario.Capienza" class="input" />
+                                </div>
+                                <div class="column is-2">
+                                    <div class="field">
+                                        <label asp-for="Calendario.Data" class="label">Giorno</label>
+                                        <div class="select is-fullwidth">
+                                            <select id="select_Giorno" asp-for="IDGiorno" asp-items="Model.ListaGiorni">
+                                                <option hidden disabled selected>Giorno</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column is-2">
+                                    <div class="field">
+                                        <label asp-for="Calendario.OraInizio" class="label">Orario Inizio Attività</label>
+                                        <div class="select">
+                                            <select id="select_OraInizio" asp-for="IDOraInizio" asp-items="Model.ListaOrari">
+                                                <option hidden disabled selected>Selezionare l'orario</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column is-2">
+                                    <div class="field">
+                                        <label asp-for="Calendario.OraFine" class="label">Orario Fine Attività</label>
+                                        <div class="select">
+                                            <select id="select_OraFine" asp-for="IDOraFine" asp-items="Model.ListaOrari">
+                                                <option hidden disabled selected>Selezionare l'orario</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column is-2" align="right">
+                                    <label class="label">&nbsp;</label>
+                                    <button type="submit" class="button is-dark" data-tooltip="Aggiunge elemento al Calendario Operativo">Aggiorna</button>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
 
 <form id="formRicerca" method="get">
     <div class="columns">
@@ -56,7 +187,6 @@
                     <div class="container">
                         <div class="column" align="center">
 
-                            @Html.HiddenFor(model => Model.Mode)
                             @Html.HiddenFor(model => Model.IDSettimana)
                             @Html.HiddenFor(model => Model.Anno)
 
@@ -66,17 +196,20 @@
                                 @Html.HiddenFor(model => Model.ListaOrari[i].Value)
                             }
 
+                            @{
+                                DateTime pg = Model.pg;
+                            }
                             <table class="calendar table table-bordered is-fullwidth">
                                 <thead>
                                     <tr>
                                         <th>&nbsp;</th>
-                                        <th width="14%" align="center">LUN</th>
-                                        <th width="14%" align="center">MAR</th>
-                                        <th width="14%" align="center">MER</th>
-                                        <th width="14%" align="center">GIO</th>
-                                        <th width="14%" align="center">VEN</th>
-                                        <th width="14%" align="center">SAB</th>
-                                        <th width="14%" align="center">DOM</th>
+                                        <th width="14%" align="center">LUN<br />@pg.Day</th>
+                                        <th width="14%" align="center">MAR<br />@(pg.AddDays(1).Day)</th>
+                                        <th width="14%" align="center">MER<br />@(pg.AddDays(2).Day)</th>
+                                        <th width="14%" align="center">GIO<br />@(pg.AddDays(3).Day)</th>
+                                        <th width="14%" align="center">VEN<br />@(pg.AddDays(4).Day)</th>
+                                        <th width="14%" align="center">SAB<br />@(pg.AddDays(5).Day)</th>
+                                        <th width="14%" align="center">DOM<br />@(pg.AddDays(6).Day)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -96,9 +229,9 @@
                                             {
                                                 @if (item.SC1.TipoCella == 1)
                                                 {
-                                                    <td class=" has-events" rowspan='@item.SC1.Riga'>
+                                                    <td class=" has-events" rowspan='@item.SC1.Riga' data-tooltip='@item.SC1.Info'>
                                                         <div class="row-fluid lecture" style="width: 99%; height: 100%">
-                                                            <span class="lecturer"><a><font style="font-weight: bold" ;>@item.SC1.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC1.Calendario.RisorsaAttivita.Risorsa.Descrizione - Posti: @item.SC1.Calendario.CapienzaResidua()</a></span>
+                                                            <span class="lecturer"><a onclick="setUpPrenotazione('@item.SC1.Booked','@item.SC1.Calendario.ID','@item.SC1.Calendario.RisorsaAttivita.Attivita.Descrizione','@item.SC1.Calendario.RisorsaAttivita.Risorsa.Descrizione','@item.SC1.Calendario.Data_OUT','@item.SC1.Calendario.OraInizio_OUT','@item.SC1.Calendario.OraFine_OUT');"><font style="font-weight: bold">@item.SC1.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC1.Calendario.RisorsaAttivita.Risorsa.Descrizione<br />Posti: @item.SC1.CapienzaResidua</a></span>
                                                         </div>
                                                     </td>
                                                 }
@@ -112,9 +245,9 @@
                                             {
                                                 @if (item.SC2.TipoCella == 1)
                                                 {
-                                                    <td class=" has-events" rowspan='@item.SC2.Riga'>
+                                                    <td class=" has-events" rowspan='@item.SC2.Riga' data-tooltip='@item.SC2.Info'>
                                                         <div class="row-fluid lecture" style="width: 99%; height: 100%">
-                                                            <span class="lecturer"><a><font style="font-weight: bold" ;>@item.SC2.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC2.Calendario.RisorsaAttivita.Risorsa.Descrizione - Posti: @item.SC2.Calendario.CapienzaResidua()</a></span>
+                                                            <span class="lecturer"><a onclick="setUpPrenotazione('@item.SC2.Booked','@item.SC2.Calendario.ID','@item.SC2.Calendario.RisorsaAttivita.Attivita.Descrizione','@item.SC2.Calendario.RisorsaAttivita.Risorsa.Descrizione','@item.SC2.Calendario.Data_OUT','@item.SC2.Calendario.OraInizio_OUT','@item.SC2.Calendario.OraFine_OUT');"><font style="font-weight: bold">@item.SC2.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC2.Calendario.RisorsaAttivita.Risorsa.Descrizione<br />Posti: @item.SC2.CapienzaResidua</a></span>
                                                         </div>
                                                     </td>
                                                 }
@@ -128,9 +261,9 @@
                                             {
                                                 @if (item.SC3.TipoCella == 1)
                                                 {
-                                                    <td class=" has-events" rowspan='@item.SC3.Riga'>
+                                                    <td class=" has-events" rowspan='@item.SC3.Riga' data-tooltip='@item.SC3.Info'>
                                                         <div class="row-fluid lecture" style="width: 99%; height: 100%">
-                                                            <span class="lecturer"><a><font style="font-weight: bold" ;>@item.SC3.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC3.Calendario.RisorsaAttivita.Risorsa.Descrizione - Posti: @item.SC3.Calendario.CapienzaResidua()</a></span>
+                                                            <span class="lecturer"><a onclick="setUpPrenotazione('@item.SC3.Booked','@item.SC3.Calendario.ID','@item.SC3.Calendario.RisorsaAttivita.Attivita.Descrizione','@item.SC3.Calendario.RisorsaAttivita.Risorsa.Descrizione','@item.SC3.Calendario.Data_OUT','@item.SC3.Calendario.OraInizio_OUT','@item.SC3.Calendario.OraFine_OUT');"><font style="font-weight: bold">@item.SC3.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC3.Calendario.RisorsaAttivita.Risorsa.Descrizione<br />Posti: @item.SC3.CapienzaResidua</a></span>
                                                         </div>
                                                     </td>
                                                 }
@@ -144,9 +277,9 @@
                                             {
                                                 @if (item.SC4.TipoCella == 1)
                                                 {
-                                                    <td class=" has-events" rowspan='@item.SC4.Riga'>
+                                                    <td class=" has-events" rowspan='@item.SC4.Riga' data-tooltip='@item.SC4.Info'>
                                                         <div class="row-fluid lecture" style="width: 99%; height: 100%">
-                                                            <span class="lecturer"><a><font style="font-weight: bold" ;>@item.SC4.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC4.Calendario.RisorsaAttivita.Risorsa.Descrizione - Posti: @item.SC4.Calendario.CapienzaResidua()</a></span>
+                                                            <span class="lecturer"><a onclick="setUpPrenotazione('@item.SC4.Booked','@item.SC4.Calendario.ID','@item.SC4.Calendario.RisorsaAttivita.Attivita.Descrizione','@item.SC4.Calendario.RisorsaAttivita.Risorsa.Descrizione','@item.SC4.Calendario.Data_OUT','@item.SC4.Calendario.OraInizio_OUT','@item.SC4.Calendario.OraFine_OUT');"><font style="font-weight: bold">@item.SC4.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC4.Calendario.RisorsaAttivita.Risorsa.Descrizione<br />Posti: @item.SC4.CapienzaResidua</a></span>
                                                         </div>
                                                     </td>
                                                 }
@@ -160,9 +293,9 @@
                                             {
                                                 @if (item.SC5.TipoCella == 1)
                                                 {
-                                                    <td class=" has-events" rowspan='@item.SC5.Riga'>
+                                                    <td class=" has-events" rowspan='@item.SC5.Riga' data-tooltip='@item.SC5.Info'>
                                                         <div class="row-fluid lecture" style="width: 99%; height: 100%">
-                                                            <span class="lecturer"><a><font style="font-weight: bold" ;>@item.SC5.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC5.Calendario.RisorsaAttivita.Risorsa.Descrizione - Posti: @item.SC5.Calendario.CapienzaResidua()</a></span>
+                                                            <span class="lecturer"><a onclick="setUpPrenotazione('@item.SC5.Booked','@item.SC5.Calendario.ID','@item.SC5.Calendario.RisorsaAttivita.Attivita.Descrizione','@item.SC5.Calendario.RisorsaAttivita.Risorsa.Descrizione','@item.SC5.Calendario.Data_OUT','@item.SC5.Calendario.OraInizio_OUT','@item.SC5.Calendario.OraFine_OUT');"><font style="font-weight: bold">@item.SC5.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC5.Calendario.RisorsaAttivita.Risorsa.Descrizione<br />Posti: @item.SC5.CapienzaResidua</a></span>
                                                         </div>
                                                     </td>
                                                 }
@@ -175,9 +308,9 @@
                                             {
                                                 @if (item.SC6.TipoCella == 1)
                                                 {
-                                                    <td class=" has-events" rowspan='@item.SC6.Riga'>
+                                                    <td class=" has-events" rowspan='@item.SC6.Riga' data-tooltip='@item.SC6.Info'>
                                                         <div class="row-fluid lecture" style="width: 99%; height: 100%">
-                                                            <span class="lecturer"><a><font style="font-weight: bold" ;>@item.SC6.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC6.Calendario.RisorsaAttivita.Risorsa.Descrizione - Posti: @item.SC6.Calendario.CapienzaResidua()</a></span>
+                                                            <span class="lecturer"><a onclick="setUpPrenotazione('@item.SC6.Booked','@item.SC6.Calendario.ID','@item.SC6.Calendario.RisorsaAttivita.Attivita.Descrizione','@item.SC6.Calendario.RisorsaAttivita.Risorsa.Descrizione','@item.SC6.Calendario.Data_OUT','@item.SC6.Calendario.OraInizio_OUT','@item.SC6.Calendario.OraFine_OUT');"><font style="font-weight: bold">@item.SC6.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC6.Calendario.RisorsaAttivita.Risorsa.Descrizione<br />Posti: @item.SC6.CapienzaResidua</a></span>
                                                         </div>
                                                     </td>
                                                 }
@@ -190,9 +323,9 @@
                                             {
                                                 @if (item.SC0.TipoCella == 1)
                                                 {
-                                                    <td class=" has-events" rowspan='@item.SC0.Riga'>
+                                                    <td class=" has-events" rowspan='@item.SC0.Riga' data-tooltip='@item.SC0.Info'>
                                                         <div class="row-fluid lecture" style="width: 99%; height: 100%">
-                                                            <span class="lecturer"><a><font style="font-weight: bold" ;>@item.SC0.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC0.Calendario.RisorsaAttivita.Risorsa.Descrizione - Posti: @item.SC0.Calendario.CapienzaResidua()</a></span>
+                                                            <span class="lecturer"><a onclick="setUpPrenotazione('@item.SC0.Booked','@item.SC0.Calendario.ID','@item.SC0.Calendario.RisorsaAttivita.Attivita.Descrizione','@item.SC0.Calendario.RisorsaAttivita.Risorsa.Descrizione','@item.SC0.Calendario.Data_OUT','@item.SC0.Calendario.OraInizio_OUT','@item.SC0.Calendario.OraFine_OUT');"><font style="font-weight: bold">@item.SC0.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC0.Calendario.RisorsaAttivita.Risorsa.Descrizione<br />Posti: @item.SC0.CapienzaResidua</a></span>
                                                         </div>
                                                     </td>
                                                 }
@@ -201,9 +334,6 @@
                                     }
                                 </tbody>
                             </table>
-
-
-
                         </div>
                     </div>
                 </div>
@@ -211,8 +341,79 @@
 
         </div>
     </div>
+    <a hidden id="EliminaPrenotazione" asp-action="EliminaPrenotazione" asp-route-ID="@Model.IDCalendarioE" onclick="return confirmElimina(this.id)" title="elimina Prenotazione"></a>
+    <input asp-for="IDCalendarioE" type="hidden">
 
 </form>
+
+<div id="modal-Prenotazione" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <form id="formInsPrenotazione" asp-action="Prenotazione">
+
+            <header class="modal-card-head">
+                <p id="pTitoloRisorsaAttivita" class="modal-card-title">Conferma la Prenotazione per l'elemento selezionato</p>
+                <button class="delete" type="reset" onclick="cancelSetUpPrenotazione()"></button>
+            </header>
+            <section class="modal-card-body">
+                <input asp-for="ModePrenotazione" value="Ins" type="hidden">
+                <input id="IDCalendario" asp-for="IDCalendario" type="hidden">
+
+                <div class="columns">
+                    <div class="column is-6">
+                        <div class="field">
+                            <label class="label">Attivita</label>
+                            <input id="Attivita" class="input" disabled>
+                        </div>
+                    </div>
+                    <div class="column is-6">
+                        <div class="field">
+                            <label class="label">Risorsa</label>
+                            <input id="Risorsa" class="input" disabled>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="columns">
+                    <div class="column is-4">
+                        <div class="field">
+                            <label class="label">Data</label>
+                            <input id="Data" class="input" disabled>
+                        </div>
+                    </div>
+                    <div class="column is-4">
+                        <div class="field">
+                            <label class="label">OraInizio</label>
+                            <input id="OraInizio" class="input" disabled>
+                        </div>
+                    </div>
+                    <div class="column is-4">
+                        <div class="field">
+                            <label class="label">OraFine</label>
+                            <input id="OraFine" class="input" disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="columns">
+                    <div class="column is-fullwidth">
+                        <div class="field">
+                            <label class="label">Nota</label>
+                            <input asp-for="Nota" id="Data" class="input">
+                        </div>
+                    </div>
+                </div>
+
+
+            </section>
+            <footer class="modal-card-foot">
+                <button id="buttonPrenotazioneOk" class="button is-dark" onclick="form.submit()">Conferma Prenotazione</button>
+                <a class="button is-dark" onclick="cancelSetUpPrenotazione()">Annulla</a>
+            </footer>
+        </form>
+    </div>
+</div>
 
 
 <div id="modal-elimina" class="modal">
@@ -234,11 +435,35 @@
     </div>
 </div>
 
+<div id="modal-creation" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Conferma Creazione Settimana di Calendario Operativo</p>
+            <button class="delete" type="reset" onclick="document.getElementById('Creation').value = 'N';cancelModalCreation()"></button>
+        </header>
+        <section class="modal-card-body">
+            <p>Confermi la creazione della Settimana corrente a partire dalla Pianificazione delle Attività e Risorse basata sulla settimana tipo? L'operazione cancellerà tutte le prenotazioni e gli elementi del Calendario eventualmente presenti nella settimana scelta.</p>
+            <input id="IDCaller" type="hidden" />
+            <input id="Creation" type="hidden" value="N" />
+        </section>
+        <footer class="modal-card-foot">
+            <button type="button" onclick="document.getElementById('Creation').value = 'S';cancelModalCreation();document.getElementById(document.getElementById('IDCaller').value).click()" class="button is-dark">Creazione Settimana di Calendario</button>
+            <button type="button" class="button is-dark" onclick="document.getElementById('Creation').value = 'N';cancelModalCreation()">Annulla</button>
+        </footer>
+    </div>
+</div>
+
 <script>
 
     function confirmElimina(id) {
         setModalElimina(id);
         return document.getElementById('Elimina').value == "S";
+    }
+
+    function confirmCreation(id) {
+        setModalCreation(id);
+        return document.getElementById('Creation').value == "S";
     }
 
 
@@ -251,27 +476,54 @@
 
     }
 
+    function setModalCreation(id) {
+
+        document.getElementById("IDCaller").value = id;
+
+        document.getElementById("modal-creation").classList.add("is-active");
+
+    }
+
+
     function cancelModalElimina() {
 
         document.getElementById("modal-elimina").classList.remove("is-active");
 
     }
 
-    function setUpdPianificazione(id, RisorsaAttivitaID, GiornoID, OraInizio, OraFine, Capienza) {
-        if (typeof id == "undefined") {
-            document.getElementById('Mode').value = 'Ins';
-        }
-        else {
-            document.getElementById('Mode').value = 'Upd';
-            document.getElementById("IDPianificazione").value = id;
-            document.getElementById("select_RisorsaAttivita").value = RisorsaAttivitaID;
-            document.getElementById("select_Giorno").value = GiornoID;
-            document.getElementById("select_OraInizio").value = OraInizio;
-            document.getElementById("select_OraFine").value = OraFine;
-            document.getElementById("Capienza").value = Capienza;
-        }
+    function cancelModalCreation() {
+
+        document.getElementById("modal-creation").classList.remove("is-active");
+
     }
 
+
+    function setUpPrenotazione(Booked, id, Attivita, Risorsa, Data, OraInizio, OraFine) {
+        if (Booked == true) {
+            document.getElementById('ModePrenotazione').value = 'Del';
+            document.getElementById("IDCalendarioE").value = id;
+            confirmElimina(id);
+            return;
+        }
+        else {
+            document.getElementById('ModePrenotazione').value = 'Ins';
+            document.getElementById("IDCalendario").value = id;
+            document.getElementById("Attivita").value = Attivita;
+            document.getElementById("Risorsa").value = Risorsa;
+            document.getElementById("Data").value = Data;
+            document.getElementById("OraInizio").value = OraInizio;
+            document.getElementById("OraFine").value = OraFine;
+        }
+
+        document.getElementById("modal-Prenotazione").classList.add("is-active");
+    }
+
+
+    function cancelSetUpPrenotazione() {
+
+        document.getElementById("modal-Prenotazione").classList.remove("is-active");
+
+    }
 </script>
 
 <script>
@@ -295,8 +547,15 @@
         var x = document.getElementById("select_RisorsaAttivita").selectedIndex;
         var y = document.getElementById("select_RisorsaAttivita").options;
         var z = document.getElementById("select_RisorsaAttivitaCapienza").options;
+        var z = document.getElementById("select_RisorsaAttivitaCapienza").options;
         document.getElementById("Capienza").value = z[x - 1].text;
     }
 
+
+    function mostraPannello(pannello) {
+        var x = document.getElementById(pannello);
+        x.hidden = !x.hidden;
+        document.getElementById('Nascondi').value = x.hidden;
+        };
 
 </script>

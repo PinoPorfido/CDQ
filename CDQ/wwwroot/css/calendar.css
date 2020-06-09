@@ -17,15 +17,18 @@ table.calendar > tbody > tr > td > div {
     display: inline-block;
     vertical-align: middle;
     float: left;
+    vertical-align: middle;
+    align-content: center;
+    line-height: 1;
+    font-family:'Arial Narrow';
 }
 
-    table.calendar > tbody > tr > td.has-events {
-        color: white;
-        cursor: pointer;
-        padding: 0;
-        border-radius: 4px;
-        vertical-align: middle;
-    }
+table.calendar > tbody > tr > td.has-events {
+    color: white;
+    cursor: pointer;
+    padding: 0;
+    border-radius: 4px;
+}
 
 table.calendar > tbody > tr > td.has-events > div {
     background-color: #08C;

@@ -394,19 +394,18 @@ namespace CDQ.Controllers
 
             if (!ModelState.IsValid) return View(helpCalendario);
 
-            //Calendario calendario = helpCalendario.Calendario;
+            Calendario calendario = helpCalendario.Calendario;
 
-            if (helpCalendario.Mode == "Ins")
+            if (helpCalendario.ModeCalendario == "Ins")
             {
                 //await RealmDataStore.InserisciPianificazione(pianificazione, helpPianificazione.IDRisorsaAttivita, helpPianificazione.IDGiorno, helpPianificazione.IDOraInizio, helpPianificazione.IDOraFine, HttpContext.Session.GetString("IDesercente"));
             }
-            else if (helpCalendario.Mode == "Upd")
+            else if (helpCalendario.ModeCalendario == "Upd")
             {
                 //await RealmDataStore.AggiornaPianificazione(pianificazione, helpPianificazione.IDRisorsaAttivita, helpPianificazione.IDGiorno, helpPianificazione.IDOraInizio, helpPianificazione.IDOraFine, HttpContext.Session.GetString("IDesercente"));
             }
 
-
-            return RedirectToAction(nameof(Pianificazione));
+            return RedirectToAction(nameof(Calendario), new { IDSettimana = helpCalendario.IDSettimanaC, Anno = helpCalendario.Anno });
         }
 
         [HttpPost]
@@ -427,7 +426,6 @@ namespace CDQ.Controllers
             {
                 await RealmDataStore.AggiornaPianificazione(pianificazione, helpPianificazione.IDRisorsaAttivita, helpPianificazione.IDGiorno, helpPianificazione.IDOraInizio, helpPianificazione.IDOraFine, HttpContext.Session.GetString("IDesercente"));
             }
-
 
             return RedirectToAction(nameof(Pianificazione));
         }
@@ -2045,9 +2043,6 @@ namespace CDQ.Controllers
                 ListaGiorni.Add(item);
             }
 
-
-
-
             Esercente esercente = await RealmDataStore.Esercente(HttpContext.Session.GetString("IDesercente"));
 
             if (esercente.OraInizio != 0) intOI = esercente.OraInizio;
@@ -2143,7 +2138,8 @@ namespace CDQ.Controllers
                 IDGiornoR = 7,
                 IsSortAttivita = false,
                 IsSortGiorno = false,
-                IsSortRisorsa = false
+                IsSortRisorsa = false,
+                Esercente = esercente.RagioneSociale
             };
 
             return View(helpPianificazione);
@@ -2151,7 +2147,7 @@ namespace CDQ.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> Calendario(string ID = "-1", int IDSettimana = -1, int Anno = -1, string Dir = "")
+        public async Task<IActionResult> Calendario(int IDSettimana = -1, int Anno = -1, string Dir = "", bool IsHidden=false)
         {
 
             if (!CheckUser()) return RedirectToAction(nameof(Login));
@@ -2180,15 +2176,64 @@ namespace CDQ.Controllers
             }
 
             IDSettimana = Utils.Utils.SettimanaAnno(dtPrimoGiornoSettimana);
+            Anno = dtPrimoGiornoSettimana.Year;
 
-            string Settimana = dtPrimoGiornoSettimana.ToShortDateString() + "-" + dtUltimoGiornoSettimana.ToShortDateString(); 
+            string Settimana = dtPrimoGiornoSettimana.ToShortDateString() + "-" + dtUltimoGiornoSettimana.ToShortDateString();
+
+            List<SelectListItem> ListaGiorni = new List<SelectListItem>();
+
+            List<DateTime> listaG = new List<DateTime>();
+            listaG.Add(dtPrimoGiornoSettimana);
+            listaG.Add(dtPrimoGiornoSettimana.AddDays(1));
+            listaG.Add(dtPrimoGiornoSettimana.AddDays(2));
+            listaG.Add(dtPrimoGiornoSettimana.AddDays(3));
+            listaG.Add(dtPrimoGiornoSettimana.AddDays(4));
+            listaG.Add(dtPrimoGiornoSettimana.AddDays(5));
+            listaG.Add(dtPrimoGiornoSettimana.AddDays(6));
+
+
+            foreach (DateTime c in listaG)
+            {
+                SelectListItem item = new SelectListItem
+                {
+                    Text = c.ToShortDateString(),
+                    Value = c.Year + "#" + c.Month + "#" + c.Day
+                };
+
+                ListaGiorni.Add(item);
+            }
+
+
+            Esercente esercente = await RealmDataStore.Esercente(HttpContext.Session.GetString("IDesercente"));
+
+            List<SelectListItem> ListaRisorseAttivita = new List<SelectListItem>();
+            List<SelectListItem> ListaRisorseAttivitaCapienza = new List<SelectListItem>();
+            var ListaRA = await RealmDataStore.ListaRisorseAttivita(esercente);
+            foreach (RisorsaAttivita c in ListaRA)
+            {
+                SelectListItem item = new SelectListItem
+                {
+                    Text = c.Attivita.Descrizione + "-" + c.Risorsa.Descrizione,
+                    Value = c.ID + ""
+                };
+
+                ListaRisorseAttivita.Add(item);
+
+                SelectListItem itemc = new SelectListItem
+                {
+                    Text = c.Capienza + "",
+                    Value = c.ID + ""
+                };
+
+                ListaRisorseAttivitaCapienza.Add(itemc);
+            }
+
 
             int intOI = 480;
             int intOF = 1200;
             int intSlot = 30;
             double dFattore = 0;
 
-            Esercente esercente = await RealmDataStore.Esercente(HttpContext.Session.GetString("IDesercente"));
 
             if (esercente.OraInizio != 0) intOI = esercente.OraInizio;
             if (esercente.OraFine != 0) intOF = esercente.OraFine;
@@ -2292,6 +2337,13 @@ namespace CDQ.Controllers
             //adesso ciclo sulla ListaCalendari per vedere se esistono attività da descrivere
             foreach (Calendario c in ListaCalendari)
             {
+                //calcolo la capienza residua
+                string Res = await RealmDataStore.CapienzaResidua(c.ID);
+                string[] aCR = Res.Split("#");
+                int CR = Convert.ToInt32(aCR[0]);
+                bool HasBooking = CR < 0 ? false : true;
+                string info = aCR[1];
+
                 foreach (StrutturaCalendario s in ListaStrutturaCalendari)
                 {
                     if (c.OraInizio == s.iOrarioCella) //ho trovato un elemento che inizia nella riga
@@ -2311,6 +2363,9 @@ namespace CDQ.Controllers
                                         CelleSpente.Add(c.OraInizio+intSlot*(x-1) + "#0");
                                     }
                                 }
+                                s.SC0.CapienzaResidua = Math.Abs(CR);
+                                s.SC0.HasBooking = HasBooking;
+                                s.SC0.Info = info;
                                 break;
                             case 1:  //LUN
                                 s.SC1.Calendario = c;
@@ -2324,6 +2379,9 @@ namespace CDQ.Controllers
                                         CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#1");
                                     }
                                 }
+                                s.SC1.CapienzaResidua = Math.Abs(CR);
+                                s.SC1.HasBooking = HasBooking;
+                                s.SC1.Info = info;
                                 break;
                             case 2:  //MAR
                                 s.SC2.Calendario = c;
@@ -2337,6 +2395,9 @@ namespace CDQ.Controllers
                                         CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#2");
                                     }
                                 }
+                                s.SC2.CapienzaResidua = Math.Abs(CR);
+                                s.SC2.HasBooking = HasBooking;
+                                s.SC2.Info = info;
                                 break;
                             case 3:  //MER
                                 s.SC3.Calendario = c;
@@ -2350,6 +2411,9 @@ namespace CDQ.Controllers
                                         CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#3");
                                     }
                                 }
+                                s.SC3.CapienzaResidua = Math.Abs(CR);
+                                s.SC3.HasBooking = HasBooking;
+                                s.SC3.Info = info;
                                 break;
                             case 4:  //GIO
                                 s.SC4.Calendario = c;
@@ -2363,6 +2427,9 @@ namespace CDQ.Controllers
                                         CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#4");
                                     }
                                 }
+                                s.SC4.CapienzaResidua = Math.Abs(CR);
+                                s.SC4.HasBooking = HasBooking;
+                                s.SC4.Info = info;
                                 break;
                             case 5:  //VEN
                                 s.SC5.Calendario = c;
@@ -2376,6 +2443,9 @@ namespace CDQ.Controllers
                                         CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#5");
                                     }
                                 }
+                                s.SC5.CapienzaResidua = Math.Abs(CR);
+                                s.SC5.HasBooking = HasBooking;
+                                s.SC5.Info = info;
                                 break;
                             case 6:  //SAB
                                 s.SC6.Calendario = c;
@@ -2389,6 +2459,9 @@ namespace CDQ.Controllers
                                         CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#6");
                                     }
                                 }
+                                s.SC6.CapienzaResidua = Math.Abs(CR);
+                                s.SC6.HasBooking = HasBooking;
+                                s.SC6.Info = info;
                                 break;
                         }
 
@@ -2440,24 +2513,25 @@ namespace CDQ.Controllers
             
             Calendario calendario = new Calendario
             {
-                Data = dtPrimoGiornoSettimana
+                Capienza = 1
             };
-
-
-            if (ID != "-1")
-            {
-                calendario = await RealmDataStore.Calendario(ID);
-            }
 
 
             HelpCalendario helpCalendario = new HelpCalendario
             {
                 ListaOrari = ListaOrari,
-                Mode = "Ins",
                 ListaStrutturaCalendari = ListaStrutturaCalendari,
                 Settimana = Settimana,
                 IDSettimana = IDSettimana,
-                Anno = Anno
+                Anno = Anno,
+                pg = dtPrimoGiornoSettimana,
+                Esercente = esercente.RagioneSociale,
+                ListaGiorni = ListaGiorni,
+                ListaRisorseAttivita = ListaRisorseAttivita,
+                ListaRisorseAttivitaCapienza = ListaRisorseAttivitaCapienza,
+                Calendario = calendario,
+                IDSettimanaC = IDSettimana,
+                IsHidden = IsHidden
             };
 
             return View(helpCalendario);
@@ -2603,6 +2677,7 @@ namespace CDQ.Controllers
             }
             return RedirectToAction(nameof(AttivitaRisorse), new { helpAttivitaRisorse.Esercente.ID, tab = 2 });
         }
+
 
         public async Task<IActionResult> InserisciRicorrentiR(HelpRelazione helpRelazione)
         {
@@ -3092,6 +3167,17 @@ namespace CDQ.Controllers
             return RedirectToAction(nameof(AttivitaRisorse), new { ID, tab = 2 });
         }
 
+        public async Task<IActionResult> CreaCalendario(int IDSettimana, int Anno)
+        {
+            if (!CheckUser()) return RedirectToAction(nameof(Login));
+            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+
+            await RealmDataStore.CreaCalendario(HttpContext.Session.GetString("IDesercente"), IDSettimana, Anno);
+
+            return RedirectToAction(nameof(Calendario), new { IDSettimana, Anno });
+        }
+
+
         public async Task<IActionResult> EliminaPianificazione(string ID)
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
@@ -3113,59 +3199,19 @@ namespace CDQ.Controllers
             return RedirectToAction(nameof(AttivitaRisorse), new { ID, tab = 4 });
         }
 
-
-        /*
-
-        [HttpGet]
-        public async Task<IActionResult> NeutralizzaRicevute()
+        [HttpPost]
+        public async Task<IActionResult> Prenotazione(HelpCalendario helpCalendario)
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
             if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
 
-            await RealmDataStore.NeutralizzaRicevute();
+            if (helpCalendario.ModePrenotazione == "Ins")
+            {
+                await RealmDataStore.InserisciPrenotazione(HttpContext.Session.GetString("IDesercente"), helpCalendario.IDCalendario, HttpContext.Session.GetString("username"), helpCalendario.Nota);
+            }
 
-            return RedirectToAction(nameof(Index));
-        }       
-
-
-        [HttpGet]
-        public async Task<IActionResult> SanaRipartizioni()
-        {
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            await RealmDataStore.SanaRipartizioni();
-
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Calendario), new { });
         }
-
-        [HttpGet]
-        public async Task<IActionResult> SanaPagamentiSpese()
-        {
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            await RealmDataStore.SanaPagamentiSpese();
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        
-
-        [HttpGet]
-        public async Task<IActionResult> SanaServizi()
-        {
-            
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            await Sanatorie.SanaPagamentiServizi();
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        */
-        
 
     }
 }

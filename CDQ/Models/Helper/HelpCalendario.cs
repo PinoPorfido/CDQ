@@ -12,16 +12,30 @@ namespace CDQ.Models.Helper
     {
 
         public List<SelectListItem> ListaOrari { get; set; }
-
         public IEnumerable<StrutturaCalendario> ListaStrutturaCalendari { get; set; }
-
         public string Settimana { get; set; }
-
         public int IDSettimana { get; set; }
-
+        public string IDCalendario { get; set; }
         public int Anno { get; set; }
+        public string ModePrenotazione { get; set; }
+        public string IDCalendarioE { get; set; }
+        public string Esercente { get; set; }
+        public DateTime pg { get; set; }
+        public string Nota { get; set; }
 
-        public string Mode { get; set; }
-		
+        public Calendario Calendario { get; set; }
+
+        public List<SelectListItem> ListaRisorseAttivita;
+        public List<SelectListItem> ListaRisorseAttivitaCapienza;
+        public List<SelectListItem> ListaGiorni;
+        public string ModeCalendario { get; set; }
+        public string IDRisorsaAttivita { get; set; }
+        public int IDGiorno { get; set; }
+        public string IDOraInizio { get; set; }
+        public string IDOraFine { get; set; }
+        public int IDSettimanaC { get; set; }
+        public bool IsHidden { get; set; }
+
+
     }
 }

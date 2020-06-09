@@ -89,7 +89,7 @@ namespace CDQ.Services
                 pathRealm = "/Users/luigi/Dropbox/Realm/CDQ/cdq.realm";
             }
 
-            var config = new RealmConfiguration(pathRealm) { SchemaVersion = 11};
+            var config = new RealmConfiguration(pathRealm) { SchemaVersion = 13};
 
 
             //if (async)
@@ -238,7 +238,7 @@ namespace CDQ.Services
         }
 
 
-        internal static async Task<int> CapienzaResidua(string IDCalendario)
+        internal static async Task<string> CapienzaResidua(string IDCalendario)
         {
             var vRealmDb = await GetRealm(true);
 
@@ -246,14 +246,25 @@ namespace CDQ.Services
 
             var prenotazione = vRealmDb.All<Prenotazione>().Where(a => a.Calendario == calendario);
 
-            int ris = 0;
+            int ris = calendario.Capienza;
 
-            if (prenotazione != null)
+            string info = "";
+
+            ris -= prenotazione.Count();
+
+            if (prenotazione.Count() == 0) ris = -ris;
+
+            int i = 1;
+
+            foreach (Prenotazione pr in prenotazione)
             {
-                ris = calendario.Capienza - prenotazione.Count();
+                info = info + Environment.NewLine + i + ". " + pr.Utente.Cognome + " " + pr.Utente.Nome + " - " + pr.Nota;
+                i += 1;
             }
 
-            return ris;
+            info = info == "" ? "Nessuna prenotazione" : "Dettagli Prenotazioni" + info;
+            
+            return ris + "#" + info;
 
         }
 
@@ -1455,6 +1466,78 @@ namespace CDQ.Services
                 Esercente = esercente,
                 Descrizione = risorsa.Descrizione,
                 Capienza = risorsa.Capienza
+            };
+
+            vRealmDb.Add(md);
+
+            trans.Commit();
+        }
+
+        internal async static Task CreaCalendario(string IDesercente, int IDSettimana, int Anno)
+        {
+            var vRealmDb = await GetRealm();
+
+            //crea il calenadio aziendale per la settimana indicata basandosi sulla Pianificazione dell'Esercente
+
+            Esercente esercente = vRealmDb.Find<Esercente>(IDesercente);
+
+            DateTime dtPrimoGiornoSettimana = Utils.Utils.PrimoGiornoSettimana(Anno, IDSettimana);
+            DateTime dtUltimoGiornoSettimana = dtPrimoGiornoSettimana.AddDays(6);
+
+            IEnumerable<Pianificazione> pianificazione = await ListaPianificazioni(esercente, -1, "-1", "-1", true, false, false);
+
+            var trans = vRealmDb.BeginWrite();
+
+            if (pianificazione.Count()>0)   //cancelliamo tutto solo se la pianificazione ha almeno un record da inserire
+            {
+                //cancellazione prenotazioni
+                var listaC = vRealmDb.All<Calendario>().Where(ss => ss.Data <= dtUltimoGiornoSettimana && ss.Data >= dtPrimoGiornoSettimana && ss.Esercente == esercente);
+                foreach (Calendario cc in listaC)
+                {
+                    var listaP = vRealmDb.All<Prenotazione>().Where(ss => ss.Calendario == cc);
+                    vRealmDb.RemoveRange<Prenotazione>(listaP);
+                }
+
+                //cancellazione calendario
+                vRealmDb.RemoveRange<Calendario>(listaC);
+            }
+
+            //inserimento nuovi elementi nel Calnedario
+            foreach (Pianificazione ss in pianificazione)
+            {
+                Calendario md = new Calendario
+                {
+                    RisorsaAttivita = ss.RisorsaAttivita,
+                    Esercente = esercente,
+                    OraInizio = ss.OraInizio,
+                    OraFine = ss.OraFine,
+                    Pianificazione = ss,
+                    Capienza = ss.Capienza,
+                    Data = dtPrimoGiornoSettimana.AddDays(ss.Giorno.ID-1)
+                };
+                vRealmDb.Add(md);
+            }
+
+            trans.Commit();
+        }
+
+
+        internal async static Task InserisciPrenotazione(string IDesercente, string IDCalendario, string IDUtente, string Nota)
+        {
+            var vRealmDb = await GetRealm();
+
+            Esercente esercente = vRealmDb.Find<Esercente>(IDesercente);
+            Calendario calendario = vRealmDb.Find<Calendario>(IDCalendario);
+            Utente utente = vRealmDb.Find<Utente>(IDUtente);
+
+            var trans = vRealmDb.BeginWrite();
+
+            Prenotazione md = new Prenotazione
+            {
+                Esercente = esercente,
+                Calendario = calendario,
+                Utente = utente,
+                Nota = Nota
             };
 
             vRealmDb.Add(md);

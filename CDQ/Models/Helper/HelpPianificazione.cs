@@ -46,8 +46,9 @@ namespace CDQ.Models.Helper
 		public bool IsSortGiorno { get; set; }
 		public bool IsSortAttivita { get; set; }
     	public bool IsSortRisorsa { get; set; }
+        public string Esercente { get; set; }
 
-		
+
 
     }
 }

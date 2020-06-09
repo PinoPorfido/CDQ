@@ -47,16 +47,6 @@ namespace CDQ.Models
             }
         }
 
-        public int CapienzaResidua()
-        {
-            {
-                //int res = Services.RealmDataStore.CapienzaResidua(ID);
-                int res = 0;
-                return res;
-            }
-        }
-
-
     }
 
 }

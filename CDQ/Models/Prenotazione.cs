@@ -11,9 +11,10 @@ namespace CDQ.Models
         [PrimaryKey]
         public string ID { get; set; } = Guid.NewGuid().ToString();
         
-        public Utente utente { get; set; }
+        public Utente Utente { get; set; }
         public Calendario Calendario { get; set; }
         public Esercente Esercente { get; set; }
+        public string Nota { get; set; }
 
     }
 
