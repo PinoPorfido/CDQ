@@ -19,6 +19,7 @@ namespace CDQ.Models.Helper
         public int Anno { get; set; }
         public string ModePrenotazione { get; set; }
         public string IDCalendarioE { get; set; }
+        public string IDCalendarioU { get; set; }
         public string Esercente { get; set; }
         public DateTime pg { get; set; }
         public string Nota { get; set; }

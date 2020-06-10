@@ -47,6 +47,14 @@ namespace CDQ.Models
             }
         }
 
+        public string Data_string
+        {
+            get
+            {
+                return Data.Year + "#" + Data.Month + "#" + Data.Day;
+            }
+        }
+
     }
 
 }

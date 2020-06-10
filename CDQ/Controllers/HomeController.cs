@@ -398,11 +398,11 @@ namespace CDQ.Controllers
 
             if (helpCalendario.ModeCalendario == "Ins")
             {
-                await RealmDataStore.InserisciCalendario(calendario, helpCalendario.IDRisorsaAttivita, helpCalendario.IDGiorno, helpCalendario.IDOraInizio, helpCalendario.IDOraFine, helpCalendario.Capienza, HttpContext.Session.GetString("IDesercente"));
+                await RealmDataStore.InserisciCalendario(calendario, helpCalendario.IDRisorsaAttivita, helpCalendario.IDGiorno, helpCalendario.IDOraInizio, helpCalendario.IDOraFine, HttpContext.Session.GetString("IDesercente"));
             }
             else if (helpCalendario.ModeCalendario == "Upd")
             {
-                //await RealmDataStore.AggiornaPianificazione(pianificazione, helpPianificazione.IDRisorsaAttivita, helpPianificazione.IDGiorno, helpPianificazione.IDOraInizio, helpPianificazione.IDOraFine, HttpContext.Session.GetString("IDesercente"));
+                await RealmDataStore.AggiornaCalendario(calendario, helpCalendario.IDRisorsaAttivita, helpCalendario.IDGiorno, helpCalendario.IDOraInizio, helpCalendario.IDOraFine, HttpContext.Session.GetString("IDesercente"), helpCalendario.IDCalendarioU);
             }
 
             return RedirectToAction(nameof(Calendario), new { IDSettimana = helpCalendario.IDSettimanaC, Anno = helpCalendario.Anno });

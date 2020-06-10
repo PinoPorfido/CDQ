@@ -1617,7 +1617,7 @@ namespace CDQ.Services
             trans.Commit();
         }
 
-        internal async static Task InserisciCalendario(Calendario calendario, string IDRisorsaAttivita, string Data, string IDOraInizio, string IDOraFine, int Capienza, string IDEsercente)
+        internal async static Task InserisciCalendario(Calendario calendario, string IDRisorsaAttivita, string Data, string IDOraInizio, string IDOraFine, string IDEsercente)
         {
             var vRealmDb = await GetRealm();
 
@@ -1650,7 +1650,34 @@ namespace CDQ.Services
         }
 
 
+        internal async static Task AggiornaCalendario(Calendario calendario, string IDRisorsaAttivita, string Data, string IDOraInizio, string IDOraFine, string IDEsercente, string IDCalendario)
+        {
+            var vRealmDb = await GetRealm();
 
+            RisorsaAttivita risorsaAttivita = vRealmDb.Find<RisorsaAttivita>(IDRisorsaAttivita);
+            Esercente esercente = vRealmDb.Find<Esercente>(IDEsercente);
+            Calendario cMod = vRealmDb.Find<Calendario>(IDCalendario);
+
+
+            if (risorsaAttivita == null || IDOraFine == null || IDOraInizio == null || Data == null) return;
+
+            string[] dtAppo = Data.Split("#");
+
+            DateTime DataOK = new DateTime(Convert.ToInt32(dtAppo[0]), Convert.ToInt32(dtAppo[1]), Convert.ToInt32(dtAppo[2]));
+
+            DataOK = DataOK.AddHours(12);
+
+            var trans = vRealmDb.BeginWrite();
+
+            cMod.RisorsaAttivita = risorsaAttivita;
+            cMod.Esercente = esercente;
+            cMod.Data = DataOK;
+            cMod.OraInizio = Convert.ToInt32(IDOraInizio);
+            cMod.OraFine = Convert.ToInt32(IDOraFine);
+            cMod.Capienza = calendario.Capienza;
+
+            trans.Commit();
+        }
 
         internal async static Task InserisciMasseDebitorieR(string IDrelazioni, MasseDebitorie masseDebitorie, string IDCausaDebito, string IDGrado)
         {
