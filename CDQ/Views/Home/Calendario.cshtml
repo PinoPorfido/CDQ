@@ -8,40 +8,33 @@
 <br />
 
 <div class="columns">
-
-    <div class="column is-1" align="left">
+    <div class="column is-2" align="left">
         <a asp-action="Index" class="button back">
             <span class="icon">
                 <i class="fas fa-backward"></i>
             </span>
         </a>
     </div>
-    <div class="column is-10" align="center">
+    <div class="column is-8" align="center">
         <h1 class="title is-4">Calendario Operativo - @Model.Esercente</h1>
     </div>
-    <div class="column is-1" align="right">
-        <a class="button back" id="ShowHide1" data-tooltip="Nascondi/Mostra il Pannello di Modifica" onclick="mostraPannello('PannelloEdit')">
-            <span class="icon" id="ShowHide2">
-                <i id="ShowHide" class="fas fa-eye-slash"></i>
-            </span>
-        </a>
+    <div class="column is-2" align="right">
     </div>
 </div>
 
 
 <form id="formCalendario" method="post">
-
     <div asp-validation-summary="ModelOnly" class="help help-message"></div>
     <div class="columns">
         <div class="column is-fullwidth">
-            <div class="panel" id="PannelloEdit" hidden="@Model.IsHidden">
+            <div class="panel" id="PannelloEdit" hidden="@Model.IsNascosto">
                 <div class="panel-heading">
                     <div class="columns">
-                        <div class="column is-5" align="center">
-                            <p>Predisposizione del Calendario Operativo</p>
+                        <div class="column is-5" align="left">
+                            <p>Predisposizione del Calendario Operativo a partire dalla Pianificazione della Settimana Tipo</p>
                         </div>
                         <div class="column is-2" align="center">
-                            <a id="CreaSettimana" class="button is-dark" asp-action="CreaCalendario" asp-route-IDSettimana="@Model.IDSettimanaC" asp-route-Anno="@Model.Anno" onclick="return confirmCreation(this.id)" data-tooltip="Crea il calendario relativo alla settimana corrente utilizzando la Pianificazione su Settimana Tipo">Crea Calendario</a>
+                            <a id="CreaSettimana" class="button is-dark" asp-action="CreaCalendario" asp-route-IDSettimana="@Model.IDSettimanaC" asp-route-Anno="@Model.Anno" onclick="return confirmCreation(this.id)">Crea Calendario</a>
                         </div>
                         <div class="column is-5" align="right">
                         </div>
@@ -54,8 +47,6 @@
                         <div class="column">
 
                             <input id="IDPianificazione" asp-for="Calendario.ID" type="hidden">
-                            <input id="Nascondi" asp-for="IsHidden" class="is-checkradio is-small is-info" type="checkbox">
-
 
 
                             @Html.HiddenFor(model => Model.ModeCalendario)
@@ -139,7 +130,7 @@
                                 </div>
                                 <div class="column is-2" align="right">
                                     <label class="label">&nbsp;</label>
-                                    <button type="submit" class="button is-dark" data-tooltip="Aggiunge elemento al Calendario Operativo">Aggiorna</button>
+                                    <button class="button is-dark" type="submit" data-tooltip="Aggiunge elemento al Calendario Operativo">Aggiorna</button>
                                 </div>
 
                             </div>
@@ -158,28 +149,37 @@
         <div class="column is-fullwidth">
             <div class="panel">
                 <div class="panel-heading" style="vertical-align:central">
+
                     <div class="columns">
                         <div class="column is-1" align="right">
-                            <a asp-action="Calendario" class="button" asp-route-Dir="less" asp-route-IDSettimana=@Model.IDSettimana asp-route-Anno=@Model.Anno>
+                            <a asp-action="Calendario" class="button" asp-route-Dir="less" asp-route-IDSettimana=@Model.IDSettimana asp-route-Anno=@Model.Anno asp-route-IsNascosto=@Model.IsNascosto>
                                 <span class="icon">
                                     <i class="fas fa-chevron-left"></i>
                                 </span>
                             </a>
                         </div>
                         <div class="column is-1" align="left">
-                            <a asp-action="Calendario" asp-route-Dir="more" asp-route-IDSettimana=@Model.IDSettimana asp-route-Anno=@Model.Anno class="button">
+                            <a asp-action="Calendario" asp-route-Dir="more" asp-route-IDSettimana=@Model.IDSettimana asp-route-Anno=@Model.Anno asp-route-IsNascosto=@Model.IsNascosto class="button">
                                 <span class="icon">
                                     <i class="fas fa-chevron-right"></i>
                                 </span>
                             </a>
                         </div>
                         <div class="column is-1">
-                            <a asp-action="Calendario" asp-route-Dir="oggi" class="button">Oggi</a>
+                            <a asp-action="Calendario" asp-route-Dir="oggi" asp-route-IsNascosto=@Model.IsNascosto class="button">Oggi</a>
                         </div>
                         <div class="column is-6" align="center">
                             <label style="font-size:large">Settimana @Model.Settimana</label>
                         </div>
                         <div class="column is-3">
+                            <div class="field">
+                                <input id="IsNascosto" class="switch" type="checkbox" onclick="mostraPannello('PannelloEdit')" asp-for="IsNascosto">
+                                <label for="IsNascosto" style="font-size:small">Nascondi Pannello Superiore</label>
+                            </div>
+                            <div class="field">
+                                <input id="ModeEdit" class="switch" type="checkbox" asp-for="ModeEdit">
+                                <label for="ModeEdit" style="font-size:small">Modalità Prenotazione</label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -439,7 +439,7 @@
     <div class="modal-background"></div>
     <div class="modal-card">
         <header class="modal-card-head">
-            <p class="modal-card-title">Conferma Creazione Settimana di Calendario Operativo</p>
+            <p class="modal-card-title" align="center">Conferma Creazione del Calendario Operativo<br />per la Settimana @Model.Settimana</p>
             <button class="delete" type="reset" onclick="document.getElementById('Creation').value = 'N';cancelModalCreation()"></button>
         </header>
         <section class="modal-card-body">
@@ -499,6 +499,7 @@
 
 
     function setUpPrenotazione(Booked, id, Attivita, Risorsa, Data, OraInizio, OraFine) {
+        alert(document.getElementById('ModeEdit').checked);
         if (Booked == true) {
             document.getElementById('ModePrenotazione').value = 'Del';
             document.getElementById("IDCalendarioE").value = id;
@@ -524,6 +525,30 @@
         document.getElementById("modal-Prenotazione").classList.remove("is-active");
 
     }
+
+
+    function setUpCalendario(id, RisorsaAttivitaID, DataID, OraInizio, OraFine, Capienza) {
+        if (typeof id == "undefined") {
+            document.getElementById('ModeCalendario').value = 'Ins';
+        }
+        else {
+            document.getElementById('ModeCalendario').value = 'Upd';
+            document.getElementById("IDCalendario").value = id;
+            document.getElementById("select_RisorsaAttivita").value = RisorsaAttivitaID;
+            document.getElementById("select_Data").value = DataID;
+            document.getElementById("select_OraInizio").value = OraInizio;
+            document.getElementById("select_OraFine").value = OraFine;
+            document.getElementById("Capienza").value = Capienza;
+        }
+    }
+
+
+    function cancelSetUpPrenotazione() {
+
+        document.getElementById("modal-Prenotazione").classList.remove("is-active");
+
+    }
+
 </script>
 
 <script>
@@ -555,7 +580,6 @@
     function mostraPannello(pannello) {
         var x = document.getElementById(pannello);
         x.hidden = !x.hidden;
-        document.getElementById('Nascondi').value = x.hidden;
-        };
+    }
 
 </script>

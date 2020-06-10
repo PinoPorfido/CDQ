@@ -398,7 +398,7 @@ namespace CDQ.Controllers
 
             if (helpCalendario.ModeCalendario == "Ins")
             {
-                //await RealmDataStore.InserisciPianificazione(pianificazione, helpPianificazione.IDRisorsaAttivita, helpPianificazione.IDGiorno, helpPianificazione.IDOraInizio, helpPianificazione.IDOraFine, HttpContext.Session.GetString("IDesercente"));
+                await RealmDataStore.InserisciCalendario(calendario, helpCalendario.IDRisorsaAttivita, helpCalendario.IDGiorno, helpCalendario.IDOraInizio, helpCalendario.IDOraFine, helpCalendario.Capienza, HttpContext.Session.GetString("IDesercente"));
             }
             else if (helpCalendario.ModeCalendario == "Upd")
             {
@@ -2147,7 +2147,7 @@ namespace CDQ.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> Calendario(int IDSettimana = -1, int Anno = -1, string Dir = "", bool IsHidden=false)
+        public async Task<IActionResult> Calendario(int IDSettimana = -1, int Anno = -1, string Dir = "", bool IsNascosto=false)
         {
 
             if (!CheckUser()) return RedirectToAction(nameof(Login));
@@ -2531,7 +2531,9 @@ namespace CDQ.Controllers
                 ListaRisorseAttivitaCapienza = ListaRisorseAttivitaCapienza,
                 Calendario = calendario,
                 IDSettimanaC = IDSettimana,
-                IsHidden = IsHidden
+                IsNascosto = false,
+                ModeEdit = true,
+                ModeCalendario = "Ins"
             };
 
             return View(helpCalendario);

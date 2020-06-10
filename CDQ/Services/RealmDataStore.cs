@@ -1617,6 +1617,41 @@ namespace CDQ.Services
             trans.Commit();
         }
 
+        internal async static Task InserisciCalendario(Calendario calendario, string IDRisorsaAttivita, string Data, string IDOraInizio, string IDOraFine, int Capienza, string IDEsercente)
+        {
+            var vRealmDb = await GetRealm();
+
+            RisorsaAttivita risorsaAttivita = vRealmDb.Find<RisorsaAttivita>(IDRisorsaAttivita);
+            Esercente esercente = vRealmDb.Find<Esercente>(IDEsercente);
+
+            if (risorsaAttivita == null || IDOraFine == null || IDOraInizio == null || Data == null) return;
+
+            string[] dtAppo = Data.Split("#");
+
+            DateTime DataOK = new DateTime (Convert.ToInt32(dtAppo[0]), Convert.ToInt32(dtAppo[1]), Convert.ToInt32(dtAppo[2]));
+
+            DataOK = DataOK.AddHours(12);
+
+            var trans = vRealmDb.BeginWrite();
+
+            Calendario md = new Calendario
+            {
+                RisorsaAttivita = risorsaAttivita,
+                Esercente = esercente,
+                Data = DataOK,
+                OraInizio = Convert.ToInt32(IDOraInizio),
+                OraFine = Convert.ToInt32(IDOraFine),
+                Capienza = calendario.Capienza
+            };
+
+            vRealmDb.Add(md);
+
+            trans.Commit();
+        }
+
+
+
+
         internal async static Task InserisciMasseDebitorieR(string IDrelazioni, MasseDebitorie masseDebitorie, string IDCausaDebito, string IDGrado)
         {
             var vRealmDb = await GetRealm();

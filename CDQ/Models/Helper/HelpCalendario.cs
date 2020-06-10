@@ -30,12 +30,13 @@ namespace CDQ.Models.Helper
         public List<SelectListItem> ListaGiorni;
         public string ModeCalendario { get; set; }
         public string IDRisorsaAttivita { get; set; }
-        public int IDGiorno { get; set; }
+        public string IDGiorno { get; set; }
         public string IDOraInizio { get; set; }
         public string IDOraFine { get; set; }
         public int IDSettimanaC { get; set; }
-        public bool IsHidden { get; set; }
-
+        public bool IsNascosto { get; set; }
+        public bool ModeEdit { get; set; }
+        public int Capienza { get; set; }
 
     }
 }
