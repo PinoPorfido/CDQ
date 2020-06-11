@@ -3190,6 +3190,15 @@ namespace CDQ.Controllers
             return RedirectToAction(nameof(Pianificazione), new { });
         }
 
+        public async Task<IActionResult> EliminaCalendario(string IDCalendarioU, int IDSettimana, int Anno)
+        {
+            if (!CheckUser()) return RedirectToAction(nameof(Login));
+            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+
+            await RealmDataStore.EliminaCalendario(IDCalendarioU);
+
+            return RedirectToAction(nameof(Calendario), new { IDSettimana, Anno });
+        }
 
         public async Task<IActionResult> EliminaRisorsaAttivita(string ID, string IDRisorsaAttivita)
         {

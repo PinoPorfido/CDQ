@@ -30,13 +30,13 @@
             <div class="panel" id="PannelloEdit" hidden="@Model.IsNascosto">
                 <div class="panel-heading">
                     <div class="columns">
-                        <div class="column is-5" align="left" style="font-size:small">
-                            <p>Predisposizione del Calendario Operativo a partire dalla Pianificazione della Settimana Tipo</p>
+                        <div class="column is-7" align="left" style="font-size:small">
+                            <p>Predisposizione del Calendario Operativo a partire dalla Pianificazione della Settimana Tipo: </p>
                         </div>
-                        <div class="column is-2" align="center" style="font-size:small">
+                        <div class="column is-1" align="center" style="font-size:small">
                             <a id="CreaSettimana" style="font-size:small" class="button is-dark" asp-action="CreaCalendario" asp-route-IDSettimana="@Model.IDSettimanaC" asp-route-Anno="@Model.Anno" onclick="return confirmCreation(this.id)">Crea Calendario</a>
                         </div>
-                        <div class="column is-5" align="right">
+                        <div class="column is-4" align="right">
                         </div>
                     </div>
                 </div>
@@ -130,15 +130,15 @@
                                 </div>
                                 <div class="column is-1" align="right">
                                     <label class="label" style="font-size:small">&nbsp;</label>
-                                    <button style="font-size:small" class="button is-dark" type="submit" data-tooltip="Aggiunge elemento al Calendario Operativo">Inserisci</button>
+                                    <button id="CalIns" style="font-size:small" class="button is-dark" type="submit" data-tooltip="Aggiunge elemento al Calendario Operativo">Inserisci</button>
                                 </div>
                                 <div class="column is-1" align="right">
                                     <label class="label" style="font-size:small">&nbsp;</label>
-                                    <button class="button is-dark" style="font-size:small" type="submit" data-tooltip="Modifica elemento al Calendario Operativo">Aggiorna</button>
+                                    <button id="CalUpd" class="button is-dark" style="font-size:small" type="submit" data-tooltip="Modifica elemento al Calendario Operativo" disabled='@Model.ModeCalendario == "Ins" ? true : false'>Aggiorna</button>
                                 </div>
                                 <div class="column is-1" align="right">
                                     <label class="label" style="font-size:small">&nbsp;</label>
-                                    <button class="button is-dark" style="font-size:small" type="submit" data-tooltip="Elimina elemento al Calendario Operativo">Elimina</button>
+                                    <button id="CalDel" class="button is-dark" style="font-size:small" type="submit" data-tooltip="Elimina elemento al Calendario Operativo" disabled='@Model.ModeCalendario == "Ins" ? true : false' asp-action="EliminaCalendario" onclick="return confirmElimina(this.id)" title="elimina Pianificazione">Elimina</button>
                                 </div>
 
                             </div>
@@ -430,7 +430,7 @@
             <button class="delete" type="reset" onclick="document.getElementById('Elimina').value = 'N';cancelModalElimina()"></button>
         </header>
         <section class="modal-card-body">
-            <p>Eliminare l'informazione selezionata?</p>
+            <p>Eliminare l'elemento selezionato e le sue dipendenze?</p>
             <input id="IDCaller" type="hidden" />
             <input id="Elimina" type="hidden" value="N" />
         </section>
@@ -507,7 +507,6 @@
     function setUpPrenotazione(Booked, id, Attivita, Risorsa, Data, OraInizio, OraFine, RisorsaAttivitaID, Capienza) {
         //aggiornamento Calendario
         if (document.getElementById('ModeEdit').checked == false) {
-            alert(Data);
             document.getElementById('ModeCalendario').value = 'Upd';
             document.getElementById("IDCalendarioU").value = id;
             document.getElementById("select_RisorsaAttivita").value = RisorsaAttivitaID;
@@ -515,6 +514,9 @@
             document.getElementById("select_OraFine").value = OraFine;
             document.getElementById("Capienza").value = Capienza;
             document.getElementById("select_Giorno").value = Data;
+            document.getElementById("CalIns").disabled = true;
+            document.getElementById("CalUpd").disabled = false;
+            document.getElementById("CalDel").disabled = false;
             return;
 
         }

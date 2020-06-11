@@ -1342,6 +1342,26 @@ namespace CDQ.Services
             trans.Commit();
         }
 
+        internal async static Task EliminaCalendario(string IDCalendario)
+        {
+            var vRealmDb = await GetRealm();
+
+            var trans = vRealmDb.BeginWrite();
+
+            Calendario ap = vRealmDb.Find<Calendario>(IDCalendario);
+
+            //eliminazione prenotazioni
+            var prenotazione = vRealmDb.All<Prenotazione>().Where(a=> a.Calendario == ap);
+
+            vRealmDb.RemoveRange(prenotazione);
+
+            //elimina calenadrio
+            vRealmDb.Remove(ap);
+
+
+            trans.Commit();
+        }
+
 
         internal async static Task EliminaRisorsaAttivita(string IDRisorsaAttivita)
         {
