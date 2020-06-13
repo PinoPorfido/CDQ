@@ -2342,7 +2342,7 @@ namespace CDQ.Controllers
                 int CR = Convert.ToInt32(aCR[0]);
                 bool HasBooking = CR < 0 ? false : true;
                 string info = aCR[1];
-                bool Booked = Convert.ToBoolean(aCR[2]);
+                int Booked = Convert.ToInt32(aCR[2]);
 
                 foreach (StrutturaCalendario s in ListaStrutturaCalendari)
                 {
@@ -3206,6 +3206,17 @@ namespace CDQ.Controllers
 
             return RedirectToAction(nameof(Calendario), new { IDSettimana, Anno });
         }
+
+        public async Task<IActionResult> EliminaPrenotazione(string IDCalendarioE, int IDSettimana, int Anno)
+        {
+            if (!CheckUser()) return RedirectToAction(nameof(Login));
+            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+
+            await RealmDataStore.EliminaPrenotazione(IDCalendarioE, HttpContext.Session.GetString("username"));
+
+            return RedirectToAction(nameof(Calendario), new { IDSettimana, Anno });
+        }
+
 
         public async Task<IActionResult> EliminaRisorsaAttivita(string ID, string IDRisorsaAttivita)
         {

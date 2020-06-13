@@ -242,7 +242,7 @@ namespace CDQ.Services
         {
             var vRealmDb = await GetRealm(true);
 
-            bool Booked = false;
+            int Booked = -1;
 
             Calendario calendario = vRealmDb.Find<Calendario>(IDCalendario);
 
@@ -265,7 +265,7 @@ namespace CDQ.Services
                 info = info + Environment.NewLine + i + ". " + pr.Utente.Cognome + " " + pr.Utente.Nome + " - " + pr.Nota;
                 i += 1;
 
-                if (pr.Utente.Mail == IDUtente) Booked = true;
+                if (pr.Utente.Mail == IDUtente) Booked = 1;
 
             }
 
@@ -1367,6 +1367,24 @@ namespace CDQ.Services
 
 
             trans.Commit();
+        }
+
+        internal async static Task EliminaPrenotazione(string IDCalendario, string IDUtente)
+        {
+            var vRealmDb = await GetRealm();
+
+            var trans = vRealmDb.BeginWrite();
+
+            Calendario ap = vRealmDb.Find<Calendario>(IDCalendario);
+
+            Utente utente = vRealmDb.Find<Utente>(IDUtente);
+
+            //eliminazione prenotazioni
+            var prenotazione = vRealmDb.All<Prenotazione>().Where(a => a.Calendario == ap && a.Utente == utente);
+
+            vRealmDb.RemoveRange(prenotazione);
+
+             trans.Commit();
         }
 
 
