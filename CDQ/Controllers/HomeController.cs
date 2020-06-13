@@ -2156,7 +2156,6 @@ namespace CDQ.Controllers
             DateTime dtPrimoGiornoSettimana = DateTime.Now;
             DateTime dtUltimoGiornoSettimana = dtPrimoGiornoSettimana.AddDays(6);
 
-
             if (IDSettimana == -1 || Dir == "oggi") IDSettimana = Utils.Utils.SettimanaAnno(DateTime.Now); 
             if (Anno == -1) Anno = DateTime.Now.Year;
 
@@ -2338,11 +2337,12 @@ namespace CDQ.Controllers
             foreach (Calendario c in ListaCalendari)
             {
                 //calcolo la capienza residua
-                string Res = await RealmDataStore.CapienzaResidua(c.ID);
+                string Res = await RealmDataStore.CapienzaResidua(c.ID, HttpContext.Session.GetString("username"));
                 string[] aCR = Res.Split("#");
                 int CR = Convert.ToInt32(aCR[0]);
                 bool HasBooking = CR < 0 ? false : true;
                 string info = aCR[1];
+                bool Booked = Convert.ToBoolean(aCR[2]);
 
                 foreach (StrutturaCalendario s in ListaStrutturaCalendari)
                 {
@@ -2366,6 +2366,7 @@ namespace CDQ.Controllers
                                 s.SC0.CapienzaResidua = Math.Abs(CR);
                                 s.SC0.HasBooking = HasBooking;
                                 s.SC0.Info = info;
+                                s.SC0.Booked = Booked;
                                 break;
                             case 1:  //LUN
                                 s.SC1.Calendario = c;
@@ -2382,6 +2383,7 @@ namespace CDQ.Controllers
                                 s.SC1.CapienzaResidua = Math.Abs(CR);
                                 s.SC1.HasBooking = HasBooking;
                                 s.SC1.Info = info;
+                                s.SC1.Booked = Booked;
                                 break;
                             case 2:  //MAR
                                 s.SC2.Calendario = c;
@@ -2398,6 +2400,7 @@ namespace CDQ.Controllers
                                 s.SC2.CapienzaResidua = Math.Abs(CR);
                                 s.SC2.HasBooking = HasBooking;
                                 s.SC2.Info = info;
+                                s.SC2.Booked = Booked;
                                 break;
                             case 3:  //MER
                                 s.SC3.Calendario = c;
@@ -2414,6 +2417,7 @@ namespace CDQ.Controllers
                                 s.SC3.CapienzaResidua = Math.Abs(CR);
                                 s.SC3.HasBooking = HasBooking;
                                 s.SC3.Info = info;
+                                s.SC3.Booked = Booked;
                                 break;
                             case 4:  //GIO
                                 s.SC4.Calendario = c;
@@ -2430,6 +2434,7 @@ namespace CDQ.Controllers
                                 s.SC4.CapienzaResidua = Math.Abs(CR);
                                 s.SC4.HasBooking = HasBooking;
                                 s.SC4.Info = info;
+                                s.SC4.Booked = Booked;
                                 break;
                             case 5:  //VEN
                                 s.SC5.Calendario = c;
@@ -2446,6 +2451,7 @@ namespace CDQ.Controllers
                                 s.SC5.CapienzaResidua = Math.Abs(CR);
                                 s.SC5.HasBooking = HasBooking;
                                 s.SC5.Info = info;
+                                s.SC5.Booked = Booked;
                                 break;
                             case 6:  //SAB
                                 s.SC6.Calendario = c;
@@ -2462,6 +2468,7 @@ namespace CDQ.Controllers
                                 s.SC6.CapienzaResidua = Math.Abs(CR);
                                 s.SC6.HasBooking = HasBooking;
                                 s.SC6.Info = info;
+                                s.SC6.Booked = Booked;
                                 break;
                         }
 

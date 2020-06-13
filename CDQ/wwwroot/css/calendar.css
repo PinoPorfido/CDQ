@@ -20,7 +20,7 @@ table.calendar > tbody > tr > td > div {
     vertical-align: middle;
     align-content: center;
     line-height: 1;
-    font-family:'Arial Narrow';
+    font-family: 'Arial Narrow';
 }
 
 table.calendar > tbody > tr > td.has-events {

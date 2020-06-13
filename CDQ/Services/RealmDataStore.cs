@@ -238,11 +238,15 @@ namespace CDQ.Services
         }
 
 
-        internal static async Task<string> CapienzaResidua(string IDCalendario)
+        internal static async Task<string> CapienzaResidua(string IDCalendario, string IDUtente)
         {
             var vRealmDb = await GetRealm(true);
 
+            bool Booked = false;
+
             Calendario calendario = vRealmDb.Find<Calendario>(IDCalendario);
+
+            Utente utente = vRealmDb.Find<Utente>(IDUtente);
 
             var prenotazione = vRealmDb.All<Prenotazione>().Where(a => a.Calendario == calendario);
 
@@ -260,11 +264,14 @@ namespace CDQ.Services
             {
                 info = info + Environment.NewLine + i + ". " + pr.Utente.Cognome + " " + pr.Utente.Nome + " - " + pr.Nota;
                 i += 1;
+
+                if (pr.Utente.Mail == IDUtente) Booked = true;
+
             }
 
             info = info == "" ? "Nessuna prenotazione" : "Dettagli Prenotazioni" + info;
             
-            return ris + "#" + info;
+            return ris + "#" + info + "#" + Booked;
 
         }
 
