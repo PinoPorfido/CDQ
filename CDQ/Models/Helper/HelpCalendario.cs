@@ -27,6 +27,7 @@ namespace CDQ.Models.Helper
         public Calendario Calendario { get; set; }
 
         public List<SelectListItem> ListaRisorseAttivita;
+        public List<SelectListItem> ListaRisorseAttivitaR;
         public List<SelectListItem> ListaRisorseAttivitaCapienza;
         public List<SelectListItem> ListaGiorni;
         public string ModeCalendario { get; set; }
@@ -38,6 +39,9 @@ namespace CDQ.Models.Helper
         public bool IsNascosto { get; set; }
         public bool ModeEdit { get; set; }
         public int Capienza { get; set; }
+        public string  HasConflict { get; set; } //"0": nessun conflitto, altro>:conflitto
+        public string IDRisorsaAttivitaR { get; set; }
+
 
     }
 }

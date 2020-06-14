@@ -2147,7 +2147,7 @@ namespace CDQ.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> Calendario(int IDSettimana = -1, int Anno = -1, string Dir = "", bool IsNascosto=false)
+        public async Task<IActionResult> Calendario(int IDSettimana = -1, int Anno = -1, string Dir = "", bool IsNascosto=false, string IDRisorsaAttivitaR="-1", bool IsRefresh=false)
         {
 
             if (!CheckUser()) return RedirectToAction(nameof(Login));
@@ -2155,6 +2155,10 @@ namespace CDQ.Controllers
 
             DateTime dtPrimoGiornoSettimana = DateTime.Now;
             DateTime dtUltimoGiornoSettimana = dtPrimoGiornoSettimana.AddDays(6);
+
+            List<SelectListItem> ListaRisorseAttivitaU = new List<SelectListItem>();
+
+            string HasConflict = "";
 
             if (IDSettimana == -1 || Dir == "oggi") IDSettimana = Utils.Utils.SettimanaAnno(DateTime.Now); 
             if (Anno == -1) Anno = DateTime.Now.Year;
@@ -2204,29 +2208,6 @@ namespace CDQ.Controllers
 
 
             Esercente esercente = await RealmDataStore.Esercente(HttpContext.Session.GetString("IDesercente"));
-
-            List<SelectListItem> ListaRisorseAttivita = new List<SelectListItem>();
-            List<SelectListItem> ListaRisorseAttivitaCapienza = new List<SelectListItem>();
-            var ListaRA = await RealmDataStore.ListaRisorseAttivita(esercente);
-            foreach (RisorsaAttivita c in ListaRA)
-            {
-                SelectListItem item = new SelectListItem
-                {
-                    Text = c.Attivita.Descrizione + "-" + c.Risorsa.Descrizione,
-                    Value = c.ID + ""
-                };
-
-                ListaRisorseAttivita.Add(item);
-
-                SelectListItem itemc = new SelectListItem
-                {
-                    Text = c.Capienza + "",
-                    Value = c.ID + ""
-                };
-
-                ListaRisorseAttivitaCapienza.Add(itemc);
-            }
-
 
             int intOI = 480;
             int intOF = 1200;
@@ -2352,6 +2333,24 @@ namespace CDQ.Controllers
                         switch ((int)c.Data.DayOfWeek)
                         {
                             case 0:  //DOM
+                                if (s.SC0.TipoCella == 1) //cella già occupata 
+                                {
+                                    HasConflict += "#" + s.SC0.Calendario.RisorsaAttivita.ID + "@" + c.RisorsaAttivita.ID;
+                                    break;
+                                }
+                                else
+                                {
+                                    //ciclo sulla lista CelleSpente per vedere se questa cella era usata da altre attività
+                                    foreach (string v in CelleSpente)
+                                    {
+                                        string[] cr = v.Split("#");
+                                        if (cr[1] == "0" && Convert.ToInt32(cr[0]) == s.iOrarioCella)
+                                        {
+                                            HasConflict += "#" + c.RisorsaAttivita.ID + "@" + cr[2];
+                                            break;
+                                        }
+                                    }
+                                }
                                 s.SC0.Calendario = c;
                                 s.SC0.TipoCella = 1;
                                 s.SC0.Riga = (c.OraFine-c.OraInizio)/intSlot;
@@ -2360,7 +2359,7 @@ namespace CDQ.Controllers
                                 {
                                     for (int x = 2; x <= s.SC0.Riga; x++)
                                     {
-                                        CelleSpente.Add(c.OraInizio+intSlot*(x-1) + "#0");
+                                        CelleSpente.Add(c.OraInizio+intSlot*(x-1) + "#0#" + c.RisorsaAttivita.ID);
                                     }
                                 }
                                 s.SC0.CapienzaResidua = Math.Abs(CR);
@@ -2369,6 +2368,24 @@ namespace CDQ.Controllers
                                 s.SC0.Booked = Booked;
                                 break;
                             case 1:  //LUN
+                                if (s.SC1.TipoCella == 1) //cella già occupata 
+                                {
+                                    HasConflict += "#" + s.SC1.Calendario.RisorsaAttivita.ID + "@" + c.RisorsaAttivita.ID;
+                                    break;
+                                }
+                                else
+                                {
+                                    //ciclo sulla lista CelleSpente per vedere se questa cella era usata da altre attività
+                                    foreach (string v in CelleSpente)
+                                    {
+                                        string[] cr = v.Split("#");
+                                        if (cr[1] == "1" && Convert.ToInt32(cr[0]) == s.iOrarioCella)
+                                        {
+                                            HasConflict += "#" + c.RisorsaAttivita.ID + "@" + cr[2];
+                                            break;
+                                        }
+                                    }
+                                }
                                 s.SC1.Calendario = c;
                                 s.SC1.TipoCella = 1;
                                 s.SC1.Riga = (c.OraFine - c.OraInizio) / intSlot;
@@ -2377,7 +2394,7 @@ namespace CDQ.Controllers
                                 {
                                     for (int x = 2; x <= s.SC1.Riga; x++)
                                     {
-                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#1");
+                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#1#" + c.RisorsaAttivita.ID);
                                     }
                                 }
                                 s.SC1.CapienzaResidua = Math.Abs(CR);
@@ -2386,6 +2403,24 @@ namespace CDQ.Controllers
                                 s.SC1.Booked = Booked;
                                 break;
                             case 2:  //MAR
+                                if (s.SC2.TipoCella == 1) //cella già occupata 
+                                {
+                                    HasConflict += "#" + s.SC2.Calendario.RisorsaAttivita.ID + "@" + c.RisorsaAttivita.ID;
+                                    break;
+                                }
+                                else
+                                {
+                                    //ciclo sulla lista CelleSpente per vedere se questa cella era usata da altre attività
+                                    foreach (string v in CelleSpente)
+                                    {
+                                        string[] cr = v.Split("#");
+                                        if (cr[1] == "2" && Convert.ToInt32(cr[0]) == s.iOrarioCella)
+                                        {
+                                            HasConflict += "#" + c.RisorsaAttivita.ID + "@" + cr[2];
+                                            break;
+                                        }
+                                    }
+                                }
                                 s.SC2.Calendario = c;
                                 s.SC2.TipoCella = 1;
                                 s.SC2.Riga = (c.OraFine - c.OraInizio) / intSlot;
@@ -2394,7 +2429,7 @@ namespace CDQ.Controllers
                                 {
                                     for (int x = 2; x <= s.SC2.Riga; x++)
                                     {
-                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#2");
+                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#2#" + c.RisorsaAttivita.ID);
                                     }
                                 }
                                 s.SC2.CapienzaResidua = Math.Abs(CR);
@@ -2403,6 +2438,24 @@ namespace CDQ.Controllers
                                 s.SC2.Booked = Booked;
                                 break;
                             case 3:  //MER
+                                if (s.SC3.TipoCella == 1) //cella già occupata 
+                                {
+                                    HasConflict += "#" + s.SC3.Calendario.RisorsaAttivita.ID + "@" + c.RisorsaAttivita.ID;
+                                    break;
+                                }
+                                else
+                                {
+                                    //ciclo sulla lista CelleSpente per vedere se questa cella era usata da altre attività
+                                    foreach (string v in CelleSpente)
+                                    {
+                                        string[] cr = v.Split("#");
+                                        if (cr[1] == "3" && Convert.ToInt32(cr[0]) == s.iOrarioCella)
+                                        {
+                                            HasConflict += "#" + c.RisorsaAttivita.ID + "@" + cr[2];
+                                            break;
+                                        }
+                                    }
+                                }
                                 s.SC3.Calendario = c;
                                 s.SC3.TipoCella = 1;
                                 s.SC3.Riga = (c.OraFine - c.OraInizio) / intSlot;
@@ -2411,7 +2464,7 @@ namespace CDQ.Controllers
                                 {
                                     for (int x = 2; x <= s.SC3.Riga; x++)
                                     {
-                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#3");
+                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#3#" + c.RisorsaAttivita.ID);
                                     }
                                 }
                                 s.SC3.CapienzaResidua = Math.Abs(CR);
@@ -2420,6 +2473,24 @@ namespace CDQ.Controllers
                                 s.SC3.Booked = Booked;
                                 break;
                             case 4:  //GIO
+                                if (s.SC4.TipoCella == 1) //cella già occupata 
+                                {
+                                    HasConflict += "#" + s.SC4.Calendario.RisorsaAttivita.ID + "@" + c.RisorsaAttivita.ID;
+                                    break;
+                                }
+                                else
+                                {
+                                    //ciclo sulla lista CelleSpente per vedere se questa cella era usata da altre attività
+                                    foreach (string v in CelleSpente)
+                                    {
+                                        string[] cr = v.Split("#");
+                                        if (cr[1] == "4" && Convert.ToInt32(cr[0]) == s.iOrarioCella)
+                                        {
+                                            HasConflict += "#" + c.RisorsaAttivita.ID + "@" + cr[2];
+                                            break;
+                                        }
+                                    }
+                                }
                                 s.SC4.Calendario = c;
                                 s.SC4.TipoCella = 1;
                                 s.SC4.Riga = (c.OraFine - c.OraInizio) / intSlot;
@@ -2428,7 +2499,7 @@ namespace CDQ.Controllers
                                 {
                                     for (int x = 2; x <= s.SC4.Riga; x++)
                                     {
-                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#4");
+                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#4#" + c.RisorsaAttivita.ID);
                                     }
                                 }
                                 s.SC4.CapienzaResidua = Math.Abs(CR);
@@ -2437,6 +2508,24 @@ namespace CDQ.Controllers
                                 s.SC4.Booked = Booked;
                                 break;
                             case 5:  //VEN
+                                if (s.SC5.TipoCella == 1) //cella già occupata 
+                                {
+                                    HasConflict += "#" + s.SC5.Calendario.RisorsaAttivita.ID + "@" + c.RisorsaAttivita.ID;
+                                    break;
+                                }
+                                else
+                                {
+                                    //ciclo sulla lista CelleSpente per vedere se questa cella era usata da altre attività
+                                    foreach (string v in CelleSpente)
+                                    {
+                                        string[] cr = v.Split("#");
+                                        if (cr[1] == "5" && Convert.ToInt32(cr[0]) == s.iOrarioCella)
+                                        {
+                                            HasConflict += "#" + c.RisorsaAttivita.ID + "@" + cr[2];
+                                            break;
+                                        }
+                                    }
+                                }
                                 s.SC5.Calendario = c;
                                 s.SC5.TipoCella = 1;
                                 s.SC5.Riga = (c.OraFine - c.OraInizio) / intSlot;
@@ -2445,7 +2534,7 @@ namespace CDQ.Controllers
                                 {
                                     for (int x = 2; x <= s.SC5.Riga; x++)
                                     {
-                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#5");
+                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#5#" + c.RisorsaAttivita.ID);
                                     }
                                 }
                                 s.SC5.CapienzaResidua = Math.Abs(CR);
@@ -2454,6 +2543,24 @@ namespace CDQ.Controllers
                                 s.SC5.Booked = Booked;
                                 break;
                             case 6:  //SAB
+                                if (s.SC6.TipoCella == 1) //cella già occupata 
+                                {
+                                    HasConflict += "#" + s.SC6.Calendario.RisorsaAttivita.ID + "@" + c.RisorsaAttivita.ID;
+                                    break;
+                                }
+                                else
+                                {
+                                    //ciclo sulla lista CelleSpente per vedere se questa cella era usata da altre attività
+                                    foreach (string v in CelleSpente)
+                                    {
+                                        string[] cr = v.Split("#");
+                                        if (cr[1] == "6" && Convert.ToInt32(cr[0]) == s.iOrarioCella)
+                                        {
+                                            HasConflict += "#" + c.RisorsaAttivita.ID + "@" + cr[2];
+                                            break;
+                                        }
+                                    }
+                                }
                                 s.SC6.Calendario = c;
                                 s.SC6.TipoCella = 1;
                                 s.SC6.Riga = (c.OraFine - c.OraInizio) / intSlot;
@@ -2462,7 +2569,7 @@ namespace CDQ.Controllers
                                 {
                                     for (int x = 2; x <= s.SC6.Riga; x++)
                                     {
-                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#6");
+                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#6#" + c.RisorsaAttivita.ID);
                                     }
                                 }
                                 s.SC6.CapienzaResidua = Math.Abs(CR);
@@ -2517,12 +2624,51 @@ namespace CDQ.Controllers
 
                 }
             }
-            
+
+            List<SelectListItem> ListaRisorseAttivita = new List<SelectListItem>();
+            List<SelectListItem> ListaRisorseAttivitaR = new List<SelectListItem>();
+            List<SelectListItem> ListaRisorseAttivitaCapienza = new List<SelectListItem>();
+
+            if (HasConflict == "")
+            {
+                //aggiunta selezione completa
+                SelectListItem itemx = new SelectListItem
+                {
+                    Text = "Tutti le Risorse-Attività",
+                    Value = "000"
+                };
+                ListaRisorseAttivitaR.Add(itemx);
+                IDRisorsaAttivitaR = "000";
+            }
+
+            string[] sConflitti = HasConflict.Split("#");
+
+
+            var ListaRA = await RealmDataStore.ListaRisorseAttivita(esercente);
+            foreach (RisorsaAttivita c in ListaRA)
+            {
+                SelectListItem item = new SelectListItem
+                {
+                    Text = c.Attivita.Descrizione + "-" + c.Risorsa.Descrizione,
+                    Value = c.ID + ""
+                };
+
+                ListaRisorseAttivita.Add(item);
+                ListaRisorseAttivitaR.Add(item);
+
+                SelectListItem itemc = new SelectListItem
+                {
+                    Text = c.Capienza + "",
+                    Value = c.ID + ""
+                };
+
+                ListaRisorseAttivitaCapienza.Add(itemc);
+            }
+
             Calendario calendario = new Calendario
             {
                 Capienza = 1
             };
-
 
             HelpCalendario helpCalendario = new HelpCalendario
             {
@@ -2540,10 +2686,28 @@ namespace CDQ.Controllers
                 IDSettimanaC = IDSettimana,
                 IsNascosto = false,
                 ModeEdit = true,
-                ModeCalendario = "Ins"
+                ModeCalendario = "Ins",
+                HasConflict = HasConflict,
+                ListaRisorseAttivitaR = ListaRisorseAttivitaR,
+                IDRisorsaAttivitaR = IDRisorsaAttivitaR
             };
 
-            return View(helpCalendario);
+            if (HasConflict != "" && IsRefresh == true) HasConflict = "OK";
+
+            if (HasConflict == "")
+            {
+                return View(helpCalendario);
+            }
+            else if (HasConflict == "OK")
+            {
+                return View(helpCalendario);
+            }
+            else
+            {
+                //if (IDRisorsaAttivitaR != "000")
+                return RedirectToAction(nameof(Calendario), new { IDSettimana, Anno, IDRisorsaAttivitaR = ListaRisorseAttivitaR[0].Value, IsRefresh = true });
+            }
+
         }
 
 

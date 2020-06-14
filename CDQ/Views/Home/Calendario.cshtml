@@ -75,15 +75,22 @@
                                 @Html.HiddenFor(model => Model.ListaRisorseAttivita[i].Value)
                             }
 
+                            @for (var i = 0; i < Model.ListaRisorseAttivitaR.Count(); i++)
+                            {
+                                @Html.HiddenFor(model => Model.ListaRisorseAttivitaR[i].Text)
+                                @Html.HiddenFor(model => Model.ListaRisorseAttivitaR[i].Value)
+                            }
+
                             @for (var i = 0; i < Model.ListaRisorseAttivitaCapienza.Count(); i++)
                             {
                                 @Html.HiddenFor(model => Model.ListaRisorseAttivitaCapienza[i].Text)
                                 @Html.HiddenFor(model => Model.ListaRisorseAttivitaCapienza[i].Value)
                             }
 
-                            <select hidden id="select_RisorsaAttivitaCapienza" asp-items="Model.ListaRisorseAttivitaCapienza"></select>
-                            <button id="BookingDel" class="button is-dark" type="submit" asp-action="EliminaPrenotazione">Elimina</button>
-
+                            <div class="field" hidden>
+                                <select hidden id="select_RisorsaAttivitaCapienza" asp-items="Model.ListaRisorseAttivitaCapienza"></select>
+                                <button hidden id="BookingDel" class="button is-dark" type="submit" asp-action="EliminaPrenotazione">Elimina</button>
+                            </div>
 
                             <div class="columns">
                                 <div class="column is-2" style="font-size:small">
@@ -178,8 +185,17 @@
                         <div class="column is-1">
                             <a asp-action="Calendario" asp-route-Dir="oggi" asp-route-IsNascosto=@Model.IsNascosto class="button">Oggi</a>
                         </div>
-                        <div class="column is-6" align="center">
+                        <div class="column is-4" align="center">
                             <label style="font-size:large">Settimana @Model.Settimana</label>
+                        </div>
+                        <div class="column is-2" style="font-size:small">
+                            <div class="field">
+                                <label class="label">Risorsa-Attività</label>
+                                <div class="select is-fullwidth">
+                                    <select id="select_RisorsaAttivitaR" asp-for="IDRisorsaAttivitaR" asp-items="Model.ListaRisorseAttivitaR">
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <div class="column is-3">
                             <div class="field">

@@ -1558,7 +1558,7 @@ namespace CDQ.Services
                     OraFine = ss.OraFine,
                     Pianificazione = ss,
                     Capienza = ss.Capienza,
-                    Data = dtPrimoGiornoSettimana.AddDays(ss.Giorno.ID-1)
+                    Data = dtPrimoGiornoSettimana.AddDays(ss.Giorno.ID-1).AddHours(12)
                 };
                 vRealmDb.Add(md);
             }
@@ -2272,7 +2272,7 @@ namespace CDQ.Services
 
             DateTime dtUltimoGiorno = dtPrimoGiorno.AddDays(7);
 
-            IEnumerable<Calendario> lista = vRealmDb.All<Calendario>().Where(ss => ss.Data <= dtUltimoGiorno && ss.Data >= dtPrimoGiorno && ss.Esercente == esercente);
+            IEnumerable<Calendario> lista = vRealmDb.All<Calendario>().Where(ss => ss.Data < dtUltimoGiorno && ss.Data >= dtPrimoGiorno && ss.Esercente == esercente).OrderBy(ss=> ss.Data).ThenBy(ss=>ss.OraInizio);
 
             return lista;
         }
