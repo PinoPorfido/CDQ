@@ -26,6 +26,13 @@ using Microsoft.AspNetCore.Diagnostics;
 
 namespace CDQ.Controllers
 {
+
+    struct Elenco
+    {
+        public string Elemento;
+        public int Totale;
+    }
+
     public class HomeController : Controller
     {
 
@@ -2146,6 +2153,33 @@ namespace CDQ.Controllers
         }
 
 
+        private List<Elenco> AggiungiElemento(List<Elenco> RisAtt, string Ele)
+        {
+
+            var itemIndex = RisAtt.FindIndex(z => z.Elemento == Ele);
+            if (itemIndex != -1)
+            {
+                var item = RisAtt.ElementAt(itemIndex);
+                int tot = item.Totale;
+                tot += 1;
+                RisAtt.RemoveAt(itemIndex);
+                Elenco Appo;
+                Appo.Elemento = Ele;
+                Appo.Totale = tot;
+                RisAtt.Add(Appo);
+            }
+            else
+            {
+                Elenco Appo;
+                Appo.Elemento = Ele;
+                Appo.Totale = 1;
+                RisAtt.Add(Appo);
+            }
+
+
+            return RisAtt;
+        }
+
         [HttpGet]
         public async Task<IActionResult> Calendario(int IDSettimana = -1, int Anno = -1, string Dir = "", bool IsNascosto=false, string IDRisorsaAttivitaR="-1", bool IsRefresh=false)
         {
@@ -2156,7 +2190,7 @@ namespace CDQ.Controllers
             DateTime dtPrimoGiornoSettimana = DateTime.Now;
             DateTime dtUltimoGiornoSettimana = dtPrimoGiornoSettimana.AddDays(6);
 
-            List<SelectListItem> ListaRisorseAttivitaU = new List<SelectListItem>();
+            List<Elenco> RisAtt = new List<Elenco>();
 
             string HasConflict = "";
 
@@ -2228,9 +2262,8 @@ namespace CDQ.Controllers
                 ListaOrari.Add(si);
             }
 
-            IEnumerable<Calendario> ListaCalendari = await RealmDataStore.ListaCalendari(esercente, dtPrimoGiornoSettimana);
+            IEnumerable<Calendario> ListaCalendari = await RealmDataStore.ListaCalendari(esercente, dtPrimoGiornoSettimana, IDRisorsaAttivitaR);
             List<StrutturaCalendario> ListaStrutturaCalendari = new List<StrutturaCalendario>();
-
 
 
             //costruisco la mia ListaStrutturaCalendari
@@ -2317,6 +2350,9 @@ namespace CDQ.Controllers
             //adesso ciclo sulla ListaCalendari per vedere se esistono attività da descrivere
             foreach (Calendario c in ListaCalendari)
             {
+
+                RisAtt = AggiungiElemento(RisAtt, c.RisorsaAttivita.ID);
+
                 //calcolo la capienza residua
                 string Res = await RealmDataStore.CapienzaResidua(c.ID, HttpContext.Session.GetString("username"));
                 string[] aCR = Res.Split("#");
@@ -2327,6 +2363,7 @@ namespace CDQ.Controllers
 
                 foreach (StrutturaCalendario s in ListaStrutturaCalendari)
                 {
+                    
                     if (c.OraInizio == s.iOrarioCella) //ho trovato un elemento che inizia nella riga
                     {
                         //cerco la colonna giusto
@@ -2629,7 +2666,7 @@ namespace CDQ.Controllers
             List<SelectListItem> ListaRisorseAttivitaR = new List<SelectListItem>();
             List<SelectListItem> ListaRisorseAttivitaCapienza = new List<SelectListItem>();
 
-            if (HasConflict == "")
+            if (HasConflict == "" && !IsRefresh)
             {
                 //aggiunta selezione completa
                 SelectListItem itemx = new SelectListItem
@@ -2704,8 +2741,8 @@ namespace CDQ.Controllers
             }
             else
             {
-                //if (IDRisorsaAttivitaR != "000")
-                return RedirectToAction(nameof(Calendario), new { IDSettimana, Anno, IDRisorsaAttivitaR = ListaRisorseAttivitaR[0].Value, IsRefresh = true });
+                RisAtt = RisAtt.OrderByDescending(z => z.Totale).ToList();
+                return RedirectToAction(nameof(Calendario), new { IDSettimana, Anno, IDRisorsaAttivitaR = RisAtt[0].Elemento, IsRefresh = true });
             }
 
         }

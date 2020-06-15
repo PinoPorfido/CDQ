@@ -118,7 +118,10 @@ namespace CDQ
             Console.WriteLine("PathRealm:" + root);
 
             SyncConfigurationBase.Initialize(UserPersistenceMode.NotEncrypted, basePath: root);
-        }
+
+
+
     }
+}
 
 }

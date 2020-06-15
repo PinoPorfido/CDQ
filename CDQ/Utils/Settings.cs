@@ -80,6 +80,7 @@ namespace CDQ.Utils
 
         public static string ID_ASSOCIATO_SERVIZIO_FINANZIATO = "_SERVFIN";
         public static string ID_AGENTE_NAZIONALE = "N001";
+
     }
 
 }

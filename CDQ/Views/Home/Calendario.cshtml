@@ -192,7 +192,7 @@
                             <div class="field">
                                 <label class="label">Risorsa-Attività</label>
                                 <div class="select is-fullwidth">
-                                    <select id="select_RisorsaAttivitaR" asp-for="IDRisorsaAttivitaR" asp-items="Model.ListaRisorseAttivitaR">
+                                    <select id="select_RisorsaAttivitaR" asp-for="IDRisorsaAttivitaR" asp-items="Model.ListaRisorseAttivitaR" onchange="this.form.submit()">
                                     </select>
                                 </div>
                             </div>

@@ -2266,13 +2266,22 @@ namespace CDQ.Services
             return lista;
         }
 
-        internal async static Task<IEnumerable<Calendario>> ListaCalendari(Esercente esercente, DateTime dtPrimoGiorno)
+        internal async static Task<IEnumerable<Calendario>> ListaCalendari(Esercente esercente, DateTime dtPrimoGiorno, string IDRA)
         {
             var vRealmDb = await GetRealm();
 
             DateTime dtUltimoGiorno = dtPrimoGiorno.AddDays(7);
+            IEnumerable<Calendario> lista = null;
 
-            IEnumerable<Calendario> lista = vRealmDb.All<Calendario>().Where(ss => ss.Data < dtUltimoGiorno && ss.Data >= dtPrimoGiorno && ss.Esercente == esercente).OrderBy(ss=> ss.Data).ThenBy(ss=>ss.OraInizio);
+            if (IDRA == "000" || IDRA == "-1")
+            {
+                lista = vRealmDb.All<Calendario>().Where(ss => ss.Data < dtUltimoGiorno && ss.Data >= dtPrimoGiorno && ss.Esercente == esercente).OrderBy(ss=> ss.Data).ThenBy(ss=>ss.OraInizio);
+            }
+            else
+            {
+                RisorsaAttivita ra = vRealmDb.Find<RisorsaAttivita>(IDRA);
+                lista = vRealmDb.All<Calendario>().Where(ss => ss.Data < dtUltimoGiorno && ss.Data >= dtPrimoGiorno && ss.Esercente == esercente && ss.RisorsaAttivita==ra).OrderBy(ss => ss.Data).ThenBy(ss => ss.OraInizio);
+            }
 
             return lista;
         }
