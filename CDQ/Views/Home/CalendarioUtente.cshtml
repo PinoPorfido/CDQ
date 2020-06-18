@@ -1,0 +1,518 @@
+﻿@model CDQ.Models.Helper.HelpPrenotazione
+
+@{
+    ViewData["Title"] = "Attività & Risorse";
+}
+
+<br />
+<br />
+
+<div class="columns">
+    <div class="column is-2" align="left">
+        <a asp-action="Index" class="button back">
+            <span class="icon">
+                <i class="fas fa-backward"></i>
+            </span>
+        </a>
+    </div>
+    <div class="column is-8" align="center">
+        <h1 class="title is-4">Calendario Operativo - @Model.Esercente</h1>
+    </div>
+    <div class="column is-2" align="right">
+    </div>
+</div>
+
+
+<form id="formCalendario" method="post">
+    <div asp-validation-summary="ModelOnly" class="help help-message"></div>
+
+    <input id="IDCalendarioU" asp-for="IDCalendarioU" type="hidden">
+    <input id="IDCalendarioE" asp-for="IDCalendarioE" type="hidden">
+
+    @Html.HiddenFor(model => Model.ModeCalendario)
+
+    @Html.HiddenFor(model => Model.IDSettimana)
+
+    @Html.HiddenFor(model => Model.IDEsercente)
+
+    @Html.HiddenFor(model => Model.IDSettimanaC)
+
+    @Html.HiddenFor(model => Model.Anno)
+
+    @for (var i = 0; i < Model.ListaRisorseAttivitaR.Count(); i++)
+    {
+        @Html.HiddenFor(model => Model.ListaRisorseAttivitaR[i].Text)
+        @Html.HiddenFor(model => Model.ListaRisorseAttivitaR[i].Value)
+    }
+
+
+    <div class="field" hidden>
+        <button hidden id="BookingDel" class="button is-dark" type="submit" asp-action="EliminaPrenotazioneUtente">Elimina</button>
+    </div>
+
+</form>
+
+
+<form id="formRicerca" method="get">
+    <div class="columns">
+        <div class="column is-fullwidth">
+            <div class="panel">
+                <div class="panel-heading" style="vertical-align:central">
+
+                    <div class="columns">
+                        <div class="column is-1" align="right">
+                            <a asp-action="CalendarioUtente" class="button" asp-route-Dir="less" asp-route-IDSettimana=@Model.IDSettimana asp-route-Anno=@Model.Anno asp-route-IDEsercente=@Model.IDEsercente>
+                                <span class="icon">
+                                    <i class="fas fa-chevron-left"></i>
+                                </span>
+                            </a>
+                        </div>
+                        <div class="column is-1" align="left">
+                            <a asp-action="CalendarioUtente" asp-route-Dir="more" asp-route-IDSettimana=@Model.IDSettimana asp-route-Anno=@Model.Anno asp-route-IDEsercente=@Model.IDEsercente class="button">
+                                <span class="icon">
+                                    <i class="fas fa-chevron-right"></i>
+                                </span>
+                            </a>
+                        </div>
+                        <div class="column is-1">
+                            <a asp-action="CalendarioUtente" asp-route-Dir="oggi" asp-route-IDEsercente=@Model.IDEsercente class="button">Oggi</a>
+                        </div>
+                        <div class="column is-6" align="center">
+                            <label style="font-size:large">Settimana @Model.Settimana</label>
+                        </div>
+                        <div class="column is-3" align="left" style="font-size:small">
+                            <div class="select is-fullwidth">
+                                <select id="select_RisorsaAttivitaR" asp-for="IDRisorsaAttivitaR" asp-items="Model.ListaRisorseAttivitaR" onchange="this.form.submit()">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-block">
+                    <div class="container">
+                        <div class="column" align="center">
+
+                            @Html.HiddenFor(model => Model.IDSettimana)
+                            @Html.HiddenFor(model => Model.Anno)
+                            @Html.HiddenFor(model => Model.IDEsercente)
+                            @{
+                                DateTime pg = Model.pg;
+                            }
+                            <table class="calendar table table-bordered is-fullwidth">
+                                <thead>
+                                    <tr>
+                                        <th>&nbsp;</th>
+                                        <th width="14%" align="center">LUN<br />@pg.Day</th>
+                                        <th width="14%" align="center">MAR<br />@(pg.AddDays(1).Day)</th>
+                                        <th width="14%" align="center">MER<br />@(pg.AddDays(2).Day)</th>
+                                        <th width="14%" align="center">GIO<br />@(pg.AddDays(3).Day)</th>
+                                        <th width="14%" align="center">VEN<br />@(pg.AddDays(4).Day)</th>
+                                        <th width="14%" align="center">SAB<br />@(pg.AddDays(5).Day)</th>
+                                        <th width="14%" align="center">DOM<br />@(pg.AddDays(6).Day)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.ListaStrutturaCalendari)
+                                    {
+
+                                        <tr>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.sOrarioCella)
+                                            </td>
+
+                                            @if (item.SC1.TipoCella == 0)
+                                            {
+                                                <td class=" no-events" rowspan="1"></td>
+                                            }
+                                            else
+                                            {
+                                                @if (item.SC1.TipoCella == 1 && item.SC1.Booked == -1)
+                                                {
+                                                    <td class=" has-events" rowspan='@item.SC1.Riga'>
+                                                        <div class="row-fluid lecture" style="width: 99%; height: 100%">
+                                                            <span class="lecturer"><a onclick="setUpPrenotazione('@item.SC1.Booked','@item.SC1.Calendario.ID','@item.SC1.Calendario.RisorsaAttivita.Attivita.Descrizione','@item.SC1.Calendario.RisorsaAttivita.Risorsa.Descrizione','@item.SC1.Calendario.Data_string','@item.SC1.Calendario.OraInizio','@item.SC1.Calendario.OraFine','@item.SC1.Calendario.RisorsaAttivita.ID','@item.SC1.Calendario.Capienza','@item.SC1.Calendario.Data_OUT','@item.SC1.Calendario.OraInizio_OUT','@item.SC1.Calendario.OraFine_OUT');"><font style="font-weight: bold">@item.SC1.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC1.Calendario.RisorsaAttivita.Risorsa.Descrizione<br />Posti: @item.SC1.CapienzaResidua</a></span>
+                                                        </div>
+                                                    </td>
+                                                }
+
+                                                @if (item.SC1.TipoCella == 1 && item.SC1.Booked == 1)
+                                                {
+                                                    <td class=" has-events" rowspan='@item.SC1.Riga' data-tooltip='@item.SC1.Info'>
+                                                        <div class="row-fluid lecture" style="width: 99%; height: 100%; background-color: red">
+                                                            <span class="lecturer"><a onclick="setUpPrenotazione('@item.SC1.Booked','@item.SC1.Calendario.ID','@item.SC1.Calendario.RisorsaAttivita.Attivita.Descrizione','@item.SC1.Calendario.RisorsaAttivita.Risorsa.Descrizione','@item.SC1.Calendario.Data_string','@item.SC1.Calendario.OraInizio','@item.SC1.Calendario.OraFine','@item.SC1.Calendario.RisorsaAttivita.ID','@item.SC1.Calendario.Capienza','@item.SC1.Calendario.Data_OUT','@item.SC1.Calendario.OraInizio_OUT','@item.SC1.Calendario.OraFine_OUT');"><font style="font-weight: bold">@item.SC1.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC1.Calendario.RisorsaAttivita.Risorsa.Descrizione<br />Posti: @item.SC1.CapienzaResidua</a></span>
+                                                        </div>
+                                                    </td>
+                                                }
+                                            }
+
+                                            @if (item.SC2.TipoCella == 0)
+                                            {
+                                                <td class=" no-events" rowspan="1"></td>
+                                            }
+                                            else
+                                            {
+                                                @if (item.SC2.TipoCella == 1 && item.SC2.Booked == -1)
+                                                {
+                                                    <td class=" has-events" rowspan='@item.SC2.Riga'>
+                                                        <div class="row-fluid lecture" style="width: 99%; height: 100%">
+                                                            <span class="lecturer"><a onclick="setUpPrenotazione('@item.SC2.Booked','@item.SC2.Calendario.ID','@item.SC2.Calendario.RisorsaAttivita.Attivita.Descrizione','@item.SC2.Calendario.RisorsaAttivita.Risorsa.Descrizione','@item.SC2.Calendario.Data_string','@item.SC2.Calendario.OraInizio','@item.SC2.Calendario.OraFine','@item.SC2.Calendario.RisorsaAttivita.ID','@item.SC2.Calendario.Capienza','@item.SC2.Calendario.Data_OUT','@item.SC2.Calendario.OraInizio_OUT','@item.SC2.Calendario.OraFine_OUT');"><font style="font-weight: bold">@item.SC2.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC2.Calendario.RisorsaAttivita.Risorsa.Descrizione<br />Posti: @item.SC2.CapienzaResidua</a></span>
+                                                        </div>
+                                                    </td>
+                                                }
+
+                                                @if (item.SC2.TipoCella == 1 && item.SC2.Booked == 1)
+                                                {
+                                                    <td class=" has-events" rowspan='@item.SC2.Riga' data-tooltip='@item.SC2.Info'>
+                                                        <div class="row-fluid lecture" style="width: 99%; height: 100%; background-color: red">
+                                                            <span class="lecturer"><a onclick="setUpPrenotazione('@item.SC2.Booked','@item.SC2.Calendario.ID','@item.SC2.Calendario.RisorsaAttivita.Attivita.Descrizione','@item.SC2.Calendario.RisorsaAttivita.Risorsa.Descrizione','@item.SC2.Calendario.Data_string','@item.SC2.Calendario.OraInizio','@item.SC2.Calendario.OraFine','@item.SC2.Calendario.RisorsaAttivita.ID','@item.SC2.Calendario.Capienza','@item.SC2.Calendario.Data_OUT','@item.SC2.Calendario.OraInizio_OUT','@item.SC2.Calendario.OraFine_OUT');"><font style="font-weight: bold">@item.SC2.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC2.Calendario.RisorsaAttivita.Risorsa.Descrizione<br />Posti: @item.SC2.CapienzaResidua</a></span>
+                                                        </div>
+                                                    </td>
+                                                }
+
+                                            }
+
+                                            @if (item.SC3.TipoCella == 0)
+                                            {
+                                                <td class=" no-events" rowspan="1"></td>
+                                            }
+                                            else
+                                            {
+                                                @if (item.SC3.TipoCella == 1 && item.SC3.Booked == -1)
+                                                {
+                                                    <td class=" has-events" rowspan='@item.SC3.Riga'>
+                                                        <div class="row-fluid lecture" style="width: 99%; height: 100%">
+                                                            <span class="lecturer"><a onclick="setUpPrenotazione('@item.SC3.Booked','@item.SC3.Calendario.ID','@item.SC3.Calendario.RisorsaAttivita.Attivita.Descrizione','@item.SC3.Calendario.RisorsaAttivita.Risorsa.Descrizione','@item.SC3.Calendario.Data_string','@item.SC3.Calendario.OraInizio','@item.SC3.Calendario.OraFine','@item.SC3.Calendario.RisorsaAttivita.ID','@item.SC3.Calendario.Capienza','@item.SC3.Calendario.Data_OUT','@item.SC3.Calendario.OraInizio_OUT','@item.SC3.Calendario.OraFine_OUT');"><font style="font-weight: bold">@item.SC3.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC3.Calendario.RisorsaAttivita.Risorsa.Descrizione<br />Posti: @item.SC3.CapienzaResidua</a></span>
+                                                        </div>
+                                                    </td>
+                                                }
+
+                                                @if (item.SC3.TipoCella == 1 && item.SC3.Booked == 1)
+                                                {
+                                                    <td class=" has-events" rowspan='@item.SC3.Riga' data-tooltip='@item.SC3.Info'>
+                                                        <div class="row-fluid lecture" style="width: 99%; height: 100%; background-color: red">
+                                                            <span class="lecturer"><a onclick="setUpPrenotazione('@item.SC3.Booked','@item.SC3.Calendario.ID','@item.SC3.Calendario.RisorsaAttivita.Attivita.Descrizione','@item.SC3.Calendario.RisorsaAttivita.Risorsa.Descrizione','@item.SC3.Calendario.Data_string','@item.SC3.Calendario.OraInizio','@item.SC3.Calendario.OraFine','@item.SC3.Calendario.RisorsaAttivita.ID','@item.SC3.Calendario.Capienza','@item.SC3.Calendario.Data_OUT','@item.SC3.Calendario.OraInizio_OUT','@item.SC3.Calendario.OraFine_OUT');"><font style="font-weight: bold">@item.SC3.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC3.Calendario.RisorsaAttivita.Risorsa.Descrizione<br />Posti: @item.SC3.CapienzaResidua</a></span>
+                                                        </div>
+                                                    </td>
+                                                }
+                                            }
+
+                                            @if (item.SC4.TipoCella == 0)
+                                            {
+                                                <td class=" no-events" rowspan="1"></td>
+                                            }
+                                            else
+                                            {
+                                                @if (item.SC4.TipoCella == 1 && item.SC4.Booked == -1)
+                                                {
+                                                    <td class=" has-events" rowspan='@item.SC4.Riga'>
+                                                        <div class="row-fluid lecture" style="width: 99%; height: 100%">
+                                                            <span class="lecturer"><a onclick="setUpPrenotazione('@item.SC4.Booked','@item.SC4.Calendario.ID','@item.SC4.Calendario.RisorsaAttivita.Attivita.Descrizione','@item.SC4.Calendario.RisorsaAttivita.Risorsa.Descrizione','@item.SC4.Calendario.Data_string','@item.SC4.Calendario.OraInizio','@item.SC4.Calendario.OraFine','@item.SC4.Calendario.RisorsaAttivita.ID','@item.SC4.Calendario.Capienza','@item.SC4.Calendario.Data_OUT','@item.SC4.Calendario.OraInizio_OUT','@item.SC4.Calendario.OraFine_OUT');"><font style="font-weight: bold">@item.SC4.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC4.Calendario.RisorsaAttivita.Risorsa.Descrizione<br />Posti: @item.SC4.CapienzaResidua</a></span>
+                                                        </div>
+                                                    </td>
+                                                }
+
+                                                @if (item.SC4.TipoCella == 1 && item.SC4.Booked == 1)
+                                                {
+                                                    <td class=" has-events" rowspan='@item.SC4.Riga' data-tooltip='@item.SC4.Info'>
+                                                        <div class="row-fluid lecture" style="width: 99%; height: 100%; background-color: red">
+                                                            <span class="lecturer"><a onclick="setUpPrenotazione('@item.SC4.Booked','@item.SC4.Calendario.ID','@item.SC4.Calendario.RisorsaAttivita.Attivita.Descrizione','@item.SC4.Calendario.RisorsaAttivita.Risorsa.Descrizione','@item.SC4.Calendario.Data_string','@item.SC4.Calendario.OraInizio','@item.SC4.Calendario.OraFine','@item.SC4.Calendario.RisorsaAttivita.ID','@item.SC4.Calendario.Capienza','@item.SC4.Calendario.Data_OUT','@item.SC4.Calendario.OraInizio_OUT','@item.SC4.Calendario.OraFine_OUT');"><font style="font-weight: bold">@item.SC4.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC4.Calendario.RisorsaAttivita.Risorsa.Descrizione<br />Posti: @item.SC4.CapienzaResidua</a></span>
+                                                        </div>
+                                                    </td>
+                                                }
+                                            }
+
+                                            @if (item.SC5.TipoCella == 0)
+                                            {
+                                                <td class=" no-events" rowspan="1"></td>
+                                            }
+                                            else
+                                            {
+                                                @if (item.SC5.TipoCella == 1 && item.SC5.Booked == -1)
+                                                {
+                                                    <td class=" has-events" rowspan='@item.SC5.Riga'>
+                                                        <div class="row-fluid lecture" style="width: 99%; height: 100%">
+                                                            <span class="lecturer"><a onclick="setUpPrenotazione('@item.SC5.Booked','@item.SC5.Calendario.ID','@item.SC5.Calendario.RisorsaAttivita.Attivita.Descrizione','@item.SC5.Calendario.RisorsaAttivita.Risorsa.Descrizione','@item.SC5.Calendario.Data_string','@item.SC5.Calendario.OraInizio','@item.SC5.Calendario.OraFine','@item.SC5.Calendario.RisorsaAttivita.ID','@item.SC5.Calendario.Capienza','@item.SC5.Calendario.Data_OUT','@item.SC5.Calendario.OraInizio_OUT','@item.SC5.Calendario.OraFine_OUT');"><font style="font-weight: bold">@item.SC5.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC5.Calendario.RisorsaAttivita.Risorsa.Descrizione<br />Posti: @item.SC5.CapienzaResidua</a></span>
+                                                        </div>
+                                                    </td>
+                                                }
+
+                                                @if (item.SC5.TipoCella == 1 && item.SC5.Booked == 1)
+                                                {
+                                                    <td class=" has-events" rowspan='@item.SC5.Riga' data-tooltip='@item.SC5.Info'>
+                                                        <div class="row-fluid lecture" style="width: 99%; height: 100%; background-color: red">
+                                                            <span class="lecturer"><a onclick="setUpPrenotazione('@item.SC5.Booked','@item.SC5.Calendario.ID','@item.SC5.Calendario.RisorsaAttivita.Attivita.Descrizione','@item.SC5.Calendario.RisorsaAttivita.Risorsa.Descrizione','@item.SC5.Calendario.Data_string','@item.SC5.Calendario.OraInizio','@item.SC5.Calendario.OraFine','@item.SC5.Calendario.RisorsaAttivita.ID','@item.SC5.Calendario.Capienza','@item.SC5.Calendario.Data_OUT','@item.SC5.Calendario.OraInizio_OUT','@item.SC5.Calendario.OraFine_OUT');"><font style="font-weight: bold">@item.SC5.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC5.Calendario.RisorsaAttivita.Risorsa.Descrizione<br />Posti: @item.SC5.CapienzaResidua</a></span>
+                                                        </div>
+                                                    </td>
+                                                }
+                                            }
+                                            @if (item.SC6.TipoCella == 0)
+                                            {
+                                                <td class=" no-events" rowspan="1"></td>
+                                            }
+                                            else
+                                            {
+                                                @if (item.SC6.TipoCella == 1 && item.SC6.Booked == -1)
+                                                {
+                                                    <td class=" has-events" rowspan='@item.SC6.Riga'>
+                                                        <div class="row-fluid lecture" style="width: 99%; height: 100%">
+                                                            <span class="lecturer"><a onclick="setUpPrenotazione('@item.SC6.Booked','@item.SC6.Calendario.ID','@item.SC6.Calendario.RisorsaAttivita.Attivita.Descrizione','@item.SC6.Calendario.RisorsaAttivita.Risorsa.Descrizione','@item.SC6.Calendario.Data_string','@item.SC6.Calendario.OraInizio','@item.SC6.Calendario.OraFine','@item.SC6.Calendario.RisorsaAttivita.ID','@item.SC6.Calendario.Capienza','@item.SC6.Calendario.Data_OUT','@item.SC6.Calendario.OraInizio_OUT','@item.SC6.Calendario.OraFine_OUT');"><font style="font-weight: bold">@item.SC6.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC6.Calendario.RisorsaAttivita.Risorsa.Descrizione<br />Posti: @item.SC6.CapienzaResidua</a></span>
+                                                        </div>
+                                                    </td>
+                                                }
+
+                                                @if (item.SC6.TipoCella == 1 && item.SC6.Booked == 1)
+                                                {
+                                                    <td class=" has-events" rowspan='@item.SC6.Riga' data-tooltip='@item.SC6.Info'>
+                                                        <div class="row-fluid lecture" style="width: 99%; height: 100%; background-color: red">
+                                                            <span class="lecturer"><a onclick="setUpPrenotazione('@item.SC6.Booked','@item.SC6.Calendario.ID','@item.SC6.Calendario.RisorsaAttivita.Attivita.Descrizione','@item.SC6.Calendario.RisorsaAttivita.Risorsa.Descrizione','@item.SC6.Calendario.Data_string','@item.SC6.Calendario.OraInizio','@item.SC6.Calendario.OraFine','@item.SC6.Calendario.RisorsaAttivita.ID','@item.SC6.Calendario.Capienza','@item.SC6.Calendario.Data_OUT','@item.SC6.Calendario.OraInizio_OUT','@item.SC6.Calendario.OraFine_OUT');"><font style="font-weight: bold">@item.SC6.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC6.Calendario.RisorsaAttivita.Risorsa.Descrizione<br />Posti: @item.SC6.CapienzaResidua</a></span>
+                                                        </div>
+                                                    </td>
+                                                }
+                                            }
+                                            @if (item.SC0.TipoCella == 0)
+                                            {
+                                                <td class=" no-events" rowspan="1"></td>
+                                            }
+                                            else
+                                            {
+                                                @if (item.SC0.TipoCella == 1 && item.SC0.Booked == -1)
+                                                {
+                                                    <td class=" has-events" rowspan='@item.SC0.Riga'>
+                                                        <div class="row-fluid lecture" style="width: 99%; height: 100%">
+                                                            <span class="lecturer"><a onclick="setUpPrenotazione('@item.SC0.Booked','@item.SC0.Calendario.ID','@item.SC0.Calendario.RisorsaAttivita.Attivita.Descrizione','@item.SC0.Calendario.RisorsaAttivita.Risorsa.Descrizione','@item.SC0.Calendario.Data_string','@item.SC0.Calendario.OraInizio','@item.SC0.Calendario.OraFine ','@item.SC0.Calendario.RisorsaAttivita.ID','@item.SC0.Calendario.Capienza','@item.SC0.Calendario.Data_OUT','@item.SC0.Calendario.OraInizio_OUT','@item.SC0.Calendario.OraFine_OUT');"><font style="font-weight: bold">@item.SC0.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC0.Calendario.RisorsaAttivita.Risorsa.Descrizione<br />Posti: @item.SC0.CapienzaResidua</a></span>
+                                                        </div>
+                                                    </td>
+                                                }
+
+                                                @if (item.SC0.TipoCella == 1 && item.SC0.Booked == 1)
+                                                {
+                                                    <td class=" has-events" rowspan='@item.SC0.Riga' data-tooltip='@item.SC0.Info'>
+                                                        <div class="row-fluid lecture" style="width: 99%; height: 100%; background-color: red">
+                                                            <span class="lecturer"><a onclick="setUpPrenotazione('@item.SC0.Booked','@item.SC0.Calendario.ID','@item.SC0.Calendario.RisorsaAttivita.Attivita.Descrizione','@item.SC0.Calendario.RisorsaAttivita.Risorsa.Descrizione','@item.SC0.Calendario.Data_string','@item.SC0.Calendario.OraInizio','@item.SC0.Calendario.OraFine ','@item.SC0.Calendario.RisorsaAttivita.ID','@item.SC0.Calendario.Capienza','@item.SC0.Calendario.Data_OUT','@item.SC0.Calendario.OraInizio_OUT','@item.SC0.Calendario.OraFine_OUT');"><font style="font-weight: bold">@item.SC0.Calendario.RisorsaAttivita.Attivita.Descrizione</font> - @item.SC0.Calendario.RisorsaAttivita.Risorsa.Descrizione<br />Posti: @item.SC0.CapienzaResidua</a></span>
+                                                        </div>
+                                                    </td>
+                                                }
+                                            }
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</form>
+
+<div id="modal-Prenotazione" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <form id="formInsPrenotazione" asp-action="PrenotazioneUtente">
+
+            <header class="modal-card-head">
+                <p id="pTitoloRisorsaAttivita" class="modal-card-title">Conferma la Prenotazione per l'elemento selezionato</p>
+                <button class="delete" type="reset" onclick="cancelSetUpPrenotazione()"></button>
+            </header>
+            <section class="modal-card-body">
+                <input asp-for="ModePrenotazione" value="Ins" type="hidden">
+                <input id="IDCalendario" asp-for="IDCalendario" type="hidden">
+                <input id="IDEsercente" asp-for="IDEsercente" type="hidden">
+                <input id="IDSettimanaX" asp-for="IDSettimana" type="hidden">
+                <input id="AnnoX" asp-for="Anno" type="hidden">
+
+                <div class="columns">
+                    <div class="column is-6">
+                        <div class="field">
+                            <label class="label">Attivita</label>
+                            <input id="Attivita" class="input" disabled>
+                        </div>
+                    </div>
+                    <div class="column is-6">
+                        <div class="field">
+                            <label class="label">Risorsa</label>
+                            <input id="Risorsa" class="input" disabled>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="columns">
+                    <div class="column is-4">
+                        <div class="field">
+                            <label class="label">Data</label>
+                            <input id="Data" class="input" disabled>
+                        </div>
+                    </div>
+                    <div class="column is-4">
+                        <div class="field">
+                            <label class="label">OraInizio</label>
+                            <input id="OraInizio" class="input" disabled>
+                        </div>
+                    </div>
+                    <div class="column is-4">
+                        <div class="field">
+                            <label class="label">OraFine</label>
+                            <input id="OraFine" class="input" disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="columns">
+                    <div class="column is-fullwidth">
+                        <div class="field">
+                            <label class="label">Nota</label>
+                            <input asp-for="Nota" id="Data" class="input">
+                        </div>
+                    </div>
+                </div>
+
+
+            </section>
+            <footer class="modal-card-foot">
+                <button id="buttonPrenotazioneOk" class="button is-dark" onclick="form.submit()">Conferma Prenotazione</button>
+                <a class="button is-dark" onclick="cancelSetUpPrenotazione()">Annulla</a>
+            </footer>
+        </form>
+    </div>
+</div>
+
+
+<div id="modal-elimina" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Attenzione</p>
+            <button class="delete" type="reset" onclick="document.getElementById('Elimina').value = 'N';cancelModalElimina()"></button>
+        </header>
+        <section class="modal-card-body">
+            <p>Eliminare l'elemento selezionato e le sue dipendenze?</p>
+            <input id="IDCaller" type="hidden" />
+            <input id="Elimina" type="hidden" value="N" />
+        </section>
+        <footer class="modal-card-foot">
+            <button type="button" onclick="document.getElementById('Elimina').value = 'S';cancelModalElimina();document.getElementById(document.getElementById('IDCaller').value).click()" class="button is-dark">Elimina</button>
+            <button type="button" class="button is-dark" onclick="document.getElementById('Elimina').value = 'N';cancelModalElimina()">Annulla</button>
+        </footer>
+    </div>
+</div>
+
+<div id="modal-decision" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title" align="center">Operazione su Prenotazione</p>
+            <button class="delete" type="reset" onclick="document.getElementById('Decision').value = 'N';cancelModalDecision()"></button>
+        </header>
+        <section class="modal-card-body">
+            <p>Vuoi cancellare le tue prenotazioni su questo elemento di Calendario oppure inserire una nuova prenotazione ?</p>
+            <input id="IDCaller" type="hidden" />
+            <input id="Decision" type="hidden" value="N" />
+            <input id="DecisionOK" type="hidden" value="N" />
+
+            <input id="DecIDCalendario" type="hidden" />
+            <input id="DecAttivita" type="hidden" />
+            <input id="DecRisorsa" type="hidden" />
+            <input id="DecData" type="hidden" />
+            <input id="DecOraInizio" type="hidden" />
+            <input id="DecOraFine" type="hidden" />
+
+        </section>
+        <footer class="modal-card-foot">
+            <button type="button" onclick="document.getElementById('DecisionOK').value = 'S'; cancelModalDecision();confirmElimina('BookingDel')" class="button is-dark">Cancella Prenotazioni</button>
+            <button type="button" onclick="document.getElementById('DecisionOK').value = 'P'; cancelModalDecision();setUpPrenotazione(-1, document.getElementById('DecIDCalendario').value, document.getElementById('DecAttivita').value, document.getElementById('DecRisorsa').value, 1, 1, 1, 1, 1, document.getElementById('DecData').value, document.getElementById('DecOraInizio').value, document.getElementById('DecOraFine').value)" class="button is-dark">Nuova Prenotazione</button>
+            <button type="button" class="button is-dark" onclick="document.getElementById('Decision').value = 'N';document.getElementById('DecisionOK').value = 'N';cancelModalDecision()">Annulla</button>
+        </footer>
+    </div>
+</div>
+
+
+
+<script>
+
+    function confirmElimina(id) {
+        setModalElimina(id);
+        return document.getElementById('Elimina').value == "S";
+    }
+
+    function confirmDecision(id) {
+        setModalDecision(id);
+        return document.getElementById('Decision').value == "S";
+    }
+
+
+
+    function setModalElimina(id) {
+
+
+        document.getElementById("IDCaller").value = id;
+
+        document.getElementById("modal-elimina").classList.add("is-active");
+
+    }
+
+    function setModalDecision(id) {
+
+        document.getElementById("IDCaller").value = id;
+
+        document.getElementById("modal-decision").classList.add("is-active");
+
+    }
+
+    function cancelModalElimina() {
+
+        document.getElementById("modal-elimina").classList.remove("is-active");
+
+    }
+
+    function cancelModalDecision() {
+
+        document.getElementById("modal-decision").classList.remove("is-active");
+
+    }
+
+    function setUpPrenotazione(Booked, id, Attivita, Risorsa, Data, OraInizio, OraFine, RisorsaAttivitaID, Capienza, sData, sOraInizio, sOraFine) {
+        //gestione prenotazioni
+        if (Booked == 1) {
+            document.getElementById('ModePrenotazione').value = 'Del';
+            document.getElementById("IDCalendarioE").value = id;
+            document.getElementById("DecIDCalendario").value = id;
+            document.getElementById("DecAttivita").value = Attivita;
+            document.getElementById("DecRisorsa").value = Risorsa;
+            document.getElementById("DecData").value = sData;
+            document.getElementById("DecOraInizio").value = sOraInizio;
+            document.getElementById("DecOraFine").value = sOraFine;
+
+            confirmDecision('BookingDel');
+        }
+        else {
+            document.getElementById('ModePrenotazione').value = 'Ins';
+            document.getElementById("IDCalendario").value = id;
+            document.getElementById("Attivita").value = Attivita;
+            document.getElementById("Risorsa").value = Risorsa;
+            document.getElementById("Data").value = sData;
+            document.getElementById("OraInizio").value = sOraInizio;
+            document.getElementById("OraFine").value = sOraFine;
+
+            document.getElementById("modal-Prenotazione").classList.add("is-active");
+        }
+
+    }
+
+
+    function cancelSetUpPrenotazione() {
+
+        document.getElementById("modal-Prenotazione").classList.remove("is-active");
+
+    }
+
+
+    function cancelSetUpPrenotazione() {
+
+        document.getElementById("modal-Prenotazione").classList.remove("is-active");
+
+    }
+
+</script>

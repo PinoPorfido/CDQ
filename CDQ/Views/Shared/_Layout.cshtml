@@ -95,6 +95,14 @@
                             </div>
                         </div>
 
+                        @if (HttpContextAccessor.HttpContext.Session.GetString("IDesercente") == "-")
+                        {<a class="navbar-item" asp-action="CalendarioUtente">
+                                <span class="icon has-text-danger">
+                                    <i class="far fa-calendar-check"></i>
+                                </span>
+                                <span>Prenotazione</span>
+                            </a>
+                        }
                         @if (HttpContextAccessor.HttpContext.Session.GetString("IDesercente") != "-")
                         {
                             <div class="navbar-item has-dropdown is-hoverable">
@@ -156,7 +164,7 @@
                             </a>
                         }
 
-                        </div>
+                    </div>
                     <div class="navbar-end">
                         <span class="icon has-text-info has-tooltip-bottom" data-tooltip='@(HttpContextAccessor.HttpContext.Session.GetString("nominativo")+" ("+HttpContextAccessor.HttpContext.Session.GetString("ruolo")+")")'>
                             <i class="fas fas fa-user"></i>

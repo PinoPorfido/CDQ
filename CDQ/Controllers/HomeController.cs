@@ -71,6 +71,11 @@ namespace CDQ.Controllers
 
         }
 
+        public bool CheckRoleUtente()
+        {
+            return (HttpContext.Session.GetString("role") == "utente");
+        }
+
 
         public async Task<JsonResult> GetEvents()
         {
@@ -574,57 +579,6 @@ namespace CDQ.Controllers
 
                 HttpContext.Session.SetString("username", utenti.Mail);
 
-                //HttpContext.Session.SetString("provinciale", PRV);
-                //HttpContext.Session.SetString("descrizioneProvinciale", agente.Nominativo);
-
-                ////qui aggiorno la tabella Associato per inserire la Provincia di appartenenza
-                //var listaAs1 = await RealmDataStore.ListaAssociati("-1");
-                //foreach (Associato ax in listaAs1)
-                //{
-                //    await RealmDataStore.AggiornaProvincialeAssociato(ax.ID, HttpContext.Session.GetString("provinciale"));
-                //}
-                ////fine aggiornamento
-
-                ////qui aggiorno la tabella Servizio per inserire la Provincia di appartenenza
-                //var listaAs2 = await RealmDataStore.ListaServizi("-1");
-                //foreach (Servizio ax in listaAs2)
-                //{
-                //    await RealmDataStore.AggiornaProvincialeServizio(ax.ID, HttpContext.Session.GetString("provinciale"));
-                //}
-                ////fine aggiornamento
-
-                ////qui aggiorno la tabella Agente per inserire la Provincia di appartenenza e per riempire il campo Codice col il contenuto del campo ID
-                //var listaAs3 = await RealmDataStore.ListaAgenti(false, "-1");
-                //foreach (Agente ax in listaAs3)
-                //{
-                //    await RealmDataStore.AggiornaProvincialeAgente(ax.ID, HttpContext.Session.GetString("provinciale"));
-                //}
-                ////fine aggiornamento
-
-                ////qui aggiorno la tabella Caricamento INAIL per inserire la Provincia di appartenenza
-                //var listaC1 = await RealmDataStore.ListaCaricamentiINAIL("-1");
-                //foreach (CaricamentoINAIL ax in listaC1)
-                //{
-                //    await RealmDataStore.AggiornaProvincialeCaricamentoINAIL(ax.ID, HttpContext.Session.GetString("provinciale"));
-                //}
-                ////fine aggiornamento
-
-                ////qui aggiorno la tabella Caricamento INPS per inserire la Provincia di appartenenza
-                //var listaC2 = await RealmDataStore.ListaCaricamentiINPS("-1");
-                //foreach (CaricamentoINPS ax in listaC2)
-                //{
-                //    await RealmDataStore.AggiornaProvincialeCaricamentoINPS(ax.ID, HttpContext.Session.GetString("provinciale"));
-                //}
-                ////fine aggiornamento
-
-                ////qui aggiorno la tabella Caricamento W430 per inserire la Provincia di appartenenza
-                //var listaC3 = await RealmDataStore.ListaCaricamentiW430("-1");
-                //foreach (CaricamentoW430 ax in listaC3)
-                //{
-                //    await RealmDataStore.AggiornaProvincialeCaricamentoW430(ax.ID, HttpContext.Session.GetString("provinciale"));
-                //}
-                ////fine aggiornamento
-
                 if (utenti.Esercente != null)
                 {
                     HttpContext.Session.SetString("IDesercente", utenti.Esercente.ID);
@@ -659,12 +613,19 @@ namespace CDQ.Controllers
                 //if (AndBinario(RuoliUtente,Settings.PROPONENTE)) return RedirectToAction(nameof(SchedaAgente), new { utenti.Username });
                 //if (AndBinario(RuoliUtente, Settings.RELATORE)) return RedirectToAction(nameof(SchedaAgente), new { utenti.Username });
 
-                if (nR == 4 && ruolo == "#CLI") return RedirectToAction(nameof(Proposte), new { utenti.Mail });
+                //if (nR == 4 && ruolo == "#CLI") return RedirectToAction(nameof(Proposte), new { utenti.Mail });
+
+                //if (HttpContext.Session.GetString("IDEsercenteUtente") != null)
+                //{
+                //    //devo chiamare direttamente la view CalendarioUtente
+                //    string IDEse = HttpContext.Session.GetString("IDEsercenteUtente");
+                //    HttpContext.Session.SetString("IDEsercenteUtente", "");
+                //    return RedirectToAction(nameof(CalendarioUtente), new { IDEse });
+                //}
 
                 return RedirectToAction(nameof(Index));
 
             }
-
 
             return View(helpUtente);
 
@@ -2749,6 +2710,554 @@ namespace CDQ.Controllers
 
 
         [HttpGet]
+        public async Task<IActionResult> CalendarioUtente(string IDEsercente, int IDSettimana = -1, int Anno = -1, string Dir = "", string IDRisorsaAttivitaR = "-1", bool IsRefresh = false)
+        {
+
+            //salvo l'id dell'Esercente
+            //if (ID != null) HttpContext.Session.SetString("IDEsercenteUtente", ID);
+
+            if (!CheckUser() || IDEsercente == null) return RedirectToAction(nameof(Login));
+
+            DateTime dtPrimoGiornoSettimana = DateTime.Now;
+            DateTime dtUltimoGiornoSettimana = dtPrimoGiornoSettimana.AddDays(6);
+
+            List<Elenco> RisAtt = new List<Elenco>();
+
+            string HasConflict = "";
+
+            if (IDSettimana == -1 || Dir == "oggi") IDSettimana = Utils.Utils.SettimanaAnno(DateTime.Now);
+            if (Anno == -1) Anno = DateTime.Now.Year;
+
+            dtPrimoGiornoSettimana = Utils.Utils.PrimoGiornoSettimana(Anno, IDSettimana);
+            dtUltimoGiornoSettimana = dtPrimoGiornoSettimana.AddDays(6);
+
+            if (Dir == "less") //devo tornare indietro di una settimana
+            {
+                dtPrimoGiornoSettimana = dtPrimoGiornoSettimana.AddDays(-7);
+                dtUltimoGiornoSettimana = dtPrimoGiornoSettimana.AddDays(6);
+            }
+
+            if (Dir == "more") //devo tornare indietro di una settimana
+            {
+                dtPrimoGiornoSettimana = dtPrimoGiornoSettimana.AddDays(7);
+                dtUltimoGiornoSettimana = dtPrimoGiornoSettimana.AddDays(6);
+            }
+
+            IDSettimana = Utils.Utils.SettimanaAnno(dtPrimoGiornoSettimana);
+            Anno = dtPrimoGiornoSettimana.Year;
+
+            string Settimana = dtPrimoGiornoSettimana.ToShortDateString() + "-" + dtUltimoGiornoSettimana.ToShortDateString();
+
+            List<SelectListItem> ListaGiorni = new List<SelectListItem>();
+
+            List<DateTime> listaG = new List<DateTime>();
+            listaG.Add(dtPrimoGiornoSettimana);
+            listaG.Add(dtPrimoGiornoSettimana.AddDays(1));
+            listaG.Add(dtPrimoGiornoSettimana.AddDays(2));
+            listaG.Add(dtPrimoGiornoSettimana.AddDays(3));
+            listaG.Add(dtPrimoGiornoSettimana.AddDays(4));
+            listaG.Add(dtPrimoGiornoSettimana.AddDays(5));
+            listaG.Add(dtPrimoGiornoSettimana.AddDays(6));
+
+
+            foreach (DateTime c in listaG)
+            {
+                SelectListItem item = new SelectListItem
+                {
+                    Text = c.ToShortDateString(),
+                    Value = c.Year + "#" + c.Month + "#" + c.Day
+                };
+
+                ListaGiorni.Add(item);
+            }
+
+
+            Esercente esercente = await RealmDataStore.Esercente(IDEsercente);
+
+            int intOI = 480;
+            int intOF = 1200;
+            int intSlot = 30;
+            double dFattore = 0;
+
+
+            if (esercente.OraInizio != 0) intOI = esercente.OraInizio;
+            if (esercente.OraFine != 0) intOF = esercente.OraFine;
+            if (esercente.MinutiSlot != 0) intSlot = esercente.MinutiSlot;
+
+            dFattore = 60 / intSlot;
+
+            IEnumerable<Calendario> ListaCalendari = await RealmDataStore.ListaCalendari(esercente, dtPrimoGiornoSettimana, IDRisorsaAttivitaR);
+            List<StrutturaCalendario> ListaStrutturaCalendari = new List<StrutturaCalendario>();
+
+
+            //costruisco la mia ListaStrutturaCalendari
+            for (int i = Convert.ToInt32(intOI * dFattore / 60); i <= Convert.ToInt32(intOF * dFattore / 60); i++)
+            {
+
+                //creo la struttura con 8 colonne e  n-righe con valori di default               
+                //Cella standard
+                StrutturaCella SC0 = new StrutturaCella
+                {
+                    Calendario = null,
+                    TipoCella = 0,
+                    Riga = 1,
+                    Colonna = 1
+                };
+                //Cella standard
+                StrutturaCella SC1 = new StrutturaCella
+                {
+                    Calendario = null,
+                    TipoCella = 0,
+                    Riga = 1,
+                    Colonna = 1
+                };
+                //Cella standard
+                StrutturaCella SC2 = new StrutturaCella
+                {
+                    Calendario = null,
+                    TipoCella = 0,
+                    Riga = 1,
+                    Colonna = 1
+                };
+                //Cella standard
+                StrutturaCella SC3 = new StrutturaCella
+                {
+                    Calendario = null,
+                    TipoCella = 0,
+                    Riga = 1,
+                    Colonna = 1
+                };
+                //Cella standard
+                StrutturaCella SC4 = new StrutturaCella
+                {
+                    Calendario = null,
+                    TipoCella = 0,
+                    Riga = 1,
+                    Colonna = 1
+                };
+                //Cella standard
+                StrutturaCella SC5 = new StrutturaCella
+                {
+                    Calendario = null,
+                    TipoCella = 0,
+                    Riga = 1,
+                    Colonna = 1
+                };
+                //Cella standard
+                StrutturaCella SC6 = new StrutturaCella
+                {
+                    Calendario = null,
+                    TipoCella = 0,
+                    Riga = 1,
+                    Colonna = 1
+                };
+
+                StrutturaCalendario strutturaCalendario = new StrutturaCalendario
+                {
+
+                    sOrarioCella = Utils.Utils.ConvertiOrario(i * intSlot),
+                    iOrarioCella = i * intSlot,
+                    SC1 = SC1,
+                    SC2 = SC2,
+                    SC3 = SC3,
+                    SC4 = SC4,
+                    SC5 = SC5,
+                    SC6 = SC6,
+                    SC0 = SC0
+                };
+
+                ListaStrutturaCalendari.Add(strutturaCalendario);
+            }
+
+            List<string> CelleSpente = new List<string>();
+
+            //adesso ciclo sulla ListaCalendari per vedere se esistono attività da descrivere
+            foreach (Calendario c in ListaCalendari)
+            {
+
+                RisAtt = AggiungiElemento(RisAtt, c.RisorsaAttivita.ID);
+
+                //calcolo la capienza residua
+                string Res = await RealmDataStore.CapienzaResidua(c.ID, HttpContext.Session.GetString("username"), false);
+                string[] aCR = Res.Split("#");
+                int CR = Convert.ToInt32(aCR[0]);
+                bool HasBooking = CR < 0 ? false : true;
+                string info = aCR[1];
+                int Booked = Convert.ToInt32(aCR[2]);
+
+                foreach (StrutturaCalendario s in ListaStrutturaCalendari)
+                {
+
+                    if (c.OraInizio == s.iOrarioCella) //ho trovato un elemento che inizia nella riga
+                    {
+                        //cerco la colonna giusto
+                        switch ((int)c.Data.DayOfWeek)
+                        {
+                            case 0:  //DOM
+                                if (s.SC0.TipoCella == 1) //cella già occupata 
+                                {
+                                    HasConflict += "#" + s.SC0.Calendario.RisorsaAttivita.ID + "@" + c.RisorsaAttivita.ID;
+                                    break;
+                                }
+                                else
+                                {
+                                    //ciclo sulla lista CelleSpente per vedere se questa cella era usata da altre attività
+                                    foreach (string v in CelleSpente)
+                                    {
+                                        string[] cr = v.Split("#");
+                                        if (cr[1] == "0" && Convert.ToInt32(cr[0]) == s.iOrarioCella)
+                                        {
+                                            HasConflict += "#" + c.RisorsaAttivita.ID + "@" + cr[2];
+                                            break;
+                                        }
+                                    }
+                                }
+                                s.SC0.Calendario = c;
+                                s.SC0.TipoCella = 1;
+                                s.SC0.Riga = (c.OraFine - c.OraInizio) / intSlot;
+                                s.SC0.Colonna = 1;
+                                if (s.SC0.Riga > 1)
+                                {
+                                    for (int x = 2; x <= s.SC0.Riga; x++)
+                                    {
+                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#0#" + c.RisorsaAttivita.ID);
+                                    }
+                                }
+                                s.SC0.CapienzaResidua = Math.Abs(CR);
+                                s.SC0.HasBooking = HasBooking;
+                                s.SC0.Info = info;
+                                s.SC0.Booked = Booked;
+                                break;
+                            case 1:  //LUN
+                                if (s.SC1.TipoCella == 1) //cella già occupata 
+                                {
+                                    HasConflict += "#" + s.SC1.Calendario.RisorsaAttivita.ID + "@" + c.RisorsaAttivita.ID;
+                                    break;
+                                }
+                                else
+                                {
+                                    //ciclo sulla lista CelleSpente per vedere se questa cella era usata da altre attività
+                                    foreach (string v in CelleSpente)
+                                    {
+                                        string[] cr = v.Split("#");
+                                        if (cr[1] == "1" && Convert.ToInt32(cr[0]) == s.iOrarioCella)
+                                        {
+                                            HasConflict += "#" + c.RisorsaAttivita.ID + "@" + cr[2];
+                                            break;
+                                        }
+                                    }
+                                }
+                                s.SC1.Calendario = c;
+                                s.SC1.TipoCella = 1;
+                                s.SC1.Riga = (c.OraFine - c.OraInizio) / intSlot;
+                                s.SC1.Colonna = 1;
+                                if (s.SC1.Riga > 1)
+                                {
+                                    for (int x = 2; x <= s.SC1.Riga; x++)
+                                    {
+                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#1#" + c.RisorsaAttivita.ID);
+                                    }
+                                }
+                                s.SC1.CapienzaResidua = Math.Abs(CR);
+                                s.SC1.HasBooking = HasBooking;
+                                s.SC1.Info = info;
+                                s.SC1.Booked = Booked;
+                                break;
+                            case 2:  //MAR
+                                if (s.SC2.TipoCella == 1) //cella già occupata 
+                                {
+                                    HasConflict += "#" + s.SC2.Calendario.RisorsaAttivita.ID + "@" + c.RisorsaAttivita.ID;
+                                    break;
+                                }
+                                else
+                                {
+                                    //ciclo sulla lista CelleSpente per vedere se questa cella era usata da altre attività
+                                    foreach (string v in CelleSpente)
+                                    {
+                                        string[] cr = v.Split("#");
+                                        if (cr[1] == "2" && Convert.ToInt32(cr[0]) == s.iOrarioCella)
+                                        {
+                                            HasConflict += "#" + c.RisorsaAttivita.ID + "@" + cr[2];
+                                            break;
+                                        }
+                                    }
+                                }
+                                s.SC2.Calendario = c;
+                                s.SC2.TipoCella = 1;
+                                s.SC2.Riga = (c.OraFine - c.OraInizio) / intSlot;
+                                s.SC2.Colonna = 1;
+                                if (s.SC2.Riga > 1)
+                                {
+                                    for (int x = 2; x <= s.SC2.Riga; x++)
+                                    {
+                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#2#" + c.RisorsaAttivita.ID);
+                                    }
+                                }
+                                s.SC2.CapienzaResidua = Math.Abs(CR);
+                                s.SC2.HasBooking = HasBooking;
+                                s.SC2.Info = info;
+                                s.SC2.Booked = Booked;
+                                break;
+                            case 3:  //MER
+                                if (s.SC3.TipoCella == 1) //cella già occupata 
+                                {
+                                    HasConflict += "#" + s.SC3.Calendario.RisorsaAttivita.ID + "@" + c.RisorsaAttivita.ID;
+                                    break;
+                                }
+                                else
+                                {
+                                    //ciclo sulla lista CelleSpente per vedere se questa cella era usata da altre attività
+                                    foreach (string v in CelleSpente)
+                                    {
+                                        string[] cr = v.Split("#");
+                                        if (cr[1] == "3" && Convert.ToInt32(cr[0]) == s.iOrarioCella)
+                                        {
+                                            HasConflict += "#" + c.RisorsaAttivita.ID + "@" + cr[2];
+                                            break;
+                                        }
+                                    }
+                                }
+                                s.SC3.Calendario = c;
+                                s.SC3.TipoCella = 1;
+                                s.SC3.Riga = (c.OraFine - c.OraInizio) / intSlot;
+                                s.SC3.Colonna = 1;
+                                if (s.SC3.Riga > 1)
+                                {
+                                    for (int x = 2; x <= s.SC3.Riga; x++)
+                                    {
+                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#3#" + c.RisorsaAttivita.ID);
+                                    }
+                                }
+                                s.SC3.CapienzaResidua = Math.Abs(CR);
+                                s.SC3.HasBooking = HasBooking;
+                                s.SC3.Info = info;
+                                s.SC3.Booked = Booked;
+                                break;
+                            case 4:  //GIO
+                                if (s.SC4.TipoCella == 1) //cella già occupata 
+                                {
+                                    HasConflict += "#" + s.SC4.Calendario.RisorsaAttivita.ID + "@" + c.RisorsaAttivita.ID;
+                                    break;
+                                }
+                                else
+                                {
+                                    //ciclo sulla lista CelleSpente per vedere se questa cella era usata da altre attività
+                                    foreach (string v in CelleSpente)
+                                    {
+                                        string[] cr = v.Split("#");
+                                        if (cr[1] == "4" && Convert.ToInt32(cr[0]) == s.iOrarioCella)
+                                        {
+                                            HasConflict += "#" + c.RisorsaAttivita.ID + "@" + cr[2];
+                                            break;
+                                        }
+                                    }
+                                }
+                                s.SC4.Calendario = c;
+                                s.SC4.TipoCella = 1;
+                                s.SC4.Riga = (c.OraFine - c.OraInizio) / intSlot;
+                                s.SC4.Colonna = 1;
+                                if (s.SC4.Riga > 1)
+                                {
+                                    for (int x = 2; x <= s.SC4.Riga; x++)
+                                    {
+                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#4#" + c.RisorsaAttivita.ID);
+                                    }
+                                }
+                                s.SC4.CapienzaResidua = Math.Abs(CR);
+                                s.SC4.HasBooking = HasBooking;
+                                s.SC4.Info = info;
+                                s.SC4.Booked = Booked;
+                                break;
+                            case 5:  //VEN
+                                if (s.SC5.TipoCella == 1) //cella già occupata 
+                                {
+                                    HasConflict += "#" + s.SC5.Calendario.RisorsaAttivita.ID + "@" + c.RisorsaAttivita.ID;
+                                    break;
+                                }
+                                else
+                                {
+                                    //ciclo sulla lista CelleSpente per vedere se questa cella era usata da altre attività
+                                    foreach (string v in CelleSpente)
+                                    {
+                                        string[] cr = v.Split("#");
+                                        if (cr[1] == "5" && Convert.ToInt32(cr[0]) == s.iOrarioCella)
+                                        {
+                                            HasConflict += "#" + c.RisorsaAttivita.ID + "@" + cr[2];
+                                            break;
+                                        }
+                                    }
+                                }
+                                s.SC5.Calendario = c;
+                                s.SC5.TipoCella = 1;
+                                s.SC5.Riga = (c.OraFine - c.OraInizio) / intSlot;
+                                s.SC5.Colonna = 1;
+                                if (s.SC5.Riga > 1)
+                                {
+                                    for (int x = 2; x <= s.SC5.Riga; x++)
+                                    {
+                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#5#" + c.RisorsaAttivita.ID);
+                                    }
+                                }
+                                s.SC5.CapienzaResidua = Math.Abs(CR);
+                                s.SC5.HasBooking = HasBooking;
+                                s.SC5.Info = info;
+                                s.SC5.Booked = Booked;
+                                break;
+                            case 6:  //SAB
+                                if (s.SC6.TipoCella == 1) //cella già occupata 
+                                {
+                                    HasConflict += "#" + s.SC6.Calendario.RisorsaAttivita.ID + "@" + c.RisorsaAttivita.ID;
+                                    break;
+                                }
+                                else
+                                {
+                                    //ciclo sulla lista CelleSpente per vedere se questa cella era usata da altre attività
+                                    foreach (string v in CelleSpente)
+                                    {
+                                        string[] cr = v.Split("#");
+                                        if (cr[1] == "6" && Convert.ToInt32(cr[0]) == s.iOrarioCella)
+                                        {
+                                            HasConflict += "#" + c.RisorsaAttivita.ID + "@" + cr[2];
+                                            break;
+                                        }
+                                    }
+                                }
+                                s.SC6.Calendario = c;
+                                s.SC6.TipoCella = 1;
+                                s.SC6.Riga = (c.OraFine - c.OraInizio) / intSlot;
+                                s.SC6.Colonna = 1;
+                                if (s.SC6.Riga > 1)
+                                {
+                                    for (int x = 2; x <= s.SC6.Riga; x++)
+                                    {
+                                        CelleSpente.Add(c.OraInizio + intSlot * (x - 1) + "#6#" + c.RisorsaAttivita.ID);
+                                    }
+                                }
+                                s.SC6.CapienzaResidua = Math.Abs(CR);
+                                s.SC6.HasBooking = HasBooking;
+                                s.SC6.Info = info;
+                                s.SC6.Booked = Booked;
+                                break;
+                        }
+
+                        break;
+                    }
+
+                }
+
+            }
+
+            //spengo le celle coperte da eventi precedenti
+            foreach (string v in CelleSpente)
+            {
+                string[] cr = v.Split("#");
+
+                foreach (StrutturaCalendario s in ListaStrutturaCalendari)
+                {
+                    if (Convert.ToInt32(cr[0]) == s.iOrarioCella) //ho trovato un elemento che inizia nella riga
+                    {
+                        switch (cr[1])
+                        {
+                            case "0":
+                                s.SC0.TipoCella = -1;
+                                break;
+                            case "1":
+                                s.SC1.TipoCella = -1;
+                                break;
+                            case "2":
+                                s.SC2.TipoCella = -1;
+                                break;
+                            case "3":
+                                s.SC3.TipoCella = -1;
+                                break;
+                            case "4":
+                                s.SC4.TipoCella = -1;
+                                break;
+                            case "5":
+                                s.SC5.TipoCella = -1;
+                                break;
+                            case "6":
+                                s.SC6.TipoCella = -1;
+                                break;
+                        }
+                        break;
+                    }
+
+                }
+            }
+
+            List<SelectListItem> ListaRisorseAttivitaR = new List<SelectListItem>();
+
+            if (HasConflict == "" && !IsRefresh)
+            {
+                //aggiunta selezione completa
+                SelectListItem itemx = new SelectListItem
+                {
+                    Text = "Tutti le Risorse-Attività",
+                    Value = "000"
+                };
+                ListaRisorseAttivitaR.Add(itemx);
+                IDRisorsaAttivitaR = "000";
+            }
+
+            string[] sConflitti = HasConflict.Split("#");
+
+
+            var ListaRA = await RealmDataStore.ListaRisorseAttivita(esercente);
+            foreach (RisorsaAttivita c in ListaRA)
+            {
+                SelectListItem item = new SelectListItem
+                {
+                    Text = c.Attivita.Descrizione + "-" + c.Risorsa.Descrizione,
+                    Value = c.ID + ""
+                };
+
+                ListaRisorseAttivitaR.Add(item);
+
+            }
+
+            Calendario calendario = new Calendario
+            {
+                Capienza = 1
+            };
+
+            HelpPrenotazione helpPrenotazione = new HelpPrenotazione
+            {
+                ListaStrutturaCalendari = ListaStrutturaCalendari,
+                Settimana = Settimana,
+                IDSettimana = IDSettimana,
+                Anno = Anno,
+                pg = dtPrimoGiornoSettimana,
+                Esercente = esercente.RagioneSociale,
+                Calendario = calendario,
+                IDSettimanaC = IDSettimana,
+                ModeEdit = true,
+                ModeCalendario = "Ins",
+                HasConflict = HasConflict,
+                ListaRisorseAttivitaR = ListaRisorseAttivitaR,
+                IDRisorsaAttivitaR = IDRisorsaAttivitaR,
+                IDEsercente = IDEsercente
+            };
+
+            if (HasConflict != "" && IsRefresh == true) HasConflict = "OK";
+
+            if (HasConflict == "")
+            {
+                return View(helpPrenotazione);
+            }
+            else if (HasConflict == "OK")
+            {
+                return View(helpPrenotazione);
+            }
+            else
+            {
+                RisAtt = RisAtt.OrderByDescending(z => z.Totale).ToList();
+                return RedirectToAction(nameof(CalendarioUtente), new { IDEsercente, IDSettimana, Anno, IDRisorsaAttivitaR = RisAtt[0].Elemento, IsRefresh = true });
+            }
+
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Relazioni(int anno = -1)
         {
 
@@ -3419,6 +3928,19 @@ namespace CDQ.Controllers
         }
 
 
+        public async Task<IActionResult> EliminaPrenotazioneUtente(string IDCalendarioE, int IDSettimana, int Anno, string IDEsercente)
+        {
+            if (!CheckUser()) return RedirectToAction(nameof(Login));
+            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+
+            await RealmDataStore.EliminaPrenotazione(IDCalendarioE, HttpContext.Session.GetString("username"));
+
+            return RedirectToAction(nameof(CalendarioUtente), new { IDEsercente, IDSettimana, Anno });
+        }
+
+
+
+
         public async Task<IActionResult> EliminaRisorsaAttivita(string ID, string IDRisorsaAttivita)
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
@@ -3442,6 +3964,21 @@ namespace CDQ.Controllers
 
             return RedirectToAction(nameof(Calendario), new { });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> PrenotazioneUtente(HelpPrenotazione helpPrenotazione)
+        {
+            if (!CheckUser()) return RedirectToAction(nameof(Login));
+            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+
+            if (helpPrenotazione.ModePrenotazione == "Ins")
+            {
+                await RealmDataStore.InserisciPrenotazione(helpPrenotazione.IDEsercente, helpPrenotazione.IDCalendario, HttpContext.Session.GetString("username"), helpPrenotazione.Nota);
+            }
+
+            return RedirectToAction(nameof(CalendarioUtente), new { helpPrenotazione.IDEsercente, helpPrenotazione.IDSettimana, helpPrenotazione.Anno });
+        }
+
 
     }
 }

@@ -238,7 +238,7 @@ namespace CDQ.Services
         }
 
 
-        internal static async Task<string> CapienzaResidua(string IDCalendario, string IDUtente)
+        internal static async Task<string> CapienzaResidua(string IDCalendario, string IDUtente, bool bEsercente=true)
         {
             var vRealmDb = await GetRealm(true);
 
@@ -247,6 +247,8 @@ namespace CDQ.Services
             Calendario calendario = vRealmDb.Find<Calendario>(IDCalendario);
 
             Utente utente = vRealmDb.Find<Utente>(IDUtente);
+
+            bool bPreUte = false;
 
             var prenotazione = vRealmDb.All<Prenotazione>().Where(a => a.Calendario == calendario);
 
@@ -262,14 +264,40 @@ namespace CDQ.Services
 
             foreach (Prenotazione pr in prenotazione)
             {
-                info = info + Environment.NewLine + i + ". " + pr.Utente.Cognome + " " + pr.Utente.Nome + " - " + pr.Nota;
+                bPreUte = false;
+                
+                if (bEsercente)
+                {
+                    info = info + Environment.NewLine + i + ". " + pr.Utente.Cognome + " " + pr.Utente.Nome + " - " + pr.Nota;
+                }
+                else
+                {
+                    if (pr.Utente.Mail == IDUtente)
+                    {
+                        info = info + Environment.NewLine + " - " + pr.Nota;
+                        bPreUte = true;
+                    }
+                    else
+                    {
+                        info = "";
+                    }
+
+                }
+
                 i += 1;
 
                 if (pr.Utente.Mail == IDUtente) Booked = 1;
 
             }
 
-            info = info == "" ? "Nessuna prenotazione" : "Dettagli Prenotazioni" + info;
+            if (bPreUte)
+            {
+                info = info == "" ? "xxx" : "Dettagli Prenotazioni" + info;
+            }
+            else
+            {
+                info = info == "" ? "Nessuna prenotazione" : "Dettagli Prenotazioni" + info;
+            }
             
             return ris + "#" + info + "#" + Booked;
 
