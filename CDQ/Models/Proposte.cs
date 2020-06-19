@@ -10,7 +10,6 @@ namespace CDQ.Models
         public string ID { get; set; } = Guid.NewGuid().ToString();
         public string User { get; set; }
         public string Oggetto { get; set; }
-        public Status Status { get; set; }
         public string Tribunale { get; set; }
         public string SezioneTribunale { get; set; }
         public string LuogoData { get; set; }
@@ -27,7 +26,6 @@ namespace CDQ.Models
         public double PatrimonioMobProQ { get; set; }
         public double PatrimonioImmobProQ { get; set; }
         public string SafeCode { get; set; } = Guid.NewGuid().GetHashCode().ToString();
-        public TipoPratica TipoPratica { get; set; }
 
         public DateTimeOffset? DataCreazione { get; set; }
         public DateTimeOffset? DataUltimaModifica { get; set; }

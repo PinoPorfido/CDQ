@@ -89,7 +89,7 @@ namespace CDQ.Services
                 pathRealm = "/Users/luigi/Dropbox/Realm/CDQ/cdq.realm";
             }
 
-            var config = new RealmConfiguration(pathRealm) { SchemaVersion = 13};
+            var config = new RealmConfiguration(pathRealm) { SchemaVersion = 14};
 
 
             //if (async)
@@ -364,33 +364,6 @@ namespace CDQ.Services
             return vRealmDb.All<RegioniItaliane>().OrderBy(r => r.Regione);
         }
 
-        internal static async Task<IEnumerable<Status>> ListaStatus(int Provinciale)
-        {
-            var vRealmDb = await GetRealm();
-            return vRealmDb.All<Status>();
-        }
-
-        internal static async Task<IEnumerable<TipoPratica>> ListaTipiPratica(int Provinciale)
-        {
-            var vRealmDb = await GetRealm();
-            return vRealmDb.All<TipoPratica>().OrderBy(a=> a.Valore);
-        }
-
-
-        internal static async Task<IEnumerable<Gradi>> ListaGradi()
-        {
-            var vRealmDb = await GetRealm();
-            return vRealmDb.All<Gradi>();
-        }
-
-        internal static async Task<Status> Status(string ID)
-        {
-            var vRealmDb = await GetRealm();
-            
-            Status status = vRealmDb.Find<Status>(ID);
-
-            return status;
-        }
 
         internal static async Task<Esercente> Esercente(string ID)
         {
@@ -420,14 +393,6 @@ namespace CDQ.Services
         }
 
 
-        internal static async Task<CausaDebito> CausaDebito(string ID)
-        {
-            var vRealmDb = await GetRealm();
-
-            CausaDebito causaDebito = vRealmDb.Find<CausaDebito>(ID);
-
-            return causaDebito;
-        }
 
         internal static async Task<Utente> Utenti(string ID)
         {
@@ -440,20 +405,6 @@ namespace CDQ.Services
 
 
 
-        internal static async Task<Status> AggiornaStatus(Status status)
-        {
-            var vRealmDb = await GetRealm();
-
-            Status statusMod = vRealmDb.Find<Status>(status.ID);
-
-            var trans = vRealmDb.BeginWrite();
-
-            statusMod.Descrizione = status.Descrizione;
-
-            trans.Commit();
-
-            return status;
-        }
 
         internal static async Task<Esercente> AggiornaEsercente(Esercente esercente, string IDCategoria,string IDOraInizio, string IDOraFine, string IDSlot)
         {
@@ -512,78 +463,6 @@ namespace CDQ.Services
             trans.Commit();
 
             return pianificazione;
-        }
-
-
-        internal static async Task<CausaDebito> AggiornaCausaDebito(CausaDebito causaDebito)
-        {
-            var vRealmDb = await GetRealm();
-
-            CausaDebito cdMod = vRealmDb.Find<CausaDebito>(causaDebito.ID);
-
-            var trans = vRealmDb.BeginWrite();
-
-            cdMod.Descrizione = causaDebito.Descrizione;
-
-            trans.Commit();
-
-            return causaDebito;
-        }
-
-        internal static async Task<Status> EliminaStatus(Status status)
-        {
-            var vRealmDb = await GetRealm();
-
-            Status statusDel = vRealmDb.Find<Status>(status.ID);
-
-            var trans = vRealmDb.BeginWrite();
-
-            vRealmDb.Remove(statusDel);
-
-            trans.Commit();
-
-            return status;
-        }
-
-        internal static async Task<CausaDebito> EliminaCausaDebito(CausaDebito causaDebito)
-        {
-            var vRealmDb = await GetRealm();
-
-            CausaDebito cdDel = vRealmDb.Find<CausaDebito>(causaDebito.ID);
-
-            var trans = vRealmDb.BeginWrite();
-
-            vRealmDb.Remove(cdDel);
-
-            trans.Commit();
-
-            return causaDebito;
-        }
-
-        internal static async Task<Status> InserisciStatus(Status status)
-        {
-            var vRealmDb = await GetRealm();
-
-            var trans = vRealmDb.BeginWrite();
-
-            vRealmDb.Add(status);
-
-            trans.Commit();
-
-            return status;
-        }
-
-        internal static async Task<CausaDebito> InserisciCausaDebito(CausaDebito causaDebito)
-        {
-            var vRealmDb = await GetRealm();
-
-            var trans = vRealmDb.BeginWrite();
-
-            vRealmDb.Add(causaDebito);
-
-            trans.Commit();
-
-            return causaDebito;
         }
 
 
@@ -656,19 +535,6 @@ namespace CDQ.Services
         }
 
 
-        internal static async Task<IEnumerable<Status>> ListaStatus(string user)
-        {
-            var vRealmDb = await GetRealm();
-
-            return vRealmDb.All<Status>().Where(z=> z.User == user || z.User == null).OrderBy(z=> z.IsSistema).ThenBy(z=> z.ID);
-        }
-
-        internal static async Task<IEnumerable<CausaDebito>> ListaCauseDebito(string user)
-        {
-            var vRealmDb = await GetRealm();
-
-            return vRealmDb.All<CausaDebito>().Where(z => z.User == user || z.User == null).OrderBy(z => z.IsSistema).ThenBy(z => z.ID);
-        }
 
         internal static async Task<IEnumerable<Categoria>> ListaCategorie()
         {
@@ -803,23 +669,6 @@ namespace CDQ.Services
         }
 
 
-        internal async static Task AggiornaRicorrenti(string IDRicorrenti, Ricorrenti ricorrenti)
-        {
-            var vRealmDb = await GetRealm();
-
-            Ricorrenti md = vRealmDb.Find<Ricorrenti>(IDRicorrenti);
-
-            var trans = vRealmDb.BeginWrite();
-
-            md.Cognome = ricorrenti.Cognome.Replace("'", "`");
-            md.Nome = ricorrenti.Nome.Replace("'", "`");
-            md.CodiceFiscale = ricorrenti.CodiceFiscale.Replace("'", "`");
-            md.Domicilio = ricorrenti.Domicilio.Replace("'", "`");
-            md.Percentuale = ricorrenti.Percentuale;
-
-            trans.Commit();
-        }
-
         internal async static Task AggiornaAttivita(string IDAttivita, Attivita attivita)
         {
             var vRealmDb = await GetRealm();
@@ -867,113 +716,7 @@ namespace CDQ.Services
             trans.Commit();
         }
 
-        internal async static Task AggiornaMasseDebitorie(string IDMasseDebitorie, MasseDebitorie masseDebitorie, string IDCauseDebito, string IDGrado)
-        {
-            var vRealmDb = await GetRealm();
 
-            CausaDebito causaDebito = vRealmDb.Find<CausaDebito>(IDCauseDebito);
-            Gradi gradi = vRealmDb.Find<Gradi>(IDGrado);
-            MasseDebitorie md = vRealmDb.Find<MasseDebitorie>(IDMasseDebitorie);
-
-            var trans = vRealmDb.BeginWrite();
-
-            md.Creditore = masseDebitorie.Creditore.Replace("'", "`");
-            md.CausaDebito = causaDebito;
-            md.Nota = masseDebitorie.Nota;
-            md.Grado = gradi;
-            md.Importo = masseDebitorie.Importo;
-            md.PercentualeSoddisfo = masseDebitorie.PercentualeSoddisfo;
-
-            trans.Commit();
-        }
-
-
-        internal async static Task AggiornaPatrimonioImmobiliare(string IDPatrimonioImmobiliare, PatrimonioImmobiliare patrimonioImmobiliare)
-        {
-            var vRealmDb = await GetRealm();
-
-            PatrimonioImmobiliare ad = vRealmDb.Find<PatrimonioImmobiliare>(IDPatrimonioImmobiliare);
-
-            var trans = vRealmDb.BeginWrite();
-
-            ad.Descrizione = patrimonioImmobiliare.Descrizione.Replace("'", "`");
-            ad.Superficie = patrimonioImmobiliare.Superficie;
-            ad.ValoreOmiVan = patrimonioImmobiliare.ValoreOmiVan;
-
-            trans.Commit();
-        }
-
-
-        internal async static Task AggiornaSpeseMese(string IDSpeseMese, SpeseMese speseMese)
-        {
-            var vRealmDb = await GetRealm();
-
-            SpeseMese ad = vRealmDb.Find<SpeseMese>(IDSpeseMese);
-
-            var trans = vRealmDb.BeginWrite();
-
-            ad.Descrizione = speseMese.Descrizione.Replace("'", "`");
-            ad.Importo = speseMese.Importo;
-
-            trans.Commit();
-        }
-
-
-        internal async static Task EliminaMasseDebitorie(string IDMasseDebitorie)
-        {
-            var vRealmDb = await GetRealm();
-
-            var trans = vRealmDb.BeginWrite();
-
-            MasseDebitorie ap = vRealmDb.Find<MasseDebitorie>(IDMasseDebitorie);
-
-            vRealmDb.Remove(ap);
-
-            trans.Commit();
-        }
-
-        internal async static Task EliminaSpeseMese(string IDSpeseMese)
-        {
-            var vRealmDb = await GetRealm();
-
-            var trans = vRealmDb.BeginWrite();
-
-            SpeseMese ap = vRealmDb.Find<SpeseMese>(IDSpeseMese);
-
-            vRealmDb.Remove(ap);
-
-            trans.Commit();
-        }
-
-        internal async static Task EliminaPatrimonioImmobiliare(string IDPatrimonioImmobiliare)
-        {
-            var vRealmDb = await GetRealm();
-
-            var trans = vRealmDb.BeginWrite();
-
-            PatrimonioImmobiliare ap = vRealmDb.Find<PatrimonioImmobiliare>(IDPatrimonioImmobiliare);
-
-            vRealmDb.Remove(ap);
-
-            trans.Commit();
-        }
-
-
-
-        internal async static Task EliminaRicorrenti(string IDRicorrenti)
-        {
-            var vRealmDb = await GetRealm();
-
-            var trans = vRealmDb.BeginWrite();
-
-            Ricorrenti ap = vRealmDb.Find<Ricorrenti>(IDRicorrenti);
-
-            vRealmDb.Remove(ap);
-
-            //eliminazione di tutte le dipendenze nella proposta o nella relazione collegata
-
-            trans.Commit();
-        }
 
         internal async static Task EliminaAttivita(string IDAttivita)
         {
@@ -1075,55 +818,7 @@ namespace CDQ.Services
         }
 
 
-        internal async static Task InserisciMasseDebitorie(string IDproposte, MasseDebitorie masseDebitorie, string IDCausaDebito, string IDGrado)
-        {
-            var vRealmDb = await GetRealm();
 
-            CausaDebito causaDebito = vRealmDb.Find<CausaDebito>(IDCausaDebito);
-            Gradi gradi = vRealmDb.Find<Gradi>(IDGrado);
-            Proposte proposte = vRealmDb.Find<Proposte>(IDproposte);
-
-
-            var trans = vRealmDb.BeginWrite();
-
-            MasseDebitorie md = new MasseDebitorie
-            {
-                Proposte = proposte,
-                Creditore = masseDebitorie.Creditore.Replace("'", "`"),
-                CausaDebito = causaDebito,
-                Nota = masseDebitorie.Nota,
-                Grado = gradi,
-                Importo = masseDebitorie.Importo,
-                PercentualeSoddisfo = masseDebitorie.PercentualeSoddisfo
-            };
-
-            vRealmDb.Add(md);
-
-            trans.Commit();
-        }
-
-        internal async static Task InserisciRicorrenti(string IDproposte, Ricorrenti ricorrenti)
-        {
-            var vRealmDb = await GetRealm();
-
-            Proposte proposte = vRealmDb.Find<Proposte>(IDproposte);
-
-            var trans = vRealmDb.BeginWrite();
-
-            Ricorrenti md = new Ricorrenti
-            {
-                Proposte = proposte,
-                Cognome = ricorrenti.Cognome.Replace("'", "`"),
-                Nome = ricorrenti.Nome.Replace("'", "`"),
-                CodiceFiscale = ricorrenti.CodiceFiscale,
-                Domicilio = ricorrenti.Domicilio.Replace("'", "`"),
-                Percentuale = ricorrenti.Percentuale,
-            };
-
-            vRealmDb.Add(md);
-
-            trans.Commit();
-        }
 
         internal async static Task InserisciAttivita(string IDesercente, Attivita attivita)
         {
@@ -1262,30 +957,6 @@ namespace CDQ.Services
         }
 
 
-        internal async static Task InserisciRicorrentiR(string IDrelazioni, Ricorrenti ricorrenti)
-        {
-            var vRealmDb = await GetRealm();
-
-            Relazioni relazioni = vRealmDb.Find<Relazioni>(IDrelazioni);
-
-            var trans = vRealmDb.BeginWrite();
-
-            Ricorrenti md = new Ricorrenti
-            {
-                Relazioni = relazioni,
-                Cognome = ricorrenti.Cognome.Replace("'", "`"),
-                Nome = ricorrenti.Nome.Replace("'", "`"),
-                CodiceFiscale = ricorrenti.CodiceFiscale,
-                Domicilio = ricorrenti.Domicilio.Replace("'", "`"),
-                Percentuale = ricorrenti.Percentuale,
-            };
-
-            vRealmDb.Add(md);
-
-            trans.Commit();
-        }
-
-
         internal async static Task InserisciPianificazione(Pianificazione pianificazione, string IDRisorsaAttivita, int IDGiorno, string IDOraInizio, string IDOraFine, string IDEsercente)
         {
             var vRealmDb = await GetRealm();
@@ -1393,148 +1064,6 @@ namespace CDQ.Services
             cMod.Capienza = calendario.Capienza;
 
             trans.Commit();
-        }
-
-        internal async static Task InserisciMasseDebitorieR(string IDrelazioni, MasseDebitorie masseDebitorie, string IDCausaDebito, string IDGrado)
-        {
-            var vRealmDb = await GetRealm();
-
-            CausaDebito causaDebito = vRealmDb.Find<CausaDebito>(IDCausaDebito);
-            Gradi gradi = vRealmDb.Find<Gradi>(IDGrado);
-            Relazioni relazioni = vRealmDb.Find<Relazioni>(IDrelazioni);
-
-
-            var trans = vRealmDb.BeginWrite();
-
-            MasseDebitorie md = new MasseDebitorie
-            {
-                Relazioni = relazioni,
-                Creditore = masseDebitorie.Creditore.Replace("'", "`"),
-                CausaDebito = causaDebito,
-                Nota = masseDebitorie.Nota,
-                Grado = gradi,
-                Importo = masseDebitorie.Importo,
-                PercentualeSoddisfo = masseDebitorie.PercentualeSoddisfo
-            };
-
-            vRealmDb.Add(md);
-
-            trans.Commit();
-        }
-
-
-        internal async static Task InserisciPatrimonioImmobiliare(string IDproposte, PatrimonioImmobiliare patrimonioImmobiliare)
-        {
-            var vRealmDb = await GetRealm();
-
-            Proposte proposte = vRealmDb.Find<Proposte>(IDproposte);
-
-
-            var trans = vRealmDb.BeginWrite();
-
-            PatrimonioImmobiliare ad = new PatrimonioImmobiliare
-            {
-                Proposte = proposte,
-                Descrizione = patrimonioImmobiliare.Descrizione.Replace("'", "`"),
-                Superficie = patrimonioImmobiliare.Superficie,
-                ValoreOmiVan = patrimonioImmobiliare.ValoreOmiVan
-            };
-
-            vRealmDb.Add(ad);
-
-            trans.Commit();
-        }
-
-        internal async static Task InserisciPatrimonioImmobiliareR(string IDrelazioni, PatrimonioImmobiliare patrimonioImmobiliare)
-        {
-            var vRealmDb = await GetRealm();
-
-            Relazioni relazioni = vRealmDb.Find<Relazioni>(IDrelazioni);
-
-
-            var trans = vRealmDb.BeginWrite();
-
-            PatrimonioImmobiliare ad = new PatrimonioImmobiliare
-            {
-                Relazioni = relazioni,
-                Descrizione = patrimonioImmobiliare.Descrizione.Replace("'", "`"),
-                Superficie = patrimonioImmobiliare.Superficie,
-                ValoreOmiVan = patrimonioImmobiliare.ValoreOmiVan
-            };
-
-            vRealmDb.Add(ad);
-
-            trans.Commit();
-        }
-
-
-        internal async static Task InserisciSpeseMese(string IDproposte, SpeseMese speseMese)
-        {
-            var vRealmDb = await GetRealm();
-
-            Proposte proposte = vRealmDb.Find<Proposte>(IDproposte);
-
-
-            var trans = vRealmDb.BeginWrite();
-
-            SpeseMese ad = new SpeseMese
-            {
-                Proposte = proposte,
-                Descrizione = speseMese.Descrizione.Replace("'", "`"),
-                Importo = speseMese.Importo
-            };
-
-            vRealmDb.Add(ad);
-
-            trans.Commit();
-        }
-
-        internal async static Task InserisciSpeseMeseR(string IDrelazioni, SpeseMese speseMese)
-        {
-            var vRealmDb = await GetRealm();
-
-            Relazioni relazioni = vRealmDb.Find<Relazioni>(IDrelazioni);
-
-
-            var trans = vRealmDb.BeginWrite();
-
-            SpeseMese ad = new SpeseMese
-            {
-                Relazioni = relazioni,
-                Descrizione = speseMese.Descrizione.Replace("'", "`"),
-                Importo = speseMese.Importo
-            };
-
-            vRealmDb.Add(ad);
-
-            trans.Commit();
-        }
-
-
-        internal async static Task<string> TestoPrecaricato(string ID)
-        {
-            var vRealmDb = await GetRealm();
-
-            TestiPrecaricati testiPrecaricati = vRealmDb.All<TestiPrecaricati>().Where(a=> a.Riferimento==ID).First();
-
-            return testiPrecaricati.Testo;
-
-        }
-
-
-        internal async static Task<IEnumerable<MasseDebitorie>> ListaMasseDebitorie(Proposte proposte)
-        {
-            var vRealmDb = await GetRealm();
-
-            List<MasseDebitorie> listaOutput = new List<MasseDebitorie>();
-
-            IEnumerable<MasseDebitorie> lista = vRealmDb.All<MasseDebitorie>().Where(ss => ss.Proposte == proposte);
-            foreach (MasseDebitorie item in lista)
-            {
-                listaOutput.Add(item);
-            }
-
-            return listaOutput;
         }
 
 
@@ -1686,112 +1215,6 @@ namespace CDQ.Services
         }
 
 
-        internal async static Task<IEnumerable<MasseDebitorie>> ListaMasseDebitorieR(Relazioni relazioni)
-        {
-            var vRealmDb = await GetRealm();
-
-            List<MasseDebitorie> listaOutput = new List<MasseDebitorie>();
-
-            IEnumerable<MasseDebitorie> lista = vRealmDb.All<MasseDebitorie>().Where(ss => ss.Relazioni == relazioni);
-            foreach (MasseDebitorie item in lista)
-            {
-                listaOutput.Add(item);
-            }
-
-            return listaOutput;
-        }
-
-
-        internal async static Task<IEnumerable<SpeseMese>> ListaSpeseMese(Proposte proposte)
-        {
-            var vRealmDb = await GetRealm();
-
-            List<SpeseMese> listaOutput = new List<SpeseMese>();
-
-            IEnumerable<SpeseMese> lista = vRealmDb.All<SpeseMese>().Where(ss => ss.Proposte == proposte);
-            foreach (SpeseMese item in lista)
-            {
-                listaOutput.Add(item);
-            }
-
-            return listaOutput;
-        }
-
-        internal async static Task<IEnumerable<SpeseMese>> ListaSpeseMeseR(Relazioni relazioni)
-        {
-            var vRealmDb = await GetRealm();
-
-            List<SpeseMese> listaOutput = new List<SpeseMese>();
-
-            IEnumerable<SpeseMese> lista = vRealmDb.All<SpeseMese>().Where(ss => ss.Relazioni == relazioni);
-            foreach (SpeseMese item in lista)
-            {
-                listaOutput.Add(item);
-            }
-
-            return listaOutput;
-        }
-
-        internal async static Task<IEnumerable<PatrimonioImmobiliare>> ListaPatrimonioImmobiliare(Proposte proposte)
-        {
-            var vRealmDb = await GetRealm();
-
-            List<PatrimonioImmobiliare> listaOutput = new List<PatrimonioImmobiliare>();
-
-            IEnumerable<PatrimonioImmobiliare> lista = vRealmDb.All<PatrimonioImmobiliare>().Where(ss => ss.Proposte == proposte);
-            foreach (PatrimonioImmobiliare item in lista)
-            {
-                listaOutput.Add(item);
-            }
-
-            return listaOutput;
-        }
-
-        internal async static Task<IEnumerable<PatrimonioImmobiliare>> ListaPatrimonioImmobiliareR(Relazioni relazioni)
-        {
-            var vRealmDb = await GetRealm();
-
-            List<PatrimonioImmobiliare> listaOutput = new List<PatrimonioImmobiliare>();
-
-            IEnumerable<PatrimonioImmobiliare> lista = vRealmDb.All<PatrimonioImmobiliare>().Where(ss => ss.Relazioni == relazioni);
-            foreach (PatrimonioImmobiliare item in lista)
-            {
-                listaOutput.Add(item);
-            }
-
-            return listaOutput;
-        }
-
-
-        internal async static Task<IEnumerable<Ricorrenti>> ListaRicorrenti(Proposte proposte)
-        {
-            var vRealmDb = await GetRealm();
-
-            List<Ricorrenti> listaOutput = new List<Ricorrenti>();
-
-            IEnumerable<Ricorrenti> lista = vRealmDb.All<Ricorrenti>().Where(ss => ss.Proposte == proposte);
-            foreach (Ricorrenti item in lista)
-            {
-                listaOutput.Add(item);
-            }
-
-            return listaOutput;
-        }
-
-        internal async static Task<IEnumerable<Ricorrenti>> ListaRicorrentiR(Relazioni relazioni)
-        {
-            var vRealmDb = await GetRealm();
-
-            List<Ricorrenti> listaOutput = new List<Ricorrenti>();
-
-            IEnumerable<Ricorrenti> lista = vRealmDb.All<Ricorrenti>().Where(ss => ss.Relazioni == relazioni);
-            foreach (Ricorrenti item in lista)
-            {
-                listaOutput.Add(item);
-            }
-
-            return listaOutput;
-        }
 
         internal static async Task<string> ValoriDaCF(string CF)
         {

@@ -263,38 +263,6 @@ namespace CDQ.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> EditStatus(string ID, bool ins, bool mod, bool del)
-        {
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            Status status = null;
-            if (mod || del)
-            {
-                status = await RealmDataStore.Status(ID);
-            }
-            else
-            {
-                status = new Status
-                {
-                    IsSistema = false,
-                    User = HttpContext.Session.GetString("user")
-                };
-            }
-
-            HelpStatus helpStatus = new HelpStatus
-            {
-                Status = status,
-                Ins = ins,
-                Mod = mod,
-                Del = del
-            };
-
-            return View(helpStatus);
-        }
-
-
-        [HttpGet]
         public async Task<IActionResult> EditEsercente(string ID, bool Upd)
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
@@ -348,37 +316,6 @@ namespace CDQ.Controllers
             };
 
             return View(helpEsercente);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> EditCausaDebito(string ID, bool ins, bool mod, bool del)
-        {
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            CausaDebito causaDebito = null;
-            if (mod || del)
-            {
-                causaDebito = await RealmDataStore.CausaDebito(ID);
-            }
-            else
-            {
-                causaDebito = new CausaDebito
-                {
-                    IsSistema = false,
-                    User = HttpContext.Session.GetString("user")
-                };
-            }
-
-            HelpCausaDebito helpCausaDebito = new HelpCausaDebito
-            {
-                CausaDebito = causaDebito,
-                Ins = ins,
-                Mod = mod,
-                Del = del
-            };
-
-            return View(helpCausaDebito);
         }
 
 
@@ -440,78 +377,6 @@ namespace CDQ.Controllers
             }
 
             return RedirectToAction(nameof(Pianificazione));
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> EditStatus(HelpStatus helpStatus)
-        {
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            if (!ModelState.IsValid) return View(helpStatus);
-
-            Status status = helpStatus.Status;
-
-            if (helpStatus.Mod)
-            {
-                await RealmDataStore.AggiornaStatus(status);
-            }
-            else if (helpStatus.Ins)
-            {
-                await RealmDataStore.InserisciStatus(status);
-            }
-            else
-            {
-                await RealmDataStore.EliminaStatus(status);
-            }
-
-            return RedirectToAction(nameof(Status));
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> EditCausaDebito(HelpCausaDebito helpCausaDebito)
-        {
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            if (!ModelState.IsValid) return View(helpCausaDebito);
-
-            CausaDebito causaDebito = helpCausaDebito.CausaDebito;
-
-            if (helpCausaDebito.Mod)
-            {
-                await RealmDataStore.AggiornaCausaDebito(causaDebito);
-            }
-            else if (helpCausaDebito.Ins)
-            {
-                await RealmDataStore.InserisciCausaDebito(causaDebito);
-            }
-            else
-            {
-                await RealmDataStore.EliminaCausaDebito(causaDebito);
-            }
-
-            return RedirectToAction(nameof(CauseDebito));
-        }
-
-        public async Task<IActionResult> Status()
-        {
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            var lista = await RealmDataStore.ListaStatus(HttpContext.Session.GetString("user"));
-
-            return View(lista);
-        }
-
-        public async Task<IActionResult> CauseDebito()
-        {
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            var lista = await RealmDataStore.ListaCauseDebito(HttpContext.Session.GetString("user"));
-
-            return View(lista);
         }
 
 
@@ -670,57 +535,7 @@ namespace CDQ.Controllers
             if (!CheckUser()) return RedirectToAction(nameof(Login));
             if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
 
-            List<SelectListItem> ListaCauseDebito = new List<SelectListItem>();
-            var listaTP = await RealmDataStore.ListaCauseDebito(HttpContext.Session.GetString("user"));
-            foreach (CausaDebito c in listaTP)
-            {
-                SelectListItem item = new SelectListItem
-                {
-                    Text = c.Descrizione,
-                    Value = c.ID + ""
-                };
 
-                ListaCauseDebito.Add(item);
-            }
-
-            List<SelectListItem> ListaStatus = new List<SelectListItem>();
-            var listaS = await RealmDataStore.ListaStatus(1);
-            foreach (Status tp in listaS)
-            {
-                SelectListItem item = new SelectListItem
-                {
-                    Text = tp.Descrizione,
-                    Value = tp.ID + ""
-                };
-
-                ListaStatus.Add(item);
-            }
-
-            List<SelectListItem> ListaTipiPratica = new List<SelectListItem>();
-            var listaP = await RealmDataStore.ListaTipiPratica(1);
-            foreach (TipoPratica tp in listaP)
-            {
-                SelectListItem item = new SelectListItem
-                {
-                    Text = tp.Descrizione,
-                    Value = tp.ID + ""
-                };
-
-                ListaTipiPratica.Add(item);
-            }
-
-            List<SelectListItem> ListaGradi = new List<SelectListItem>();
-            var listaRP = await RealmDataStore.ListaGradi();
-            foreach (Gradi gr in listaRP)
-            {
-                SelectListItem item = new SelectListItem
-                {
-                    Text = gr.Descrizione,
-                    Value = gr.ID + ""
-                };
-
-                ListaGradi.Add(item);
-            }
 
 
 
@@ -730,48 +545,20 @@ namespace CDQ.Controllers
                 DataUltimaModifica = DateTimeOffset.Now
             };
 
-            IEnumerable<MasseDebitorie> ListaMasseDebitorie = null;
-            IEnumerable<SpeseMese> ListaSpeseMese = null;
-            IEnumerable<PatrimonioImmobiliare> ListaPatrimonioImmobiliare = null;
-            IEnumerable<Ricorrenti> ListaRicorrenti = null;
-
-            string TP_CauseIndebitamentoeDiligenza = await RealmDataStore.TestoPrecaricato("CauseIndebitamentoeDiligenza");
-            string TP_ResocontoPagamenti5Anni = await RealmDataStore.TestoPrecaricato("ResocontoPagamenti5Anni");
 
 
             if (ID != null)
             {
                 proposte = await RealmDataStore.Proposte(ID);
 
-                ListaMasseDebitorie = await RealmDataStore.ListaMasseDebitorie(proposte);
-
-
-
-                ListaSpeseMese = await RealmDataStore.ListaSpeseMese(proposte);
-
-                ListaPatrimonioImmobiliare = await RealmDataStore.ListaPatrimonioImmobiliare(proposte);
-
-                ListaRicorrenti = await RealmDataStore.ListaRicorrenti(proposte);
             }
 
 
             HelpProposta helpProposta = new HelpProposta
             {
                 Proposte = proposte,
-                IDStatus = proposte.Status == null ? "-1" : proposte.Status.ID,
-                IDTipiPratica = proposte.TipoPratica == null ? "-1" : proposte.TipoPratica.ID,
-                ListaMasseDebitorie = ListaMasseDebitorie,
-                ListaSpeseMese = ListaSpeseMese,
-                ListaPatrimonioImmobiliare = ListaPatrimonioImmobiliare,
-                ListaStatus = ListaStatus,
-                ListaTipiPratica = ListaTipiPratica,
-                ListaCauseDebito = ListaCauseDebito,
-                ListaGradi = ListaGradi,
                 Ins = (ID == null),
                 Tab = tab,
-                TP_CauseIndebitamentoeDiligenza = TP_CauseIndebitamentoeDiligenza,
-                TP_ResocontoPagamenti5Anni = TP_ResocontoPagamenti5Anni,
-                ListaRicorrenti = ListaRicorrenti
             };
 
             return View(helpProposta);
@@ -839,61 +626,6 @@ namespace CDQ.Controllers
             if (!CheckUser()) return RedirectToAction(nameof(Login));
             if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
 
-            List<SelectListItem> ListaCauseDebito = new List<SelectListItem>();
-            var listaTP = await RealmDataStore.ListaCauseDebito(HttpContext.Session.GetString("user"));
-            foreach (CausaDebito c in listaTP)
-            {
-                SelectListItem item = new SelectListItem
-                {
-                    Text = c.Descrizione,
-                    Value = c.ID + ""
-                };
-
-                ListaCauseDebito.Add(item);
-            }
-
-            List<SelectListItem> ListaStatus = new List<SelectListItem>();
-            var listaS = await RealmDataStore.ListaStatus(1);
-            foreach (Status tp in listaS)
-            {
-                SelectListItem item = new SelectListItem
-                {
-                    Text = tp.Descrizione,
-                    Value = tp.ID + ""
-                };
-
-                ListaStatus.Add(item);
-            }
-
-
-            List<SelectListItem> ListaTipiPratica = new List<SelectListItem>();
-            var listaP = await RealmDataStore.ListaTipiPratica(1);
-            foreach (TipoPratica tp in listaP)
-            {
-                SelectListItem item = new SelectListItem
-                {
-                    Text = tp.Descrizione,
-                    Value = tp.ID + ""
-                };
-
-                ListaTipiPratica.Add(item);
-            }
-
-
-            List<SelectListItem> ListaGradi = new List<SelectListItem>();
-            var listaRP = await RealmDataStore.ListaGradi();
-            foreach (Gradi gr in listaRP)
-            {
-                SelectListItem item = new SelectListItem
-                {
-                    Text = gr.Descrizione,
-                    Value = gr.ID + ""
-                };
-
-                ListaGradi.Add(item);
-            }
-
-
 
             Relazioni relazioni = new Relazioni
             {
@@ -901,27 +633,11 @@ namespace CDQ.Controllers
                 DataUltimaModifica = DateTimeOffset.Now
             };
 
-            IEnumerable<MasseDebitorie> ListaMasseDebitorie = null;
-            IEnumerable<SpeseMese> ListaSpeseMese = null;
-            IEnumerable<PatrimonioImmobiliare> ListaPatrimonioImmobiliare = null;
-            IEnumerable<Ricorrenti> ListaRicorrenti = null;
-
-            string TP_CauseIndebitamentoeDiligenza = await RealmDataStore.TestoPrecaricato("CauseIndebitamentoeDiligenza");
-            string TP_ResocontoPagamenti5Anni = await RealmDataStore.TestoPrecaricato("ResocontoPagamenti5Anni");
-
 
             if (ID != null)
             {
                 relazioni = await RealmDataStore.Relazioni(ID);
 
-                ListaMasseDebitorie = await RealmDataStore.ListaMasseDebitorieR(relazioni);
-
-                ListaSpeseMese = await RealmDataStore.ListaSpeseMeseR(relazioni);
-
-                ListaPatrimonioImmobiliare = await RealmDataStore.ListaPatrimonioImmobiliareR(relazioni);
-
-
-                ListaRicorrenti = await RealmDataStore.ListaRicorrentiR(relazioni);
 
             }
 
@@ -929,20 +645,8 @@ namespace CDQ.Controllers
             HelpRelazione helpRelazione = new HelpRelazione
             {
                 Relazioni = relazioni,
-                IDStatus = relazioni.Status == null ? "-1" : relazioni.Status.ID,
-                IDTipiPratica = relazioni.TipoPratica == null ? "-1" : relazioni.TipoPratica.ID,
-                ListaMasseDebitorie = ListaMasseDebitorie,
-                ListaSpeseMese = ListaSpeseMese,
-                ListaPatrimonioImmobiliare = ListaPatrimonioImmobiliare,
-                ListaStatus = ListaStatus,
-                ListaTipiPratica = ListaTipiPratica,
-                ListaCauseDebito = ListaCauseDebito,
-                ListaGradi = ListaGradi,
                 Ins = (ID == null),
                 Tab = tab,
-                TP_CauseIndebitamentoeDiligenza = TP_CauseIndebitamentoeDiligenza,
-                TP_ResocontoPagamenti5Anni = TP_ResocontoPagamenti5Anni,
-                ListaRicorrenti = ListaRicorrenti
             };
 
             return View(helpRelazione);
@@ -2589,27 +2293,6 @@ namespace CDQ.Controllers
             return RedirectToAction(nameof(Relazioni), new { anno });
         }
 
-        public async Task<IActionResult> InserisciRicorrenti(HelpProposta helpProposta)
-        {
-
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            if (helpProposta.ModeRicorrenti == "Cancel") return RedirectToAction(nameof(Proposta), new { helpProposta.Proposte.ID, tab = 1 });
-
-            if (!ModelState.IsValid) return RedirectToAction(nameof(Proposta), new { helpProposta.Proposte.ID });
-
-            if (helpProposta.ModeRicorrenti == "Ins")
-            {
-                await RealmDataStore.InserisciRicorrenti(helpProposta.Proposte.ID, helpProposta.Ricorrenti);
-            }
-            else if (helpProposta.ModeRicorrenti == "Upd")
-            {
-                await RealmDataStore.AggiornaRicorrenti(helpProposta.IDRicorrenti, helpProposta.Ricorrenti);
-            }
-            return RedirectToAction(nameof(Proposta), new { helpProposta.Proposte.ID, tab = 1 });
-        }
-
         public async Task<IActionResult> InserisciAttivita(HelpAttivitaRisorse helpAttivitaRisorse)
         {
 
@@ -2675,229 +2358,6 @@ namespace CDQ.Controllers
             return RedirectToAction(nameof(AttivitaRisorse), new { helpAttivitaRisorse.Esercente.ID, tab = 2 });
         }
 
-
-        public async Task<IActionResult> InserisciRicorrentiR(HelpRelazione helpRelazione)
-        {
-
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            if (helpRelazione.ModeRicorrenti == "Cancel") return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID, tab = 1 });
-
-            if (!ModelState.IsValid) return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID });
-
-            if (helpRelazione.ModeRicorrenti == "Ins")
-            {
-                await RealmDataStore.InserisciRicorrentiR(helpRelazione.Relazioni.ID, helpRelazione.Ricorrenti);
-            }
-            else if (helpRelazione.ModeRicorrenti == "Upd")
-            {
-                await RealmDataStore.AggiornaRicorrenti(helpRelazione.IDRicorrenti, helpRelazione.Ricorrenti);
-            }
-            return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID, tab = 1 });
-        }
-
-
-        public async Task<IActionResult> InserisciMasseDebitorie(HelpProposta helpProposta)
-        {
-
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            if (helpProposta.ModeMasseDebitorie == "Cancel") return RedirectToAction(nameof(Proposta), new { helpProposta.Proposte.ID, tab = 4 });
-
-            if (!ModelState.IsValid) return RedirectToAction(nameof(Proposta), new { helpProposta.Proposte.ID });
-
-            if (helpProposta.ModeMasseDebitorie == "Ins")
-            {
-                await RealmDataStore.InserisciMasseDebitorie(helpProposta.Proposte.ID, helpProposta.MasseDebitorie, helpProposta.IDCauseDebito, helpProposta.IDGradi);
-            }
-            else if (helpProposta.ModeMasseDebitorie == "Upd")
-            {
-                await RealmDataStore.AggiornaMasseDebitorie(helpProposta.IDMasseDebitorie, helpProposta.MasseDebitorie, helpProposta.IDCauseDebito, helpProposta.IDGradi);
-            }
-            return RedirectToAction(nameof(Proposta), new { helpProposta.Proposte.ID, tab = 4 });
-        }
-
-        public async Task<IActionResult> InserisciMasseDebitorieR(HelpRelazione helpRelazione)
-        {
-
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            if (helpRelazione.ModeMasseDebitorie == "Cancel") return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID, tab = 4 });
-
-            if (!ModelState.IsValid) return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID });
-
-            if (helpRelazione.ModeMasseDebitorie == "Ins")
-            {
-                await RealmDataStore.InserisciMasseDebitorieR(helpRelazione.Relazioni.ID, helpRelazione.MasseDebitorie, helpRelazione.IDCauseDebito, helpRelazione.IDGradi);
-            }
-            else if (helpRelazione.ModeMasseDebitorie == "Upd")
-            {
-                await RealmDataStore.AggiornaMasseDebitorie(helpRelazione.IDMasseDebitorie, helpRelazione.MasseDebitorie, helpRelazione.IDCauseDebito, helpRelazione.IDGradi);
-            }
-            return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID, tab = 4 });
-        }
-
-        public async Task<IActionResult> InserisciSpeseMese(HelpProposta helpProposta)
-        {
-
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            if (helpProposta.ModeSpeseMese == "Cancel") return RedirectToAction(nameof(Proposta), new { helpProposta.Proposte.ID, tab = 7 });
-
-            if (!ModelState.IsValid) return RedirectToAction(nameof(Proposta), new { helpProposta.Proposte.ID });
-
-            if (helpProposta.ModeSpeseMese == "Ins")
-            {
-                await RealmDataStore.InserisciSpeseMese(helpProposta.Proposte.ID, helpProposta.SpeseMese);
-            }
-            else if (helpProposta.ModeSpeseMese == "Upd")
-            {
-                await RealmDataStore.AggiornaSpeseMese(helpProposta.IDSpeseMese, helpProposta.SpeseMese);
-            }
-            return RedirectToAction(nameof(Proposta), new { helpProposta.Proposte.ID, tab = 7 });
-        }
-
-        public async Task<IActionResult> InserisciSpeseMeseR(HelpRelazione helpRelazione)
-        {
-
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            if (helpRelazione.ModeSpeseMese == "Cancel") return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID, tab = 7 });
-
-            if (!ModelState.IsValid) return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID });
-
-            if (helpRelazione.ModeSpeseMese == "Ins")
-            {
-                await RealmDataStore.InserisciSpeseMeseR(helpRelazione.Relazioni.ID, helpRelazione.SpeseMese);
-            }
-            else if (helpRelazione.ModeSpeseMese == "Upd")
-            {
-                await RealmDataStore.AggiornaSpeseMese(helpRelazione.IDSpeseMese, helpRelazione.SpeseMese);
-            }
-            return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID, tab = 7 });
-        }
-
-
-
-        public async Task<IActionResult> InserisciPatrimonioImmobiliare(HelpProposta helpProposta)
-        {
-
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            if (helpProposta.ModePatrimonioImmobiliare == "Cancel") return RedirectToAction(nameof(Proposta), new { helpProposta.Proposte.ID, tab = 8 });
-
-            if (!ModelState.IsValid) return RedirectToAction(nameof(Proposta), new { helpProposta.Proposte.ID });
-
-            if (helpProposta.ModePatrimonioImmobiliare == "Ins")
-            {
-                await RealmDataStore.InserisciPatrimonioImmobiliare(helpProposta.Proposte.ID, helpProposta.PatrimonioImmobiliare);
-            }
-            else if (helpProposta.ModePatrimonioImmobiliare == "Upd")
-            {
-                await RealmDataStore.AggiornaPatrimonioImmobiliare(helpProposta.IDPatrimonioImmobiliare, helpProposta.PatrimonioImmobiliare);
-            }
-            return RedirectToAction(nameof(Proposta), new { helpProposta.Proposte.ID, tab = 8 });
-        }
-
-        public async Task<IActionResult> InserisciPatrimonioImmobiliareR(HelpRelazione helpRelazione)
-        {
-
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            if (helpRelazione.ModePatrimonioImmobiliare == "Cancel") return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID, tab = 8 });
-
-            if (!ModelState.IsValid) return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID });
-
-            if (helpRelazione.ModePatrimonioImmobiliare == "Ins")
-            {
-                await RealmDataStore.InserisciPatrimonioImmobiliareR(helpRelazione.Relazioni.ID, helpRelazione.PatrimonioImmobiliare);
-            }
-            else if (helpRelazione.ModePatrimonioImmobiliare == "Upd")
-            {
-                await RealmDataStore.AggiornaPatrimonioImmobiliare(helpRelazione.IDPatrimonioImmobiliare, helpRelazione.PatrimonioImmobiliare);
-            }
-            return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID, tab = 8 });
-        }
-
-
-
-
-        public async Task<IActionResult> EliminaMasseDebitorie(string ID, string IDMasseDebitorie, bool bProp = true)
-        {
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            await RealmDataStore.EliminaMasseDebitorie(IDMasseDebitorie);
-
-            if (bProp) 
-            {
-                return RedirectToAction(nameof(Proposta), new { ID, tab = 4 });
-            }
-            else
-            {
-                return RedirectToAction(nameof(Relazione), new { ID, tab = 4 }); //relazioni
-            }
-        }
-
-        public async Task<IActionResult> EliminaSpeseMese(string ID, string IDSpeseMese, bool bProp = true)
-        {
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            await RealmDataStore.EliminaSpeseMese(IDSpeseMese);
-
-            if (bProp)
-            {
-                return RedirectToAction(nameof(Proposta), new { ID, tab = 7 });
-            }
-            else
-            {
-                return RedirectToAction(nameof(Relazione), new { ID, tab = 7 }); //relazioni
-            }
-        }
-
-
-        public async Task<IActionResult> EliminaPatrimonioImmobiliare(string ID, string IDPatrimonioImmobiliare, bool bProp = true)
-        {
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            await RealmDataStore.EliminaPatrimonioImmobiliare(IDPatrimonioImmobiliare);
-
-            if (bProp)
-            {
-                return RedirectToAction(nameof(Proposta), new { ID, tab = 8 });
-            }
-            else
-            {
-                return RedirectToAction(nameof(Relazione), new { ID, tab = 8 }); //relazioni
-            }
-        }
-
-
-        public async Task<IActionResult> EliminaRicorrenti(string ID, string IDRicorrenti, bool bProp = true)
-        {
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            await RealmDataStore.EliminaRicorrenti(IDRicorrenti);
-
-            if (bProp)
-            {
-                return RedirectToAction(nameof(Proposta), new { ID, tab = 1 });
-            }
-            else
-            {
-                return RedirectToAction(nameof(Relazione), new { ID, tab = 1 }); //relazioni
-            }
-        }
 
         public async Task<IActionResult> EliminaAttivita(string ID, string IDAttivita)
         {

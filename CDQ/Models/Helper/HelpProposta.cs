@@ -20,10 +20,6 @@ namespace CDQ.Models.Helper
         public string TP_CauseIndebitamentoeDiligenza { get; set; }
         public string TP_ResocontoPagamenti5Anni { get; set; }
 
-        public Ricorrenti Ricorrenti { get; set; }
-        public MasseDebitorie MasseDebitorie { get; set; }
-        public SpeseMese SpeseMese { get; set; }
-        public PatrimonioImmobiliare PatrimonioImmobiliare { get; set; }
         public string IDMasseDebitorie { get; set; }
         public string IDRicorrenti { get; set; }
         public string IDAttiDisposizione { get; set; }
@@ -47,10 +43,6 @@ namespace CDQ.Models.Helper
 
         public Proposte Proposte { get; set; }
 
-        public IEnumerable<MasseDebitorie> ListaMasseDebitorie;
-        public IEnumerable<SpeseMese> ListaSpeseMese;
-        public IEnumerable<PatrimonioImmobiliare> ListaPatrimonioImmobiliare;
-        public IEnumerable<Ricorrenti> ListaRicorrenti;
 
         [Display(Name = "Spese/Consulenze")]
         [DataType(DataType.Currency)]
