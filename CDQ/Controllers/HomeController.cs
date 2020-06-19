@@ -65,6 +65,17 @@ namespace CDQ.Controllers
             return (HttpContext.Session.GetString("role") == "agente");
         }
 
+        public bool CheckRoleOnlyCliente()
+        {
+            return (HttpContext.Session.GetString("ruolo") == "#CLI");
+        }
+
+        public bool CheckRoleEsercente()
+        {
+            return (HttpContext.Session.GetString("ruolo").IndexOf("#ESE")>-1);
+        }
+
+
         public bool CheckRoleAdmin()
         {
             return (HttpContext.Session.GetString("role") == "admin");
@@ -77,14 +88,14 @@ namespace CDQ.Controllers
         }
 
 
-        public async Task<JsonResult> GetEvents()
-        {
-            IEnumerable<Calendar> events = null;
+        //public async Task<JsonResult> GetEvents()
+        //{
+        //    IEnumerable<Calendar> events = null;
 
-            //events = RealmDataStore.ListaEventi();
+        //    //events = RealmDataStore.ListaEventi();
 
-            return new JsonResult(events);
-        }
+        //    return new JsonResult(events);
+        //}
 
 
         public bool CheckVisibilitaAgente(string IDAgente)
@@ -98,37 +109,21 @@ namespace CDQ.Controllers
 
         }
 
-        public string MaxIDAgenteView()
-        {
-            if (CheckRoleAgente()) return HttpContext.Session.GetString("idagente");
-            return null;
-        }
-
 
         [HttpGet]
         public IActionResult Index()
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
 
             return View();
         }
-
-        //[HttpGet]
-        //public IActionResult Calendario()
-        //{
-        //    if (!CheckUser()) return RedirectToAction(nameof(Login));
-        //    if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-        //    return View();
-        //}
 
 
         [HttpGet]
         public async Task<IActionResult>Dashboard()
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             //Grafico 0 - Associati
             List<string> listaLabels0 = new List<string> { "Proposte", "Relazioni"};
@@ -245,7 +240,7 @@ namespace CDQ.Controllers
         public async Task<IActionResult> AllineaRealm()
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             await RealmDataStore.GetRealm();
             return RedirectToAction(nameof(Index));
@@ -255,7 +250,7 @@ namespace CDQ.Controllers
         public IActionResult UnderConstruction()
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             return View();
         }
@@ -266,7 +261,7 @@ namespace CDQ.Controllers
         public async Task<IActionResult> EditEsercente(string ID, bool Upd)
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             List<SelectListItem> ListaOrari = new List<SelectListItem>();
             for (int i = 6 ; i <= 48 ; i++)
@@ -323,7 +318,7 @@ namespace CDQ.Controllers
         public async Task<IActionResult> EditEsercente(HelpEsercente helpEsercente)
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             if (!ModelState.IsValid) return View(helpEsercente);
 
@@ -339,7 +334,7 @@ namespace CDQ.Controllers
         public async Task<IActionResult> Calendario(HelpCalendario helpCalendario)
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             if (!ModelState.IsValid) return View(helpCalendario);
 
@@ -361,7 +356,7 @@ namespace CDQ.Controllers
         public async Task<IActionResult> Pianificazione(HelpPianificazione helpPianificazione)
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             if (!ModelState.IsValid) return View(helpPianificazione);
 
@@ -398,7 +393,7 @@ namespace CDQ.Controllers
         public IActionResult Password()
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             HelpUtente helpUtente = new HelpUtente
             {
@@ -474,20 +469,6 @@ namespace CDQ.Controllers
                 HttpContext.Session.SetString("currentlogin", utenti.DataUltimoLogin_OUT);
                 HttpContext.Session.SetString("lastlogin", utenti.DataPenultimoLogin_OUT);
 
-                //a seconda del ruolo abilitiamo le pagine 
-                //if (AndBinario(RuoliUtente,Settings.PROPONENTE)) return RedirectToAction(nameof(SchedaAgente), new { utenti.Username });
-                //if (AndBinario(RuoliUtente, Settings.RELATORE)) return RedirectToAction(nameof(SchedaAgente), new { utenti.Username });
-
-                //if (nR == 4 && ruolo == "#CLI") return RedirectToAction(nameof(Proposte), new { utenti.Mail });
-
-                //if (HttpContext.Session.GetString("IDEsercenteUtente") != null)
-                //{
-                //    //devo chiamare direttamente la view CalendarioUtente
-                //    string IDEse = HttpContext.Session.GetString("IDEsercenteUtente");
-                //    HttpContext.Session.SetString("IDEsercenteUtente", "");
-                //    return RedirectToAction(nameof(CalendarioUtente), new { IDEse });
-                //}
-
                 return RedirectToAction(nameof(Index));
 
             }
@@ -533,7 +514,7 @@ namespace CDQ.Controllers
         public async Task<IActionResult> AttivitaRisorse(string ID = null, int tab = 1)
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             IEnumerable<Attivita> ListaAttivita = null;
             IEnumerable<Risorsa> ListaRisorse = null;
@@ -585,219 +566,11 @@ namespace CDQ.Controllers
         }
 
 
-
-        [HttpGet]
-        public async Task<IActionResult> SchedaAgente(string ID, int tab = 0, int mese = -1, int anno = -1, bool IsPosizioniAperte = false)
-        {
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (!CheckVisibilitaAgente(ID)) return RedirectToAction(nameof(Login));
-
-            //la variabile bPosAperte dice che dobbiamo prendere tutte le operazioni 
-            //aperte (ovvero non pagate o pagate parzialmente) indipendentemente dal mese/anno
-                        
-            
-            double Versato = 0;
-            byte daPagare = 0;
-
-            string[] words = ID.Split('+');
-            if (words.Length > 1)
-            {
-                ID = words[1];
-            }
-               
-            //var listaSA = await RealmDataStore.ListaStrutturaAgente(MaxIDAgenteView(), ID);
-
-            if (mese == -1)
-            {
-                anno = DateTime.Now.Year;
-                mese = DateTime.Now.Month;
-            }
-
-            //Agente agente = await RealmDataStore.Agente(ID);
-
-            
-            //Caricamento oggetto complesso ListaServiziAgente
-            //var listaConServizi = await RealmDataStore.ListaConsulenzeAgente(agente, mese, anno, IsPosizioniAperte);
-            //var listaSpeServizi = await RealmDataStore.ListaSpeseAgente(agente, mese, anno, IsPosizioniAperte);
-            //var listaRipartizioni = await RealmDataStore.ListaRipartizioniAgente(agente, mese, anno, IsPosizioniAperte);
-
-
-            //List<ListaServiziAgente> listaServizi = new List<ListaServiziAgente>();
-
-            //primo ciclo: le consulenze
-            //foreach (ConsulenzaServizio ag in listaConServizi)
-            //{
-            //    //determina il residuo da pagare
-            //    Versato = await RealmDataStore.CalcolaVersato("CS", ag.ID);
-            //    if (ag.ImportoNetto - Versato == 0 && ag.ImportoNetto != 0) daPagare = 2;
-            //    else if (ag.ImportoNetto - Versato > 0 && Versato > 0 ) daPagare = 1;
-            //    else if (Versato == 0) daPagare = 0;
-
-            //    //if ((IsPosizioniAperte && daPagare != 2) || !IsPosizioniAperte)
-            //    //{
-            //    //    ListaServiziAgente LAS = new ListaServiziAgente
-            //    //    {
-            //    //        Data = ag.Data,
-            //    //        ConsulenzaServizio = ag,
-            //    //        SpesaServizio = null,
-            //    //        Ripartizione = null,
-            //    //        nPagato = daPagare,
-            //    //        Residuo = ag.ImportoNetto - Versato,
-            //    //        IsSelezionato = false
-            //    //    };
-
-            //    //    listaServizi.Add(LAS);
-            //    //}
-            //}
-
-            //secondo ciclo: le spese
-            //foreach (SpesaServizio ag in listaSpeServizi)
-            //{
-            //    //determina il residuo da pagare
-            //    Versato = await RealmDataStore.CalcolaVersato("SS", ag.ID);
-            //    if (ag.Importo - Versato == 0 && ag.Importo != 0) daPagare = 2;
-            //    else if (ag.Importo - Versato > 0 && Versato > 0) daPagare = 1;
-            //    else if (Versato == 0) daPagare = 0;
-
-            //    //if ((IsPosizioniAperte && daPagare != 2) || !IsPosizioniAperte)
-            //    //{
-            //    //    ListaServiziAgente LAS = new ListaServiziAgente
-            //    //    {
-            //    //        Data = ag.Data,
-            //    //        ConsulenzaServizio = null,
-            //    //        SpesaServizio = ag,
-            //    //        Ripartizione = null,
-            //    //        nPagato = daPagare,
-            //    //        Residuo = ag.Importo - Versato,
-            //    //        IsSelezionato = false
-            //    //    };
-
-            //    //    listaServizi.Add(LAS);
-            //    //}
-            //}
-            //terzo ciclo: le ripartizioni
-            //foreach (Ripartizione ag in listaRipartizioni)
-            //{
-            //    //determina il residuo da pagare
-            //    Versato = await RealmDataStore.CalcolaVersato("RI", ag.ID);
-            //    if (ag.Importo - Versato == 0 && ag.Importo != 0) daPagare = 2;
-            //    else if (ag.Importo - Versato > 0 && Versato > 0) daPagare = 1;
-            //    else if (Versato == 0) daPagare = 0;
-
-            //    //if ((IsPosizioniAperte && daPagare != 2) || !IsPosizioniAperte)
-            //    //{
-            //    //    ListaServiziAgente LAS = new ListaServiziAgente
-            //    //    {
-            //    //        Data = ag.Data,
-            //    //        ConsulenzaServizio = null,
-            //    //        SpesaServizio = null,
-            //    //        Ripartizione = ag,
-            //    //        nPagato = daPagare,
-            //    //        Residuo = ag.Importo - Versato,
-            //    //        IsSelezionato = false
-            //    //    };
-
-            //    //    listaServizi.Add(LAS);
-            //    //}
-            //}
-
-
-            //var elencoAssociatiServizio = new List<string>();
-
-            //foreach(ConsulenzaServizio cs in listaConServizi)
-            //{
-            //    string elenco = await RealmDataStore.ElencoAssociatiServizio(cs.Servizio, HttpContext.Session.GetString("provinciale"));
-
-            //    elencoAssociatiServizio.Add(elenco);
-            //}
-
-            //foreach (SpesaServizio cs in listaSpeServizi)
-            //{
-            //    string elenco = await RealmDataStore.ElencoAssociatiServizio(cs.Servizio, HttpContext.Session.GetString("provinciale"));
-
-            //    elencoAssociatiServizio.Add(elenco);
-            //}
-
-            //var listaPagamentiAgente = await RealmDataStore.ListaPagamentiAgente(agente, mese, anno, IsPosizioniAperte);
-
-            //var listaRipartizioniTotali = await RealmDataStore.ListaRipartizioniAgente(agente);
-            //var listaPagamentiAgenteTotali = await RealmDataStore.ListaPagamentiAgente(agente);
-
-            //var listaSubAgenti = await RealmDataStore.ListaSubAgenti(agente);
-            //var listaAssociati = await RealmDataStore.ListaAssociatiPerAgente(agente, HttpContext.Session.GetString("provinciale"));
-            //var listaLink = new List<LinkAngente>();
-            //foreach (Agente ag in listaSA)
-            //{
-            //    listaLink.Insert(0, new LinkAngente
-            //    {
-            //        ID = ag.ID,
-            //        Nominativo = ag.Nominativo
-
-            //    });
-            //}
-
-            List<SelectListItem> listaMesi = new List<SelectListItem>();
-            var listaM = await RealmDataStore.ListaMesi();
-            foreach (Mese m in listaM)
-            {
-                SelectListItem item = new SelectListItem
-                {
-                    Text = m.Nome,
-                    Value = m.ID + ""
-                };
-
-                listaMesi.Add(item);
-            }
-
-            List<SelectListItem> listaAnni = new List<SelectListItem>();
-            for (int i = 2015; i <= DateTime.Now.Year + 1; i++)
-            {
-                SelectListItem si = new SelectListItem { Text = i + "", Value = i + "" };
-                listaAnni.Add(si);
-            }
-
-            Mese ms = await RealmDataStore.Mese(mese);
-
-            //listaAssociati = listaAssociati.OrderBy(a => a.NSocio).ThenBy(a => a.Denominazione);
-
-            HelpSchedaAgente helpSchedaAgente = new HelpSchedaAgente
-            {
-                //Agente = agente,
-                //ElencoAssociatiServizio = elencoAssociatiServizio,
-                //ListaServizi = listaServizi,
-                //ListaRipartizioni = listaRipartizioni,
-                //ListaPagamentiAgente = listaPagamentiAgente,
-                //ListaRipartizioniTotali = listaRipartizioniTotali,
-                //ListaPagamentiAgenteTotali = listaPagamentiAgenteTotali,
-                //ListaSubAgenti = listaSubAgenti,
-                //ListaAssociati = listaAssociati,
-                ListaMesi = listaMesi,
-                ListaAnni = listaAnni,
-                //ListaLink = listaLink,
-                Anno = anno,
-                Mese = mese,
-                DescMese = ms.Nome,
-                Tab = tab,
-                IsAdmin = CheckRoleAdmin(),
-                IsPosizioniAperte = IsPosizioniAperte
-            };
-
-            //PagamentoAgente pagamentoAgente = new PagamentoAgente
-            //{
-            //    Data = DateTime.Now,
-            //    Importo = helpSchedaAgente.Saldo < 0 ? -helpSchedaAgente.Saldo : 0
-            //};
-
-            //helpSchedaAgente.PagamentoAgente = pagamentoAgente;
-
-            return View(helpSchedaAgente);
-        }
-
         [HttpGet]
         public async Task<IActionResult> Backup()
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             await RealmDataStore.Backup();
 
@@ -868,7 +641,7 @@ namespace CDQ.Controllers
         {
 
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             int intOI = 480;
             int intOF = 1200;
@@ -1032,7 +805,7 @@ namespace CDQ.Controllers
         {
 
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             DateTime dtPrimoGiornoSettimana = DateTime.Now;
             DateTime dtUltimoGiornoSettimana = dtPrimoGiornoSettimana.AddDays(6);
@@ -1603,6 +1376,8 @@ namespace CDQ.Controllers
             //if (ID != null) HttpContext.Session.SetString("IDEsercenteUtente", ID);
 
             if (!CheckUser() || IDEsercente == null) return RedirectToAction(nameof(Login));
+            if (!CheckRoleOnlyCliente()) return RedirectToAction(nameof(Login));
+
 
             DateTime dtPrimoGiornoSettimana = DateTime.Now;
             DateTime dtUltimoGiornoSettimana = dtPrimoGiornoSettimana.AddDays(6);
@@ -2148,7 +1923,7 @@ namespace CDQ.Controllers
         {
 
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             if (helpAttivitaRisorse.ModeAttivita == "Cancel") return RedirectToAction(nameof(AttivitaRisorse), new { helpAttivitaRisorse.Esercente.ID, tab = 1 });
 
@@ -2170,7 +1945,7 @@ namespace CDQ.Controllers
         {
 
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             if (helpAttivitaRisorse.ModeRisorsaAttivita == "Cancel") return RedirectToAction(nameof(AttivitaRisorse), new { helpAttivitaRisorse.Esercente.ID, tab = 4 });
 
@@ -2192,7 +1967,7 @@ namespace CDQ.Controllers
         {
 
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             if (helpAttivitaRisorse.ModeRisorsa == "Cancel") return RedirectToAction(nameof(AttivitaRisorse), new { helpAttivitaRisorse.Esercente.ID, tab = 2 });
 
@@ -2213,7 +1988,7 @@ namespace CDQ.Controllers
         public async Task<IActionResult> EliminaAttivita(string ID, string IDAttivita)
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             await RealmDataStore.EliminaAttivita(IDAttivita);
 
@@ -2224,7 +1999,7 @@ namespace CDQ.Controllers
         public async Task<IActionResult> EliminaRisorsa(string ID, string IDRisorsa)
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             await RealmDataStore.EliminaRisorsa(IDRisorsa);
 
@@ -2234,7 +2009,7 @@ namespace CDQ.Controllers
         public async Task<IActionResult> CreaCalendario(int IDSettimana, int Anno)
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             await RealmDataStore.CreaCalendario(HttpContext.Session.GetString("IDesercente"), IDSettimana, Anno);
 
@@ -2245,7 +2020,7 @@ namespace CDQ.Controllers
         public async Task<IActionResult> EliminaPianificazione(string ID)
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             await RealmDataStore.EliminaPianificazione(ID);
 
@@ -2255,7 +2030,7 @@ namespace CDQ.Controllers
         public async Task<IActionResult> EliminaCalendario(string IDCalendarioU, int IDSettimana, int Anno)
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             await RealmDataStore.EliminaCalendario(IDCalendarioU);
 
@@ -2265,7 +2040,7 @@ namespace CDQ.Controllers
         public async Task<IActionResult> EliminaPrenotazione(string IDCalendarioE, int IDSettimana, int Anno)
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             await RealmDataStore.EliminaPrenotazione(IDCalendarioE, HttpContext.Session.GetString("username"));
 
@@ -2276,7 +2051,7 @@ namespace CDQ.Controllers
         public async Task<IActionResult> EliminaPrenotazioneUtente(string IDCalendarioE, int IDSettimana, int Anno, string IDEsercente)
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             await RealmDataStore.EliminaPrenotazione(IDCalendarioE, HttpContext.Session.GetString("username"));
 
@@ -2289,7 +2064,7 @@ namespace CDQ.Controllers
         public async Task<IActionResult> EliminaRisorsaAttivita(string ID, string IDRisorsaAttivita)
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             await RealmDataStore.EliminaRisorsaAttivita(IDRisorsaAttivita);
 
@@ -2300,7 +2075,7 @@ namespace CDQ.Controllers
         public async Task<IActionResult> Prenotazione(HelpCalendario helpCalendario)
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleEsercente()) return RedirectToAction(nameof(Login));
 
             if (helpCalendario.ModePrenotazione == "Ins")
             {
@@ -2314,7 +2089,7 @@ namespace CDQ.Controllers
         public async Task<IActionResult> PrenotazioneUtente(HelpPrenotazione helpPrenotazione)
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
+            if (!CheckRoleOnlyCliente()) return RedirectToAction(nameof(Login));
 
             if (helpPrenotazione.ModePrenotazione == "Ins")
             {

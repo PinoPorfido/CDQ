@@ -53,6 +53,7 @@
     <Compile Remove="Models\Helper\HelpRelazione.cs" />
     <Compile Remove="Models\Helper\HelpRelazioni.cs" />
     <Compile Remove="Models\Helper\HelpScadenzeCorsi.cs" />
+    <Compile Remove="Models\Helper\HelpSchedaAgente.cs" />
     <Compile Remove="Models\Helper\HelpSchedaAssociato.cs" />
     <Compile Remove="Models\Helper\HelpServizi.cs" />
     <Compile Remove="Models\Helper\HelpServizio.cs" />
@@ -169,6 +170,7 @@
     <Content Remove="Views\Home\Relazioni.cshtml" />
     <Content Remove="Views\Home\Ristorni.cshtml" />
     <Content Remove="Views\Home\ScadenzeCorsi.cshtml" />
+    <Content Remove="Views\Home\SchedaAgente.cshtml" />
     <Content Remove="Views\Home\SchedaAssociato.cshtml" />
     <Content Remove="Views\Home\Servizi.cshtml" />
     <Content Remove="Views\Home\Servizio.cshtml" />

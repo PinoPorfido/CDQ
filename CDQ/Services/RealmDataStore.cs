@@ -483,7 +483,7 @@ namespace CDQ.Services
 
         internal static async Task<bool> CheckCFDuplicato(string CF)
         {
-            //var vRealmDb = await GetRealm(true);
+            var vRealmDb = await GetRealm(true);
 
             //int As = vRealmDb.All<Associato>().Where(a => a.CodiceFiscale == CF).Count();
 
