@@ -13,11 +13,11 @@ namespace CDQ.Hubs
             await Clients.Caller.SendAsync("CheckCFResult", cfDouble);
         }
 
-        public async Task CheckRelazioneDaProposta(string IDRelazione, string IDSafeCode, bool chiamante)
-        {
-            byte tipo = await RealmDataStore.CheckRelazioneDaProposta(IDRelazione, IDSafeCode);
-            await Clients.Caller.SendAsync("CheckRPResult", tipo, chiamante);
-        }
+        //public async Task CheckRelazioneDaProposta(string IDRelazione, string IDSafeCode, bool chiamante)
+        //{
+        //    byte tipo = await RealmDataStore.CheckRelazioneDaProposta(IDRelazione, IDSafeCode);
+        //    await Clients.Caller.SendAsync("CheckRPResult", tipo, chiamante);
+        //}
 
         public async Task ValuesFromCF(string cf, byte tipo)
         {

@@ -493,21 +493,6 @@ namespace CDQ.Services
 
         }
 
-        internal static async Task<byte> CheckRelazioneDaProposta(string IDProposta, string IDSafeCode)
-        {
-            var vRealmDb = await GetRealm(true);
-
-            if (IDProposta == "" || IDSafeCode == "") return 0; //nessun risultato utilizzabile
-
-
-            int As = vRealmDb.All<Proposte>().Where(a => a.ID == IDProposta && a.SafeCode == IDSafeCode).Count();
-
-            if (As > 0) return 2; //ok - può caricare
-
-            return 1; //errore di uno o entrambi i volari
-
-        }
-
         internal static async Task<Utente> CheckUtente(Utente utenteLogin)
         {
             var vRealmDb = await GetRealm(true,true);
@@ -602,16 +587,6 @@ namespace CDQ.Services
 
 
 
-        internal async static Task<Proposte> Proposte(string ID)
-        {
-            var vRealmDb = await GetRealm();
-
-            Proposte proposte = vRealmDb.Find<Proposte>(ID);
-
-            return proposte;
-
-        }
-
         internal async static Task<Relazioni> Relazioni(string ID)
         {
             var vRealmDb = await GetRealm();
@@ -623,28 +598,6 @@ namespace CDQ.Services
         }
 
 
-
-        internal async static Task<IEnumerable<Proposte>> ListaProposte(int anno, string user)
-        {
-            var vRealmDb = await GetRealm();
-
-            DateTime dtMin = new DateTime(anno, 1, 1);
-            DateTime dtMax = new DateTime(anno, 12, 31);
-
-            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-            var isDevelopment = (AppConfig || environment == Settings.DEVELOPMENT);
-            DateTime dt1 = dtMin;
-            DateTime dt2 = dtMax;
-            if (true || !isDevelopment)
-            {
-                dt1 = dtMin.AddHours(-Settings.ORE_MENO);
-                dt2 = dtMax.AddHours(-Settings.ORE_MENO + Settings.ORE_PIU);
-            }
-
-            var lista = vRealmDb.All<Proposte>().Where(s => s.DataUltimaModifica >= dt1 && s.DataUltimaModifica <= dt2 && s.User == user).OrderByDescending(s => s.DataUltimaModifica);
-
-            return lista;
-        }
 
         internal async static Task<IEnumerable<Relazioni>> ListaRelazioni(int anno, string user)
         {

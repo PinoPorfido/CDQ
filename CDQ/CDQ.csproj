@@ -24,6 +24,7 @@
     <Compile Remove="Models\Causale.cs" />
     <Compile Remove="Models\ConsulenzaServizio.cs" />
     <Compile Remove="Models\Corso.cs" />
+    <Compile Remove="Models\Documenti.cs" />
     <Compile Remove="Models\Edizione.cs" />
     <Compile Remove="Models\EnteAttuatore.cs" />
     <Compile Remove="Models\EnteDelegato.cs" />
@@ -47,6 +48,8 @@
     <Compile Remove="Models\Helper\HelpPagamento.cs" />
     <Compile Remove="Models\Helper\HelpProgetti.cs" />
     <Compile Remove="Models\Helper\HelpProgetto.cs" />
+    <Compile Remove="Models\Helper\HelpProposta.cs" />
+    <Compile Remove="Models\Helper\HelpProposte.cs" />
     <Compile Remove="Models\Helper\HelpScadenzeCorsi.cs" />
     <Compile Remove="Models\Helper\HelpSchedaAssociato.cs" />
     <Compile Remove="Models\Helper\HelpServizi.cs" />
@@ -75,6 +78,7 @@
     <Compile Remove="Models\PersonaleEdizione.cs" />
     <Compile Remove="Models\Progetto.cs" />
     <Compile Remove="Models\Progressivo.cs" />
+    <Compile Remove="Models\Proposte.cs" />
     <Compile Remove="Models\Ricorrenti.cs" />
     <Compile Remove="Models\Ripartizione.cs" />
     <Compile Remove="Models\Ristorno.cs" />

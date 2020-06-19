@@ -530,41 +530,6 @@ namespace CDQ.Controllers
 
 
 
-        public async Task<IActionResult> Proposta(string ID = null, int tab = 1)
-        {
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-
-
-
-
-            Proposte proposte = new Proposte
-            {
-                DataCreazione = DateTimeOffset.Now,
-                DataUltimaModifica = DateTimeOffset.Now
-            };
-
-
-
-            if (ID != null)
-            {
-                proposte = await RealmDataStore.Proposte(ID);
-
-            }
-
-
-            HelpProposta helpProposta = new HelpProposta
-            {
-                Proposte = proposte,
-                Ins = (ID == null),
-                Tab = tab,
-            };
-
-            return View(helpProposta);
-        }
-
-
         public async Task<IActionResult> AttivitaRisorse(string ID = null, int tab = 1)
         {
             if (!CheckUser()) return RedirectToAction(nameof(Login));
@@ -928,35 +893,6 @@ namespace CDQ.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
-        [HttpGet]
-        public async Task<IActionResult> Proposte(int anno = -1)
-        {
-
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            if (anno == -1) anno = DateTime.Now.Year;
-
-            List<SelectListItem> listaAnni = new List<SelectListItem>();
-            for (int i = 2015; i <= DateTime.Now.Year + 1; i++)
-            {
-                SelectListItem si = new SelectListItem { Text = i + "", Value = i + "" };
-                listaAnni.Add(si);
-            }
-
-            var listaProposte = await RealmDataStore.ListaProposte(anno, HttpContext.Session.GetString("user"));
-
-            HelpProposte helpProposte = new HelpProposte
-            {
-
-                ListaAnni = listaAnni,
-                Anno = anno,
-                ListaProposte = listaProposte
-            };
-
-            return View(helpProposte);
-        }
 
 
         [HttpGet]
@@ -2268,18 +2204,6 @@ namespace CDQ.Controllers
             return View(helpRelazioni);
         }
 
-
-        [HttpPost]
-        public async Task<IActionResult> Proposte(HelpProposte helpProposte)
-        {
-
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            int anno = helpProposte.Anno;
-
-            return RedirectToAction(nameof(Proposte), new { anno });
-        }
 
         [HttpPost]
         public async Task<IActionResult> Relazioni(HelpRelazioni helpRelazioni)

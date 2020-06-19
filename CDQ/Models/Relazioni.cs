@@ -8,7 +8,6 @@ namespace CDQ.Models
     {
         [PrimaryKey]
         public string ID { get; set; } = Guid.NewGuid().ToString();
-        public Proposte PropostaRiferimento { get; set; }
         public string User { get; set; }
         public string Oggetto { get; set; }
         public string Tribunale { get; set; }
