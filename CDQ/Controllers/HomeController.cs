@@ -733,8 +733,6 @@ namespace CDQ.Controllers
             IEnumerable<MasseDebitorie> ListaMasseDebitorie = null;
             IEnumerable<SpeseMese> ListaSpeseMese = null;
             IEnumerable<PatrimonioImmobiliare> ListaPatrimonioImmobiliare = null;
-            IEnumerable<BeniMobiliRegistrati> ListaBeniMobiliRegistrati = null;
-            IEnumerable<BeniMobili> ListaBeniMobili = null;
             IEnumerable<Ricorrenti> ListaRicorrenti = null;
 
             string TP_CauseIndebitamentoeDiligenza = await RealmDataStore.TestoPrecaricato("CauseIndebitamentoeDiligenza");
@@ -753,10 +751,6 @@ namespace CDQ.Controllers
 
                 ListaPatrimonioImmobiliare = await RealmDataStore.ListaPatrimonioImmobiliare(proposte);
 
-                ListaBeniMobiliRegistrati = await RealmDataStore.ListaBeniMobiliRegistrati(proposte);
-
-                ListaBeniMobili = await RealmDataStore.ListaBeniMobili(proposte);
-
                 ListaRicorrenti = await RealmDataStore.ListaRicorrenti(proposte);
             }
 
@@ -769,8 +763,6 @@ namespace CDQ.Controllers
                 ListaMasseDebitorie = ListaMasseDebitorie,
                 ListaSpeseMese = ListaSpeseMese,
                 ListaPatrimonioImmobiliare = ListaPatrimonioImmobiliare,
-                ListaBeniMobiliRegistrati = ListaBeniMobiliRegistrati,
-                ListaBeniMobili = ListaBeniMobili,
                 ListaStatus = ListaStatus,
                 ListaTipiPratica = ListaTipiPratica,
                 ListaCauseDebito = ListaCauseDebito,
@@ -912,8 +904,6 @@ namespace CDQ.Controllers
             IEnumerable<MasseDebitorie> ListaMasseDebitorie = null;
             IEnumerable<SpeseMese> ListaSpeseMese = null;
             IEnumerable<PatrimonioImmobiliare> ListaPatrimonioImmobiliare = null;
-            IEnumerable<BeniMobiliRegistrati> ListaBeniMobiliRegistrati = null;
-            IEnumerable<BeniMobili> ListaBeniMobili = null;
             IEnumerable<Ricorrenti> ListaRicorrenti = null;
 
             string TP_CauseIndebitamentoeDiligenza = await RealmDataStore.TestoPrecaricato("CauseIndebitamentoeDiligenza");
@@ -930,9 +920,6 @@ namespace CDQ.Controllers
 
                 ListaPatrimonioImmobiliare = await RealmDataStore.ListaPatrimonioImmobiliareR(relazioni);
 
-                ListaBeniMobiliRegistrati = await RealmDataStore.ListaBeniMobiliRegistratiR(relazioni);
-
-                ListaBeniMobili = await RealmDataStore.ListaBeniMobiliR(relazioni);
 
                 ListaRicorrenti = await RealmDataStore.ListaRicorrentiR(relazioni);
 
@@ -947,8 +934,6 @@ namespace CDQ.Controllers
                 ListaMasseDebitorie = ListaMasseDebitorie,
                 ListaSpeseMese = ListaSpeseMese,
                 ListaPatrimonioImmobiliare = ListaPatrimonioImmobiliare,
-                ListaBeniMobiliRegistrati = ListaBeniMobiliRegistrati,
-                ListaBeniMobili = ListaBeniMobili,
                 ListaStatus = ListaStatus,
                 ListaTipiPratica = ListaTipiPratica,
                 ListaCauseDebito = ListaCauseDebito,
@@ -961,35 +946,6 @@ namespace CDQ.Controllers
             };
 
             return View(helpRelazione);
-        }
-
-
-        [HttpPost]
-        public async Task<IActionResult> AggiornaProposta(HelpProposta helpProposta)
-        {
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-
-            if (!ModelState.IsValid) return View(helpProposta);
-
-            await RealmDataStore.AggiornaProposta(helpProposta.Proposte, helpProposta.IDStatus, helpProposta.IDTipiPratica, helpProposta.Ins, HttpContext.Session.GetString("user"));
-
-            return RedirectToAction(nameof(Proposta), new { helpProposta.Proposte.ID, Tab=1 });
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> AggiornaRelazione(HelpRelazione helpRelazione)
-        {
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-
-            if (!ModelState.IsValid) return View(helpRelazione);
-
-            await RealmDataStore.AggiornaRelazione(helpRelazione.Relazioni, helpRelazione.IDStatus, helpRelazione.IDTipiPratica, helpRelazione.Ins, HttpContext.Session.GetString("user"));
-
-            return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID, Tab = 1 });
         }
 
 
@@ -2870,100 +2826,8 @@ namespace CDQ.Controllers
             return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID, tab = 8 });
         }
 
-        public async Task<IActionResult> InserisciBeniMobiliRegistrati(HelpProposta helpProposta)
-        {
-
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            if (helpProposta.ModeBeniMobiliRegistrati == "Cancel") return RedirectToAction(nameof(Proposta), new { helpProposta.Proposte.ID, tab = 9 });
-
-            if (!ModelState.IsValid) return RedirectToAction(nameof(Proposta), new { helpProposta.Proposte.ID });
-
-            if (helpProposta.ModeBeniMobiliRegistrati == "Ins")
-            {
-                await RealmDataStore.InserisciBeniMobiliRegistrati(helpProposta.Proposte.ID, helpProposta.BeniMobiliRegistrati);
-            }
-            else if (helpProposta.ModeBeniMobiliRegistrati == "Upd")
-            {
-                await RealmDataStore.AggiornaBeniMobiliRegistrati(helpProposta.IDBeniMobiliRegistrati, helpProposta.BeniMobiliRegistrati);
-            }
-            return RedirectToAction(nameof(Proposta), new { helpProposta.Proposte.ID, tab = 9 });
-        }
-
-        public async Task<IActionResult> InserisciBeniMobiliRegistratiR(HelpRelazione helpRelazione)
-        {
-
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            if (helpRelazione.ModeBeniMobiliRegistrati == "Cancel") return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID, tab = 9 });
-
-            if (!ModelState.IsValid) return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID });
-
-            if (helpRelazione.ModeBeniMobiliRegistrati == "Ins")
-            {
-                await RealmDataStore.InserisciBeniMobiliRegistratiR(helpRelazione.Relazioni.ID, helpRelazione.BeniMobiliRegistrati);
-            }
-            else if (helpRelazione.ModeBeniMobiliRegistrati == "Upd")
-            {
-                await RealmDataStore.AggiornaBeniMobiliRegistrati(helpRelazione.IDBeniMobiliRegistrati, helpRelazione.BeniMobiliRegistrati);
-            }
-            return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID, tab = 9 });
-        }
-
-        public async Task<IActionResult> InserisciBeniMobili(HelpProposta helpProposta)
-        {
-
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            if (helpProposta.ModeBeniMobili == "Cancel") return RedirectToAction(nameof(Proposta), new { helpProposta.Proposte.ID, tab = 10 });
-
-            if (!ModelState.IsValid) return RedirectToAction(nameof(Proposta), new { helpProposta.Proposte.ID });
-
-            if (helpProposta.ModeBeniMobili == "Ins")
-            {
-                await RealmDataStore.InserisciBeniMobili(helpProposta.Proposte.ID, helpProposta.BeniMobili);
-            }
-            else if (helpProposta.ModeBeniMobili == "Upd")
-            {
-                await RealmDataStore.AggiornaBeniMobili(helpProposta.IDBeniMobili, helpProposta.BeniMobili);
-            }
-            return RedirectToAction(nameof(Proposta), new { helpProposta.Proposte.ID, tab = 10 });
-        }
-
-        public async Task<IActionResult> InserisciBeniMobiliR(HelpRelazione helpRelazione)
-        {
-
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            if (helpRelazione.ModeBeniMobili == "Cancel") return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID, tab = 10 });
-
-            if (!ModelState.IsValid) return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID });
-
-            if (helpRelazione.ModeBeniMobili == "Ins")
-            {
-                await RealmDataStore.InserisciBeniMobiliR(helpRelazione.Relazioni.ID, helpRelazione.BeniMobili);
-            }
-            else if (helpRelazione.ModeBeniMobili == "Upd")
-            {
-                await RealmDataStore.AggiornaBeniMobili(helpRelazione.IDBeniMobili, helpRelazione.BeniMobili);
-            }
-            return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID, tab = 10 });
-        }
 
 
-        public async Task<IActionResult> RelazioneDaProposta(HelpRelazioni helpRelazioni)
-        {
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            await RealmDataStore.RelazioneDaProposta(helpRelazioni.IDPropostaRiferimento, HttpContext.Session.GetString("user"));
-
-            return RedirectToAction(nameof(Relazioni), new { helpRelazioni.Anno });
-        }
 
         public async Task<IActionResult> EliminaMasseDebitorie(string ID, string IDMasseDebitorie, bool bProp = true)
         {
@@ -3017,39 +2881,6 @@ namespace CDQ.Controllers
             }
         }
 
-        public async Task<IActionResult> EliminaBeniMobiliRegistrati(string ID, string IDBeniMobiliRegistrati, bool bProp = true)
-        {
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            await RealmDataStore.EliminaBeniMobiliRegistrati(IDBeniMobiliRegistrati);
-
-            if (bProp)
-            {
-                return RedirectToAction(nameof(Proposta), new { ID, tab = 9 });
-            }
-            else
-            {
-                return RedirectToAction(nameof(Relazione), new { ID, tab = 9 }); //relazioni
-            }
-        }
-
-        public async Task<IActionResult> EliminaBeniMobili(string ID, string IDBeniMobili, bool bProp = true)
-        {
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            await RealmDataStore.EliminaBeniMobili(IDBeniMobili);
-
-            if (bProp)
-            {
-                return RedirectToAction(nameof(Proposta), new { ID, tab = 10 });
-            }
-            else
-            {
-                return RedirectToAction(nameof(Relazione), new { ID, tab = 10 }); //relazioni
-            }
-        }
 
         public async Task<IActionResult> EliminaRicorrenti(string ID, string IDRicorrenti, bool bProp = true)
         {
