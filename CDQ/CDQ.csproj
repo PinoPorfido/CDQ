@@ -13,6 +13,7 @@
     <Compile Remove="Models\AssociatoCorso.cs" />
     <Compile Remove="Models\AssociatoProgetto.cs" />
     <Compile Remove="Models\AssociatoServizio.cs" />
+    <Compile Remove="Models\AttiDisposizione.cs" />
     <Compile Remove="Models\Aula.cs" />
     <Compile Remove="Models\CaricamentoINAIL.cs" />
     <Compile Remove="Models\CaricamentoINPS.cs" />

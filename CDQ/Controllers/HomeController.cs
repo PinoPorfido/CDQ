@@ -731,7 +731,6 @@ namespace CDQ.Controllers
             };
 
             IEnumerable<MasseDebitorie> ListaMasseDebitorie = null;
-            IEnumerable<AttiDisposizione> ListaAttiDisposizione = null;
             IEnumerable<SpeseMese> ListaSpeseMese = null;
             IEnumerable<PatrimonioImmobiliare> ListaPatrimonioImmobiliare = null;
             IEnumerable<BeniMobiliRegistrati> ListaBeniMobiliRegistrati = null;
@@ -748,7 +747,6 @@ namespace CDQ.Controllers
 
                 ListaMasseDebitorie = await RealmDataStore.ListaMasseDebitorie(proposte);
 
-                ListaAttiDisposizione = await RealmDataStore.ListaAttiDisposizione(proposte);
 
 
                 ListaSpeseMese = await RealmDataStore.ListaSpeseMese(proposte);
@@ -769,7 +767,6 @@ namespace CDQ.Controllers
                 IDStatus = proposte.Status == null ? "-1" : proposte.Status.ID,
                 IDTipiPratica = proposte.TipoPratica == null ? "-1" : proposte.TipoPratica.ID,
                 ListaMasseDebitorie = ListaMasseDebitorie,
-                ListaAttiDisposizione = ListaAttiDisposizione,
                 ListaSpeseMese = ListaSpeseMese,
                 ListaPatrimonioImmobiliare = ListaPatrimonioImmobiliare,
                 ListaBeniMobiliRegistrati = ListaBeniMobiliRegistrati,
@@ -913,7 +910,6 @@ namespace CDQ.Controllers
             };
 
             IEnumerable<MasseDebitorie> ListaMasseDebitorie = null;
-            IEnumerable<AttiDisposizione> ListaAttiDisposizione = null;
             IEnumerable<SpeseMese> ListaSpeseMese = null;
             IEnumerable<PatrimonioImmobiliare> ListaPatrimonioImmobiliare = null;
             IEnumerable<BeniMobiliRegistrati> ListaBeniMobiliRegistrati = null;
@@ -929,9 +925,6 @@ namespace CDQ.Controllers
                 relazioni = await RealmDataStore.Relazioni(ID);
 
                 ListaMasseDebitorie = await RealmDataStore.ListaMasseDebitorieR(relazioni);
-
-                ListaAttiDisposizione = await RealmDataStore.ListaAttiDisposizioneR(relazioni);
-
 
                 ListaSpeseMese = await RealmDataStore.ListaSpeseMeseR(relazioni);
 
@@ -952,7 +945,6 @@ namespace CDQ.Controllers
                 IDStatus = relazioni.Status == null ? "-1" : relazioni.Status.ID,
                 IDTipiPratica = relazioni.TipoPratica == null ? "-1" : relazioni.TipoPratica.ID,
                 ListaMasseDebitorie = ListaMasseDebitorie,
-                ListaAttiDisposizione = ListaAttiDisposizione,
                 ListaSpeseMese = ListaSpeseMese,
                 ListaPatrimonioImmobiliare = ListaPatrimonioImmobiliare,
                 ListaBeniMobiliRegistrati = ListaBeniMobiliRegistrati,
@@ -2835,47 +2827,6 @@ namespace CDQ.Controllers
         }
 
 
-        public async Task<IActionResult> InserisciAttiDisposizione(HelpProposta helpProposta)
-        {
-
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            if (helpProposta.ModeAttiDisposizione == "Cancel") return RedirectToAction(nameof(Proposta), new { helpProposta.Proposte.ID, tab = 5 });
-
-            if (!ModelState.IsValid) return RedirectToAction(nameof(Proposta), new { helpProposta.Proposte.ID });
-
-            if (helpProposta.ModeAttiDisposizione == "Ins")
-            {
-                await RealmDataStore.InserisciAttiDisposizione(helpProposta.Proposte.ID, helpProposta.AttiDisposizione);
-            }
-            else if (helpProposta.ModeAttiDisposizione == "Upd")
-            {
-                await RealmDataStore.AggiornaAttiDisposizione(helpProposta.IDAttiDisposizione, helpProposta.AttiDisposizione);
-            }
-            return RedirectToAction(nameof(Proposta), new { helpProposta.Proposte.ID, tab = 5 });
-        }
-
-        public async Task<IActionResult> InserisciAttiDisposizioneR(HelpRelazione helpRelazione)
-        {
-
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            if (helpRelazione.ModeAttiDisposizione == "Cancel") return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID, tab = 5 });
-
-            if (!ModelState.IsValid) return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID });
-
-            if (helpRelazione.ModeAttiDisposizione == "Ins")
-            {
-                await RealmDataStore.InserisciAttiDisposizioneR(helpRelazione.Relazioni.ID, helpRelazione.AttiDisposizione);
-            }
-            else if (helpRelazione.ModeAttiDisposizione == "Upd")
-            {
-                await RealmDataStore.AggiornaAttiDisposizione(helpRelazione.IDAttiDisposizione, helpRelazione.AttiDisposizione);
-            }
-            return RedirectToAction(nameof(Relazione), new { helpRelazione.Relazioni.ID, tab = 5 });
-        }
 
         public async Task<IActionResult> InserisciPatrimonioImmobiliare(HelpProposta helpProposta)
         {
@@ -3028,23 +2979,6 @@ namespace CDQ.Controllers
             else
             {
                 return RedirectToAction(nameof(Relazione), new { ID, tab = 4 }); //relazioni
-            }
-        }
-
-        public async Task<IActionResult> EliminaAttiDisposizione(string ID, string IDAttiDisposizione, bool bProp = true)
-        {
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            await RealmDataStore.EliminaAttiDisposizione(IDAttiDisposizione);
-
-            if (bProp)
-            {
-                return RedirectToAction(nameof(Proposta), new { ID, tab = 5 });
-            }
-            else
-            {
-                return RedirectToAction(nameof(Relazione), new { ID, tab = 5 }); //relazioni
             }
         }
 

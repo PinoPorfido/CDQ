@@ -1138,19 +1138,6 @@ namespace CDQ.Services
             trans.Commit();
         }
 
-        internal async static Task AggiornaAttiDisposizione(string IDAttiDisposizione, AttiDisposizione attiDisposizione)
-        {
-            var vRealmDb = await GetRealm();
-
-            AttiDisposizione ad = vRealmDb.Find<AttiDisposizione>(IDAttiDisposizione);
-
-            var trans = vRealmDb.BeginWrite();
-
-            ad.Descrizione = attiDisposizione.Descrizione.Replace("'", "`");
-
-            trans.Commit();
-        }
-
 
         internal async static Task AggiornaPatrimonioImmobiliare(string IDPatrimonioImmobiliare, PatrimonioImmobiliare patrimonioImmobiliare)
         {
@@ -1218,19 +1205,6 @@ namespace CDQ.Services
             var trans = vRealmDb.BeginWrite();
 
             MasseDebitorie ap = vRealmDb.Find<MasseDebitorie>(IDMasseDebitorie);
-
-            vRealmDb.Remove(ap);
-
-            trans.Commit();
-        }
-
-        internal async static Task EliminaAttiDisposizione(string IDAttiDisposizione)
-        {
-            var vRealmDb = await GetRealm();
-
-            var trans = vRealmDb.BeginWrite();
-
-            AttiDisposizione ap = vRealmDb.Find<AttiDisposizione>(IDAttiDisposizione);
 
             vRealmDb.Remove(ap);
 
@@ -1753,48 +1727,6 @@ namespace CDQ.Services
         }
 
 
-        internal async static Task InserisciAttiDisposizione(string IDproposte, AttiDisposizione attiDisposizione)
-        {
-            var vRealmDb = await GetRealm();
-
-            Proposte proposte = vRealmDb.Find<Proposte>(IDproposte);
-
-
-            var trans = vRealmDb.BeginWrite();
-
-            AttiDisposizione ad = new AttiDisposizione
-            {
-                Proposte = proposte,
-                Descrizione = attiDisposizione.Descrizione.Replace("'", "`")
-            };
-
-            vRealmDb.Add(ad);
-
-            trans.Commit();
-        }
-
-        internal async static Task InserisciAttiDisposizioneR(string IDrelazioni, AttiDisposizione attiDisposizione)
-        {
-            var vRealmDb = await GetRealm();
-
-            Relazioni relazioni = vRealmDb.Find<Relazioni>(IDrelazioni);
-
-
-            var trans = vRealmDb.BeginWrite();
-
-            AttiDisposizione ad = new AttiDisposizione
-            {
-                Relazioni = relazioni,
-                Descrizione = attiDisposizione.Descrizione.Replace("'", "`")
-            };
-
-            vRealmDb.Add(ad);
-
-            trans.Commit();
-        }
-
-
-
         internal async static Task InserisciPatrimonioImmobiliare(string IDproposte, PatrimonioImmobiliare patrimonioImmobiliare)
         {
             var vRealmDb = await GetRealm();
@@ -2035,18 +1967,6 @@ namespace CDQ.Services
                     Grado = ss.Grado,
                     Importo = ss.Importo,
                     PercentualeSoddisfo = ss.PercentualeSoddisfo
-                };
-                vRealmDb.Add(md);
-            }
-
-            //Atti di disposizione
-            IEnumerable<AttiDisposizione> attiDisposizione = await ListaAttiDisposizione(proposte);
-            foreach (AttiDisposizione ss in attiDisposizione)
-            {
-                AttiDisposizione md = new AttiDisposizione
-                {
-                    Relazioni = relazione,
-                    Descrizione = ss.Descrizione
                 };
                 vRealmDb.Add(md);
             }
@@ -2295,37 +2215,6 @@ namespace CDQ.Services
 
             IEnumerable<MasseDebitorie> lista = vRealmDb.All<MasseDebitorie>().Where(ss => ss.Relazioni == relazioni);
             foreach (MasseDebitorie item in lista)
-            {
-                listaOutput.Add(item);
-            }
-
-            return listaOutput;
-        }
-
-
-        internal async static Task<IEnumerable<AttiDisposizione>> ListaAttiDisposizione(Proposte proposte)
-        {
-            var vRealmDb = await GetRealm();
-
-            List<AttiDisposizione> listaOutput = new List<AttiDisposizione>();
-
-            IEnumerable<AttiDisposizione> lista = vRealmDb.All<AttiDisposizione>().Where(ss => ss.Proposte == proposte);
-            foreach (AttiDisposizione item in lista)
-            {
-                listaOutput.Add(item);
-            }
-
-            return listaOutput;
-        }
-
-        internal async static Task<IEnumerable<AttiDisposizione>> ListaAttiDisposizioneR(Relazioni relazioni)
-        {
-            var vRealmDb = await GetRealm();
-
-            List<AttiDisposizione> listaOutput = new List<AttiDisposizione>();
-
-            IEnumerable<AttiDisposizione> lista = vRealmDb.All<AttiDisposizione>().Where(ss => ss.Relazioni == relazioni);
-            foreach (AttiDisposizione item in lista)
             {
                 listaOutput.Add(item);
             }
