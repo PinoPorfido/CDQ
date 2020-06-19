@@ -50,6 +50,8 @@
     <Compile Remove="Models\Helper\HelpProgetto.cs" />
     <Compile Remove="Models\Helper\HelpProposta.cs" />
     <Compile Remove="Models\Helper\HelpProposte.cs" />
+    <Compile Remove="Models\Helper\HelpRelazione.cs" />
+    <Compile Remove="Models\Helper\HelpRelazioni.cs" />
     <Compile Remove="Models\Helper\HelpScadenzeCorsi.cs" />
     <Compile Remove="Models\Helper\HelpSchedaAssociato.cs" />
     <Compile Remove="Models\Helper\HelpServizi.cs" />
@@ -79,6 +81,7 @@
     <Compile Remove="Models\Progetto.cs" />
     <Compile Remove="Models\Progressivo.cs" />
     <Compile Remove="Models\Proposte.cs" />
+    <Compile Remove="Models\Relazioni.cs" />
     <Compile Remove="Models\Ricorrenti.cs" />
     <Compile Remove="Models\Ripartizione.cs" />
     <Compile Remove="Models\Ristorno.cs" />

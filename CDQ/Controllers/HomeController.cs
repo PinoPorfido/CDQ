@@ -586,38 +586,6 @@ namespace CDQ.Controllers
 
 
 
-        public async Task<IActionResult> Relazione(string ID = null, int tab = 1)
-        {
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-
-            Relazioni relazioni = new Relazioni
-            {
-                DataCreazione = DateTimeOffset.Now,
-                DataUltimaModifica = DateTimeOffset.Now
-            };
-
-
-            if (ID != null)
-            {
-                relazioni = await RealmDataStore.Relazioni(ID);
-
-
-            }
-
-
-            HelpRelazione helpRelazione = new HelpRelazione
-            {
-                Relazioni = relazioni,
-                Ins = (ID == null),
-                Tab = tab,
-            };
-
-            return View(helpRelazione);
-        }
-
-
         [HttpGet]
         public async Task<IActionResult> SchedaAgente(string ID, int tab = 0, int mese = -1, int anno = -1, bool IsPosizioniAperte = false)
         {
@@ -2175,47 +2143,6 @@ namespace CDQ.Controllers
 
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Relazioni(int anno = -1)
-        {
-
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            if (anno == -1) anno = DateTime.Now.Year;
-
-            List<SelectListItem> listaAnni = new List<SelectListItem>();
-            for (int i = 2015; i <= DateTime.Now.Year + 1; i++)
-            {
-                SelectListItem si = new SelectListItem { Text = i + "", Value = i + "" };
-                listaAnni.Add(si);
-            }
-
-            var listaRelazioni = await RealmDataStore.ListaRelazioni(anno, HttpContext.Session.GetString("user"));
-
-            HelpRelazioni helpRelazioni = new HelpRelazioni
-            {
-
-                ListaAnni = listaAnni,
-                Anno = anno,
-                ListaRelazioni = listaRelazioni
-            };
-
-            return View(helpRelazioni);
-        }
-
-
-        [HttpPost]
-        public async Task<IActionResult> Relazioni(HelpRelazioni helpRelazioni)
-        {
-
-            if (!CheckUser()) return RedirectToAction(nameof(Login));
-            if (CheckRoleAgente()) return RedirectToAction(nameof(SchedaAgente), new { ID = HttpContext.Session.GetString("idagente") });
-
-            int anno = helpRelazioni.Anno;
-
-            return RedirectToAction(nameof(Relazioni), new { anno });
-        }
 
         public async Task<IActionResult> InserisciAttivita(HelpAttivitaRisorse helpAttivitaRisorse)
         {
