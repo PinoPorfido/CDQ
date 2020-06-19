@@ -8,6 +8,7 @@
   <ItemGroup>
     <Compile Remove="Models\Agente.cs" />
     <Compile Remove="Models\AgenteProgetto.cs" />
+    <Compile Remove="Models\AnnotazioniAggiuntive.cs" />
     <Compile Remove="Models\Associato.cs" />
     <Compile Remove="Models\AssociatoCorso.cs" />
     <Compile Remove="Models\AssociatoProgetto.cs" />
@@ -138,6 +139,10 @@
     <Content Remove="Views\Home\Pagamento.cshtml" />
     <Content Remove="Views\Home\Progetti.cshtml" />
     <Content Remove="Views\Home\Progetto.cshtml" />
+    <Content Remove="Views\Home\Proposta.cshtml" />
+    <Content Remove="Views\Home\Proposte.cshtml" />
+    <Content Remove="Views\Home\Relazione.cshtml" />
+    <Content Remove="Views\Home\Relazioni.cshtml" />
     <Content Remove="Views\Home\Ristorni.cshtml" />
     <Content Remove="Views\Home\ScadenzeCorsi.cshtml" />
     <Content Remove="Views\Home\SchedaAssociato.cshtml" />

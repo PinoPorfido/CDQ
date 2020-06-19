@@ -23,7 +23,6 @@ namespace CDQ.Models.Helper
         public Ricorrenti Ricorrenti { get; set; }
         public MasseDebitorie MasseDebitorie { get; set; }
         public AttiDisposizione AttiDisposizione { get; set; }
-        public AnnotazioniAggiuntive AnnotazioniAggiuntive { get; set; }
         public SpeseMese SpeseMese { get; set; }
         public PatrimonioImmobiliare PatrimonioImmobiliare { get; set; }
         public BeniMobiliRegistrati BeniMobiliRegistrati { get; set; }
@@ -54,7 +53,6 @@ namespace CDQ.Models.Helper
 
         public IEnumerable<MasseDebitorie> ListaMasseDebitorie;
         public IEnumerable<AttiDisposizione> ListaAttiDisposizione;
-        public IEnumerable<AnnotazioniAggiuntive> ListaAnnotazioniAggiuntive;
         public IEnumerable<SpeseMese> ListaSpeseMese;
         public IEnumerable<PatrimonioImmobiliare> ListaPatrimonioImmobiliare;
         public IEnumerable<BeniMobiliRegistrati> ListaBeniMobiliRegistrati;

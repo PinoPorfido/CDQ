@@ -1210,20 +1210,6 @@ namespace CDQ.Services
             trans.Commit();
         }
 
-        internal async static Task AggiornaAnnotazioniAggiuntive(string IDAnnotazioniAggiuntive, AnnotazioniAggiuntive annotazioniAggiuntive)
-        {
-            var vRealmDb = await GetRealm();
-
-            AnnotazioniAggiuntive ad = vRealmDb.Find<AnnotazioniAggiuntive>(IDAnnotazioniAggiuntive);
-
-            var trans = vRealmDb.BeginWrite();
-
-            ad.Descrizione = annotazioniAggiuntive.Descrizione.Replace("'", "`");
-
-            trans.Commit();
-        }
-
-
 
         internal async static Task EliminaMasseDebitorie(string IDMasseDebitorie)
         {
@@ -1258,19 +1244,6 @@ namespace CDQ.Services
             var trans = vRealmDb.BeginWrite();
 
             SpeseMese ap = vRealmDb.Find<SpeseMese>(IDSpeseMese);
-
-            vRealmDb.Remove(ap);
-
-            trans.Commit();
-        }
-
-        internal async static Task EliminaAnnotazioniAggiuntive(string IDAnnotazioniAggiuntive)
-        {
-            var vRealmDb = await GetRealm();
-
-            var trans = vRealmDb.BeginWrite();
-
-            AnnotazioniAggiuntive ap = vRealmDb.Find<AnnotazioniAggiuntive>(IDAnnotazioniAggiuntive);
 
             vRealmDb.Remove(ap);
 
@@ -1994,45 +1967,6 @@ namespace CDQ.Services
             trans.Commit();
         }
 
-        internal async static Task InserisciAnnotazioniAggiuntive(string IDproposte, AnnotazioniAggiuntive annotazioniAggiuntive)
-        {
-            var vRealmDb = await GetRealm();
-
-            Proposte proposte = vRealmDb.Find<Proposte>(IDproposte);
-
-
-            var trans = vRealmDb.BeginWrite();
-
-            AnnotazioniAggiuntive ia = new AnnotazioniAggiuntive
-            {
-                Proposte = proposte,
-                Descrizione = annotazioniAggiuntive.Descrizione.Replace("'","`")
-            };
-
-            vRealmDb.Add(ia);
-
-            trans.Commit();
-        }
-
-        internal async static Task InserisciAnnotazioniAggiuntiveR(string IDrelazioni, AnnotazioniAggiuntive annotazioniAggiuntive)
-        {
-            var vRealmDb = await GetRealm();
-
-            Relazioni relazioni = vRealmDb.Find<Relazioni>(IDrelazioni);
-
-
-            var trans = vRealmDb.BeginWrite();
-
-            AnnotazioniAggiuntive ia = new AnnotazioniAggiuntive
-            {
-                Relazioni = relazioni,
-                Descrizione = annotazioniAggiuntive.Descrizione.Replace("'", "`")
-            };
-
-            vRealmDb.Add(ia);
-
-            trans.Commit();
-        }
 
         internal async static Task RelazioneDaProposta(string IDProposta, string user)
         {
@@ -2118,16 +2052,6 @@ namespace CDQ.Services
             }
 
             //Annotazioni
-            IEnumerable<AnnotazioniAggiuntive> annotazioniAggiuntive = await ListaAnnotazioniAggiuntive(proposte);
-            foreach (AnnotazioniAggiuntive ss in annotazioniAggiuntive)
-            {
-                AnnotazioniAggiuntive md = new AnnotazioniAggiuntive
-                {
-                    Relazioni = relazione,
-                    Descrizione = ss.Descrizione
-                };
-                vRealmDb.Add(md);
-            }
 
             //Spese Mese
             IEnumerable<SpeseMese> speseMese = await ListaSpeseMese(proposte);
@@ -2409,35 +2333,6 @@ namespace CDQ.Services
             return listaOutput;
         }
 
-        internal async static Task<IEnumerable<AnnotazioniAggiuntive>> ListaAnnotazioniAggiuntive(Proposte proposte)
-        {
-            var vRealmDb = await GetRealm();
-
-            List<AnnotazioniAggiuntive> listaOutput = new List<AnnotazioniAggiuntive>();
-
-            IEnumerable<AnnotazioniAggiuntive> lista = vRealmDb.All<AnnotazioniAggiuntive>().Where(ss => ss.Proposte == proposte);
-            foreach (AnnotazioniAggiuntive item in lista)
-            {
-                listaOutput.Add(item);
-            }
-
-            return listaOutput;
-        }
-
-        internal async static Task<IEnumerable<AnnotazioniAggiuntive>> ListaAnnotazioniAggiuntiveR(Relazioni relazioni)
-        {
-            var vRealmDb = await GetRealm();
-
-            List<AnnotazioniAggiuntive> listaOutput = new List<AnnotazioniAggiuntive>();
-
-            IEnumerable<AnnotazioniAggiuntive> lista = vRealmDb.All<AnnotazioniAggiuntive>().Where(ss => ss.Relazioni == relazioni);
-            foreach (AnnotazioniAggiuntive item in lista)
-            {
-                listaOutput.Add(item);
-            }
-
-            return listaOutput;
-        }
 
         internal async static Task<IEnumerable<SpeseMese>> ListaSpeseMese(Proposte proposte)
         {
